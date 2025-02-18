@@ -1,3 +1,13 @@
+/**
+ * Generates the HTML for the navigation menu.
+ * 
+ * This includes links to the summary, add task, board, and contacts pages
+ * as well as links to the privacy policy and legal notice. Each link is
+ * represented as a navigation button with an associated icon.
+ *
+ * @return {string} The HTML code for the navigation menu.
+ */
+
 function renderNavigationHTML() {
   return /* html */ `
 	<div class="navigation-content">
@@ -29,6 +39,11 @@ function renderNavigationHTML() {
 </div>`;
 }
 
+/**
+ * Renders the HTML for the summary page.
+ *
+ * @return {string} The HTML code for the summary page.
+ */
 function renderSummaryHTML() {
   return /*html*/ `
   <div class="sub-main-summary">
@@ -108,44 +123,59 @@ function renderSummaryHTML() {
 </div>`;
 }
 
+  /**
+   * Renders the HTML code for a task card.
+   * 
+   * @param {Object} task - The task object to be rendered.
+   * @return {string} The HTML code for the task card.
+   */
 function renderTasksHTML(task) {
-  return /*html*/ `
-    <div draggable="true" ondragstart="startDragging(${
-      task.id
-    })" ondragend="stopDragging()" id="${
-    task.id
-  }" class="card" onclick="openCard(${task.id})">
-        <div class="cardTopContainer">
-            <div id="cardType${task.id}" class="cardType">${task.type}</div>
-            <div class="cardTitle">${task.title}</div>
-            <div id="cardText${task.id}" class="cardText">${
-    task.description
-  }</div>
-        </div>
-        <div class="cardBottomContainer">
-            <div id="cardSubtask${task.id}" class="cardSubtasks"></div>
-            <div class="assignedToAndPriority">
-                <div id="cardAssignedToContainerId${
-                  task["id"]
-                }" class="cardAssignedToContainer"></div>
-                <div class="cardPriority">${setPriorityImage(
-                  task["priority"]
-                )}</div>
-            </div>
-        </div>
-    </div>`;
-}
+    return /*html*/ `
+      <div draggable="true" ondragstart="startDragging(${task.id})" ondragend="stopDragging()" id="${task.id}" class="card" onclick="openCard(${task.id})">
+          <div class="cardTopContainer">
+              <div id="cardType${task.id}" class="cardType">${task.type}</div>
+              <div class="cardTitle">${task.title}</div>
+              <div id="cardText${task.id}" class="cardText">${task.description}</div>
+          </div>
+          <div class="cardBottomContainer">
+              <div id="cardSubtask${task.id}" class="cardSubtasks"></div>
+              <div class="assignedToAndPriority">
+                  <div id="cardAssignedToContainerId${task.id}" class="cardAssignedToContainer"></div>
+                  <div class="cardPriority">${setPriorityImage(task.priority)}</div>
+              </div>
+              <!-- Neuer Container für Bilder -->
+              <div id="cardImagesContainer${task.id}" class="cardImagesContainer"></div>
+          </div>
+      </div>`;
+  }
 
+/**
+ * Renders a div with a class of "empty-category" containing the message "No tasks [name]".
+ *
+ * @param {string} name - The name of the category with no tasks.
+ * @return {string} The HTML code for the empty category message.
+ */
 function renderEmptyCategoryHTML(name) {
   return /*html*/ `<div class="empty-category">No tasks ${name}</div>`;
 }
 
+/**
+ * Renders the HTML for a profile badge with the given contact information.
+ *
+ * @param {object} contact - The contact object containing the color and name.
+ * @return {string} The HTML code for the profile badge.
+ */
 function renderAssignedToButtonsHTML(contact) {
   return /*html*/ `<div class="profile-badge-group" style="background-color: ${
     contact.contactColor
   }">${getInitials(contact.name)}</div>`;
 }
 
+/**
+ * Renders the HTML for the login page.
+ *
+ * @return {string} The HTML code for the login page.
+ */
 function renderLoginPageHTML() {
   return /*html*/ `
   <div id="loginMainContainer" class="loginMainContainer">
@@ -209,6 +239,10 @@ function renderLoginPageHTML() {
 </div>`;
 }
 
+/**
+ * Returns the HTML for the sign up page.
+ * @return {string} HTML for the sign up page.
+ */
 function renderSignUpPageHTML() {
   return /*html*/ `
     <div id="signUpMainContainer" class="signUpMainContainer">
@@ -261,6 +295,11 @@ function renderSignUpPageHTML() {
     </div>`;
 }
 
+/**
+ * Renders the HTML for the header of the add task overlay.
+ *
+ * @return {string} The rendered HTML.
+ */
 function renderBoardAddTaskHeaderHTML() {
   return /*html*/ `
     <div class="boardAddTaskHeader">
@@ -268,6 +307,18 @@ function renderBoardAddTaskHeaderHTML() {
     <div class="boardAddTaskCloseHoverContainer" onclick="hideAddTaskContainer()"></div>
  </div>`;
 }
+
+/**
+ * Renders the main content HTML for adding a task.
+ * 
+ * This function generates a structured HTML layout containing input fields and
+ * dropdowns for task details such as title, description, due date, priority,
+ * assigned contacts, category, subtasks, and images. It includes interactive
+ * elements for selecting priorities and categories, as well as buttons for
+ * adding subtasks and images.
+ * 
+ * @return {string} The HTML string for the task addition interface.
+ */
 
 function renderAddTaskMainContentHTML() {
   return /*html*/ `<div class="addTaskBodyLeft">
@@ -357,17 +408,16 @@ function renderAddTaskMainContentHTML() {
         <div class="addTaskContainer">
         <div class="addTaskTitles"><span class="bold">Images</span> (optional)
             </div>
-            <div id="addImageBottom" class="addImageBottom border-bottom" onclick="renderImageInputField()">
+            <div id="addImageBottom" class="addImageBottom border-bottom">
                 <div id="imageInputFieldDiv">Add new image</div>
-                <div id="subtaskImgAddPlus" class="subtaskImgDiv pointer" onclick=filepicker.click()>
-                <input type="file" id="filepicker" style="display: none">
+                <div id="subtaskImgAddPlus" class="subtaskImgDiv pointer" onclick=openFilepicker()>
+                <input type="file" id="filepicker" style="display: none" accept="image/*"  multiple>
                 </div>
             </div>
+            <div id="subtasksImageContainer"></div>
         </div>
         </div>
         <div id="addTaskBodyRight" class="addTaskBodyRight"></div>
-
-
     </div>`;
 }
 
@@ -392,51 +442,48 @@ function renderAddTaskFooterHTML() {
  * @return {string} The HTML string for the open card.
  */
 function renderOpenCardHTML(task) {
-  return /*html*/ `
-    <div class="boardAddTaskCloseHoverOuterContainer">
-        <div class="boardAddTaskCloseHoverContainer" onclick="closeCard()"></div>
-    </div>
-    <div class="openCardInnerContainer">
-        <div id="openCardType${task["id"]}" class="cardType">${
-    task["type"]
-  }</div>
-        <div class="cardTitle">${task["title"]}</div>
-        <div class="openCardDescription">${task["description"]}</div>
-        <div class="openCardTextBox">
-            <span class="openCardText">Due Date:</span>
-            <span class="openCardValue">${task["dueDate"]}</span>
-        </div>
-        <div class="openCardTextBox">
-            <span class="openCardText">Priority:</span>
-            <div class="openCardPriority">
-                <span class="openCardValue">${task["priority"]}</span>
-                <div class="openCardPriorityImage">${setPriorityImage(
-                  task["priority"]
-                )}</div>
-            </div>
-        </div>
-        <div id="openCardAssignedToContainer">
-        </div>
-        <div id="openCardSubtasksContainer">
-        </div>
-        <div class="openCardDeleteEditContainer">
-            <div class="openCardDeleteContainer" onclick='openCardDelete(${
-              task.id
-            })'>
-                <div class="openCardImgDiv pointer" id="openCardImgDelete"> </div>
-                <span>Delete</span>
-            </div>
-            <div class="vLine"></div>
-            <div class="openCardEditContainer"  onclick='openCardEdit(${
-              task.id
-            })'>
-                <div class="openCardImgDiv pointer" id="openCardImgEdit"> </div>
-                <span>Edit</span>
-            </div>
-        </div>
-    </div>`;
-}
+    return /*html*/ `
+      <div class="boardAddTaskCloseHoverOuterContainer">
+          <div class="boardAddTaskCloseHoverContainer" onclick="closeCard()"></div>
+      </div>
+      <div class="openCardInnerContainer">
+          <div id="openCardType${task.id}" class="cardType">${task.type}</div>
+          <div class="cardTitle">${task.title}</div>
+          <div class="openCardDescription">${task.description}</div>
+          <div class="openCardTextBox">
+              <span class="openCardText">Due Date:</span>
+              <span class="openCardValue">${task.dueDate}</span>
+          </div>
+          <div class="openCardTextBox">
+              <span class="openCardText">Priority:</span>
+              <div class="openCardPriority">
+                  <span class="openCardValue">${task.priority}</span>
+                  <div class="openCardPriorityImage">${setPriorityImage(task.priority)}</div>
+              </div>
+          </div>
+          <div id="openCardAssignedToContainer"></div>
+          <div id="openCardSubtasksContainer"></div>
+          <div id="openCardImagesContainer" class="openCardImagesContainer"></div>
+          <div class="openCardDeleteEditContainer">
+              <div class="openCardDeleteContainer" onclick='openCardDelete(${task.id})'>
+                  <div class="openCardImgDiv pointer" id="openCardImgDelete"></div>
+                  <span>Delete</span>
+              </div>
+              <div class="vLine"></div>
+              <div class="openCardEditContainer" onclick='openCardEdit(${task.id})'>
+                  <div class="openCardImgDiv pointer" id="openCardImgEdit"></div>
+                  <span>Edit</span>
+              </div>
+          </div>
+      </div>`;
+  }
 
+/**
+ * Renders the HTML for a subtask in edit mode.
+ *
+ * @param {Object} subtask - The subtask object containing the details to render.
+ * @return {string} The HTML string for the subtask in edit mode.
+ */
 function editSubtaskHTML(subtask) {
   return /*html*/ `
         <input type="text" id="subtaskEditInputField" value="${subtask.subtaskText}">
@@ -446,6 +493,16 @@ function editSubtaskHTML(subtask) {
         </div>`;
 }
 
+/**
+ * Renders the HTML for the subtask input field with add and cancel buttons.
+ * 
+ * The rendered HTML is a container containing an input field and a div with two
+ * child divs for the add and cancel buttons. The add button will add a new subtask
+ * to the subtask array and render the subtasks, while the cancel button will
+ * cancel the input process and clear the input field.
+ * 
+ * @return {string} The HTML string for the subtask input field with add and cancel buttons.
+ */
 function renderSubtaskInputFieldHTML() {
   return /*html*/ `
      <input type="text" id="subtaskInputField" placeholder="Add new subtask" onclick="doNotClose(event)">
@@ -456,6 +513,17 @@ function renderSubtaskInputFieldHTML() {
      </div>`;
 }
 
+/**
+ * Renders the HTML for a subtask in the output container.
+ * 
+ * The rendered HTML is a container containing the subtask text and two buttons
+ * for editing and deleting the subtask. The edit button will enter the edit mode
+ * for the subtask, while the delete button will delete the subtask from the
+ * subtasks array and render the subtasks.
+ * 
+ * @param {HTMLElement} outputContainer - The container where the subtask HTML will be rendered.
+ * @param {Object} subtask - The subtask object containing the details to render.
+ */
 function renderSubtaskHTML(outputContainer, subtask) {
   outputContainer.innerHTML += /*html*/ `
         <div class="subTaskOutputDiv" id="subtask${subtask.id}" ondblclick="editSubtask(${subtask.id})">
@@ -468,9 +536,15 @@ function renderSubtaskHTML(outputContainer, subtask) {
         </div>`;
 }
 
-function renderImageInputField() {
+function renderImageInputField() {}
 
-}
+/**
+ * Renders the default HTML for a subtask input, providing a placeholder text
+ * and an add button. This is displayed when no subtask is being actively edited
+ * or added, serving as a prompt to the user to add a new subtask.
+ *
+ * @return {string} The HTML string for the default subtask input prompt.
+ */
 
 function renderSubtaskDefaultHTML() {
   return /*html*/ `<div id="subtaskInputFieldDiv">Add new subtask</div>

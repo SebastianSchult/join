@@ -25,29 +25,35 @@ async function boardInit() {
 }
 
 
-/**
- * Renders the cards inside each category based on the tasks provided.
- *
- * @param {Array} arrayToSearchIn - The array of tasks to search through.
- */
+
+  /**
+   * Renders the categories by iterating through each category, filtering the tasks by the current category,
+   * and rendering the tasks in the category container.
+   *
+   * @param {Array} arrayToSearchIn - The array of tasks to search through.
+   */
 function renderCategories(arrayToSearchIn) {
     categories.forEach(category => {
-        let categoryContainer = document.getElementById(Object.keys(category)[0]);
-        categoryContainer.innerHTML = "";
-        let filteredTasks = filterTasks(arrayToSearchIn, Object.keys(category)[0]);
-        if (filteredTasks.length != 0) {
-            for (let j = 0; j < filteredTasks.length; j++) {
-                let task = getTaskOutOfId(filteredTasks[j].id);
-                categoryContainer.innerHTML += renderTasksHTML(task);
-                setCardType(task);
-                renderTaskDescription(task) 
-                renderSubtask(task);
-                renderAssignedToButtons(task);
-            }
-        } else {
-            renderEmptyCategory(categoryContainer, Object.values(category)[0]);
-        }});
-    }
+      let categoryContainer = document.getElementById(Object.keys(category)[0]);
+      categoryContainer.innerHTML = "";
+      let filteredTasks = filterTasks(arrayToSearchIn, Object.keys(category)[0]);
+      if (filteredTasks.length != 0) {
+        filteredTasks.forEach(taskData => {
+          let task = getTaskOutOfId(taskData.id);
+          categoryContainer.innerHTML += renderTasksHTML(task);
+          setCardType(task);
+          renderTaskDescription(task);
+          renderSubtask(task);
+          renderAssignedToButtons(task);
+          setTimeout(() => {
+            renderTaskImages(task);
+          }, 0);
+        });
+      } else {
+        renderEmptyCategory(categoryContainer, Object.values(category)[0]);
+      }
+    });
+  }
 
 
  /**
@@ -270,6 +276,7 @@ function openCardEdit(taskId){
     renderAssignedContactsContainer();
     renderSubtasks()
     setTaskValuesToFields(newTask);
+    renderEditCardImages(newTask);
 }
 
 
@@ -380,3 +387,118 @@ function displayEmptyTask(taskId, categoryId){
     newDiv.style = cardStyle;
     document.getElementById('category-' + categoryId).appendChild(newDiv);
 }
+
+/**
+ * Renders the images of a task inside a container with the ID "cardImagesContainer<task.id>".
+ *
+ * @param {Object} task - The task object containing the images to be rendered.
+ */
+function renderTaskImages(task) {
+    const container = document.getElementById(`cardImagesContainer${task.id}`);
+    if (!container) return;
+    container.innerHTML = ""; 
+    if (task.images && task.images.length > 0) {
+      task.images.forEach(base64 => {
+        const img = document.createElement("img");
+        img.src = base64;
+        img.style.width = "100px";
+        img.style.height = "100px";
+        img.style.objectFit = "cover";
+        img.style.margin = "5px"; 
+        container.appendChild(img);
+      });
+    }
+  }
+
+  
+/**
+ * Renders the images of a task in the open card container.
+ *
+ * @param {Object} task - The task object containing the images to be rendered.
+ */
+  function renderOpenCardImages(task) {
+    const container = document.getElementById('openCardImagesContainer');
+    if (!container) return;
+    container.innerHTML = "";
+    if (task.images && task.images.length > 0) {
+      task.images.forEach(base64 => {
+        const img = document.createElement("img");
+        img.src = base64;
+        img.style.width = "100px";
+        img.style.height = "100px";
+        img.style.objectFit = "cover";
+        img.style.margin = "5px";
+        container.appendChild(img);
+      });
+    }
+  }
+
+  
+  /**
+   * Gets the container element for the edit card images. If the element does not exist yet, it is created and appended to the open card container.
+   *
+   * @return {HTMLElement} The container element for the edit card images.
+   */
+  function getEditCardImagesContainer() {
+    let container = document.getElementById('editCardImagesContainer');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'editCardImagesContainer';
+      container.className = 'editCardImagesContainer';
+      const openCard = document.getElementById('openCardContainer');
+      openCard.appendChild(container);
+    }
+    return container;
+  }
+
+  
+  /**
+   * Creates a thumbnail element with the given base64 image and delete button.
+   *
+   * @param {string} base64 - The base64 encoded image string.
+   * @param {number} index - The index of the image in the task's images array.
+   * @param {Object} task - The task object containing the images array.
+   *
+   * @return {HTMLElement} The created thumbnail element.
+   */
+  function createThumbnailElement(base64, index, task) {
+    const thumb = document.createElement('div');
+    thumb.className = 'editThumbnailWrapper';
+    const img = document.createElement('img');
+    img.src = base64;
+    img.style.cssText = "width:100px;height:100px;object-fit:cover;margin:5px;";
+    const btn = document.createElement('button');
+    btn.textContent = 'X'; 
+    btn.className = 'delete-edit-thumbnail';
+    btn.addEventListener('click', e => { 
+      e.stopPropagation(); 
+      task.images.splice(index, 1); 
+      renderEditCardImages(task); 
+    });
+    thumb.appendChild(img); 
+    thumb.appendChild(btn);
+    return thumb;
+  }
+
+  
+/**
+ * Renders the images of a task in the edit card, displaying them as thumbnails with delete buttons.
+ *
+ * Clears the contents of the edit card images container and iterates over the task's images array.
+ * For each image, it creates a thumbnail element using createThumbnailElement and appends it to the container.
+ * If no images are present, it displays a message indicating no images are attached.
+ *
+ * @param {Object} task - The task object containing the images to be rendered.
+ */
+
+  function renderEditCardImages(task) {
+    const container = getEditCardImagesContainer();
+    container.innerHTML = "";
+    if (task.images && task.images.length > 0) {
+      task.images.forEach((base64, index) => {
+        container.appendChild(createThumbnailElement(base64, index, task));
+      });
+    } else {
+      container.innerHTML = '<p>No images attached.</p>';
+    }
+  }

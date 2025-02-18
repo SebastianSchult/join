@@ -654,6 +654,20 @@ select {
     background-color: var(--clr-border);
 }
 
+#subtasksImageContainer {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+#subtasksImageContainer img {
+    object-fit: cover;
+    height: 100px;
+    width: 100px;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
 #subtaskImgDelete {
     background-image: url("../img/icon-delete.png");
 

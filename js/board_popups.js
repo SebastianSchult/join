@@ -6,16 +6,31 @@
 function openCard(taskId){
     if (!document.getElementById('openCardContainer')){
         let newDiv = document.createElement('div');
-        setAttributes(newDiv, {'id': 'openCardContainer', 'class': 'openCardContainer', 'onclick': 'doNotClose(event)'});
+        setAttributes(newDiv, {
+            'id': 'openCardContainer',
+            'class': 'openCardContainer',
+            'onclick': 'doNotClose(event)'
+        });
         document.body.appendChild(newDiv);
     }
     let openCardContainer = document.getElementById('openCardContainer');
-    let task = getTaskOutOfId(taskId)
+    let task = getTaskOutOfId(taskId);
+    
     openCardContainer.classList.remove('d-none');
     openCardContainer.innerHTML = renderOpenCardHTML(task);
+    
     setCardType(task);
-    if (task.assignedTo.length != 0) renderContactsToOpenCard(task);
-    if(task.subtasks.length != 0) renderSubtasksToOpenCard(task);
+    if (task.assignedTo.length != 0) {
+        renderContactsToOpenCard(task);
+    }
+    if(task.subtasks.length != 0) {
+        renderSubtasksToOpenCard(task);
+    }
+    // Neue Funktion: Bilder in der offenen Karte rendern
+    if(task.images && task.images.length > 0) {
+        renderOpenCardImages(task);
+    }
+    
     toggleBoardOverlay('closeCard()');
 }
 

@@ -164,6 +164,33 @@
     }
 }
 
+.editCardImagesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  
+  .editThumbnailWrapper {
+    position: relative;
+    margin: 5px;
+  }
+  
+  .delete-edit-thumbnail {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(255, 0, 0, 0.8);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 18px;
+    padding: 0;
+  }
+
 input:focus,
 select:focus,
 textarea:focus,

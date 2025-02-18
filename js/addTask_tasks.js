@@ -27,7 +27,8 @@ let newTask =
         'assignedTo': [],
         'category': 'category-0',
         'priority': '',
-        'dueDate': ''
+        'dueDate': '',
+        'images': []
 };
 
 
@@ -130,10 +131,12 @@ function clearFormular(){
 async function createTask(){
     await loadTasksFromRemoteStorage();
     collectInformationsForNewCard();
+    newTask.images = allImages.map(image => image.base64);
     tasks.push(newTask);
     await saveTasksToRemoteStorage();
     showSuccessMessage();
     resetNewTask();
+    allImages = [];
 }
 
 /**
@@ -150,7 +153,8 @@ function resetNewTask(){
         'assignedTo': [],
         'category': 'category-0',
         'priority': '',
-        'dueDate': ''
+        'dueDate': '',
+        'images': []
     };
     tempAssignedContacts = [];
 }
