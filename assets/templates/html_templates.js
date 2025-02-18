@@ -1,6 +1,5 @@
-
-function renderNavigationHTML(){
-	return /* html */ `
+function renderNavigationHTML() {
+  return /* html */ `
 	<div class="navigation-content">
 	<div id="nav-wrapper" class="nav-wrapper">
 		<div class="nav-buttons-box">
@@ -29,7 +28,6 @@ function renderNavigationHTML(){
 	</div>
 </div>`;
 }
-
 
 function renderSummaryHTML() {
   return /*html*/ `
@@ -110,37 +108,43 @@ function renderSummaryHTML() {
 </div>`;
 }
 
-
 function renderTasksHTML(task) {
   return /*html*/ `
-    <div draggable="true" ondragstart="startDragging(${task.id})" ondragend="stopDragging()" id="${task.id}" class="card" onclick="openCard(${task.id})">
+    <div draggable="true" ondragstart="startDragging(${
+      task.id
+    })" ondragend="stopDragging()" id="${
+    task.id
+  }" class="card" onclick="openCard(${task.id})">
         <div class="cardTopContainer">
             <div id="cardType${task.id}" class="cardType">${task.type}</div>
             <div class="cardTitle">${task.title}</div>
-            <div id="cardText${task.id}" class="cardText">${task.description}</div>
+            <div id="cardText${task.id}" class="cardText">${
+    task.description
+  }</div>
         </div>
         <div class="cardBottomContainer">
             <div id="cardSubtask${task.id}" class="cardSubtasks"></div>
             <div class="assignedToAndPriority">
-                <div id="cardAssignedToContainerId${task["id"]}" class="cardAssignedToContainer"></div>
-                <div class="cardPriority">${setPriorityImage(task["priority"])}</div>
+                <div id="cardAssignedToContainerId${
+                  task["id"]
+                }" class="cardAssignedToContainer"></div>
+                <div class="cardPriority">${setPriorityImage(
+                  task["priority"]
+                )}</div>
             </div>
         </div>
     </div>`;
 }
 
-
 function renderEmptyCategoryHTML(name) {
   return /*html*/ `<div class="empty-category">No tasks ${name}</div>`;
 }
-
 
 function renderAssignedToButtonsHTML(contact) {
   return /*html*/ `<div class="profile-badge-group" style="background-color: ${
     contact.contactColor
   }">${getInitials(contact.name)}</div>`;
 }
-
 
 function renderLoginPageHTML() {
   return /*html*/ `
@@ -205,7 +209,6 @@ function renderLoginPageHTML() {
 </div>`;
 }
 
-
 function renderSignUpPageHTML() {
   return /*html*/ `
     <div id="signUpMainContainer" class="signUpMainContainer">
@@ -258,18 +261,16 @@ function renderSignUpPageHTML() {
     </div>`;
 }
 
-
-function renderBoardAddTaskHeaderHTML(){
-    return /*html*/`
+function renderBoardAddTaskHeaderHTML() {
+  return /*html*/ `
     <div class="boardAddTaskHeader">
     <div class="boardAddTaskHeaderText">Add Task</div>
     <div class="boardAddTaskCloseHoverContainer" onclick="hideAddTaskContainer()"></div>
- </div>`
+ </div>`;
 }
 
-
-function renderAddTaskMainContentHTML(){
-    return /*html*/ `<div class="addTaskBodyLeft">
+function renderAddTaskMainContentHTML() {
+  return /*html*/ `<div class="addTaskBodyLeft">
         <div class="addTaskBodyTop">
             <div class="addTaskAddTitleContainer">
                 <input type="text" id="addTaskEnterTitleInput" placeholder="Enter a title" required>
@@ -351,14 +352,27 @@ function renderAddTaskMainContentHTML(){
             </div>
             <div id="subtasksOutputContainer"></div>
         </div>
+
+
+        <div class="addTaskContainer">
+        <div class="addTaskTitles"><span class="bold">Images</span> (optional)
+            </div>
+            <div id="addImageBottom" class="addImageBottom border-bottom" onclick="renderImageInputField()">
+                <div id="imageInputFieldDiv">Add new image</div>
+                <div id="subtaskImgAddPlus" class="subtaskImgDiv pointer" onclick=filepicker.click()>
+                <input type="file" id="filepicker" style="display: none">
+                </div>
+            </div>
+        </div>
         </div>
         <div id="addTaskBodyRight" class="addTaskBodyRight"></div>
-    </div>`
+
+
+    </div>`;
 }
 
-
-function renderAddTaskFooterHTML(){
-    return /*html*/ `
+function renderAddTaskFooterHTML() {
+  return /*html*/ `
             <div class="addTaskBtnContainer">
                 <div class="clearBtn addTaskBtn" onclick="clearFormular()">
                     <span class="addTaskBtnText">Clear</span>
@@ -368,9 +382,8 @@ function renderAddTaskFooterHTML(){
                     <span class="addTaskBtnText">Create Task</span>
                     <div class="createBtnImg"></div>
                 </div>
-        </div>`
+        </div>`;
 }
-
 
 /**
  * Renders the HTML for the open card based on the given task object.
@@ -378,24 +391,28 @@ function renderAddTaskFooterHTML(){
  * @param {Object} task - The task object containing the details to render.
  * @return {string} The HTML string for the open card.
  */
-function renderOpenCardHTML(task){
-    return /*html*/`
+function renderOpenCardHTML(task) {
+  return /*html*/ `
     <div class="boardAddTaskCloseHoverOuterContainer">
         <div class="boardAddTaskCloseHoverContainer" onclick="closeCard()"></div>
     </div>
     <div class="openCardInnerContainer">
-        <div id="openCardType${task['id']}" class="cardType">${task['type']}</div>
-        <div class="cardTitle">${task['title']}</div>
-        <div class="openCardDescription">${task['description']}</div>
+        <div id="openCardType${task["id"]}" class="cardType">${
+    task["type"]
+  }</div>
+        <div class="cardTitle">${task["title"]}</div>
+        <div class="openCardDescription">${task["description"]}</div>
         <div class="openCardTextBox">
             <span class="openCardText">Due Date:</span>
-            <span class="openCardValue">${task['dueDate']}</span>
+            <span class="openCardValue">${task["dueDate"]}</span>
         </div>
         <div class="openCardTextBox">
             <span class="openCardText">Priority:</span>
             <div class="openCardPriority">
-                <span class="openCardValue">${task['priority']}</span>
-                <div class="openCardPriorityImage">${setPriorityImage(task['priority'])}</div>
+                <span class="openCardValue">${task["priority"]}</span>
+                <div class="openCardPriorityImage">${setPriorityImage(
+                  task["priority"]
+                )}</div>
             </div>
         </div>
         <div id="openCardAssignedToContainer">
@@ -403,44 +420,44 @@ function renderOpenCardHTML(task){
         <div id="openCardSubtasksContainer">
         </div>
         <div class="openCardDeleteEditContainer">
-            <div class="openCardDeleteContainer" onclick='openCardDelete(${task.id})'>
+            <div class="openCardDeleteContainer" onclick='openCardDelete(${
+              task.id
+            })'>
                 <div class="openCardImgDiv pointer" id="openCardImgDelete"> </div>
                 <span>Delete</span>
             </div>
             <div class="vLine"></div>
-            <div class="openCardEditContainer"  onclick='openCardEdit(${task.id})'>
+            <div class="openCardEditContainer"  onclick='openCardEdit(${
+              task.id
+            })'>
                 <div class="openCardImgDiv pointer" id="openCardImgEdit"> </div>
                 <span>Edit</span>
             </div>
         </div>
-    </div>`
+    </div>`;
 }
 
-
 function editSubtaskHTML(subtask) {
-    return /*html*/`
+  return /*html*/ `
         <input type="text" id="subtaskEditInputField" value="${subtask.subtaskText}">
         <div class="subtaskCheckboxes">
         <div class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${subtask.id})"> </div><div class="vLine"></div>
             <div class="subtaskImgDiv pointer" id="subtaskImgAddCheck" onclick="saveEditSubtask(${subtask.id})"> </div>
-        </div>`
+        </div>`;
 }
 
-
-function renderSubtaskInputFieldHTML(){
-    return /*html*/`
+function renderSubtaskInputFieldHTML() {
+  return /*html*/ `
      <input type="text" id="subtaskInputField" placeholder="Add new subtask" onclick="doNotClose(event)">
      <div class="subtaskAddOrCancel">
          <div id="subtaskImgAddCheck" class="subtaskImgDiv pointer" onclick="subtaskAddOrCancel('add'); doNotClose(event)"></div>
          <div class="vLine"></div>
          <div id="subtaskImgAddCancel" class="subtaskImgDiv pointer" onclick="subtaskAddOrCancel('cancel'); doNotClose(event)"></div>
-     </div>`
- }
+     </div>`;
+}
 
-
- function renderSubtaskHTML(outputContainer, subtask){
-    outputContainer.innerHTML +=
-    /*html*/`
+function renderSubtaskHTML(outputContainer, subtask) {
+  outputContainer.innerHTML += /*html*/ `
         <div class="subTaskOutputDiv" id="subtask${subtask.id}" ondblclick="editSubtask(${subtask.id})">
         <div class="subtaskText">${subtask.subtaskText}</div>
             <div class="subtaskCheckboxes">
@@ -448,12 +465,15 @@ function renderSubtaskInputFieldHTML(){
                 <div class="vLine"></div>
                 <div class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${subtask.id})"> </div>
             </div>
-        </div>`
+        </div>`;
 }
 
+function renderImageInputField() {
 
-function renderSubtaskDefaultHTML(){
-    return /*html*/`<div id="subtaskInputFieldDiv">Add new subtask</div>
+}
+
+function renderSubtaskDefaultHTML() {
+  return /*html*/ `<div id="subtaskInputFieldDiv">Add new subtask</div>
     <div id="subtaskImgAddPlus" class="subtaskImgDiv pointer"></div>
-    `
+    `;
 }

@@ -507,6 +507,33 @@ select {
     top: 1px;
 }
 
+.addImageBottom {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: var(--padding-1216);
+    cursor: pointer;
+
+    #imageInputFieldDiv{
+        color: #D1D1D1;
+    }
+    
+    input {
+        border-bottom: none;
+        cursor: pointer;
+        padding: 0;
+    }
+}
+
+#addImageBottom {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    top: 1px;
+}
+
 .addTaskSubtasks {
     display: flex;
     flex-direction: column;
