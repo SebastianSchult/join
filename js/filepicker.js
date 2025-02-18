@@ -67,6 +67,12 @@ function isImageFile(file) {
   return file.type.includes("image/");
 }
 
+/**
+ * Displays an error message for a non-image file.
+ * The error message is displayed in the element with ID "error".
+ * If the element does not exist, no error message is displayed.
+ * @param {File} file - The file that caused the error.
+ */
 function displayFileError(file) {
   const errorEl = document.getElementById("error");
   if (errorEl) {
@@ -74,12 +80,24 @@ function displayFileError(file) {
   }
 }
 
+/**
+ * Processes an image file by compressing it and appending the resulting image
+ * element to a specified container. The compressed image is also added to an
+ * array of all images.
+ *
+ * @param {File} file - The image file to process.
+ * @param {HTMLElement} container - The DOM element where the processed image
+ * will be displayed.
+ * @return {Promise<void>} A promise that resolves when the file is processed.
+ */
+
 async function processFile(file, container) {
   const blob = new Blob([file], { type: file.type });
   const compressedbase64 = await compressImage(file, 800, 800, 0.8);
   const img = createImageElement(compressedbase64);
   container.appendChild(img);
   addImageToArray(file, compressedbase64);
+  renderAddTaskImages(); 
 }
 
 
@@ -249,6 +267,58 @@ function loadImageFromFile(file) {
     } catch (error) {
       throw error;
     }
+  }
+
+  function initializeViewer() {
+    const container = document.getElementById("subtasksImageContainer");
+    if (!container) return;
+    
+    // Falls bereits eine Viewer-Instanz existiert, zerstören wir diese zunächst
+    if (window.addTaskViewer) {
+      window.addTaskViewer.destroy();
+    }
+    
+    window.addTaskViewer = new Viewer(container, {
+    });
+  }
+
+  function renderAddTaskImages() {
+    const container = document.getElementById("subtasksImageContainer");
+    if (!container) return;
+    
+    container.innerHTML = "";
+    if (allImages.length > 0) {
+      allImages.forEach((imageObj, index) => {
+        const thumbWrapper = document.createElement("div");
+        thumbWrapper.className = "thumbnailWrapper";
+        
+        const img = document.createElement("img");
+        img.src = imageObj.base64;
+        img.style.width = "100px";
+        img.style.height = "100px";
+        img.style.objectFit = "cover";
+        img.style.margin = "5px";
+        
+        // Optional: Lösch-Button
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "X";
+        deleteBtn.className = "delete-btn";
+        deleteBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          allImages.splice(index, 1);
+          renderAddTaskImages();
+        });
+        
+        thumbWrapper.appendChild(img);
+        thumbWrapper.appendChild(deleteBtn);
+        container.appendChild(thumbWrapper);
+      });
+    } else {
+      container.innerHTML = "<p>No images attached.</p>";
+    }
+    
+    // Viewer.js initialisieren
+    initializeViewer();
   }
 
 document.addEventListener("DOMContentLoaded", addFilepickerListener);

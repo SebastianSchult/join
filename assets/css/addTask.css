@@ -480,6 +480,26 @@ select {
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, .2), 0 3px 1px -1px var(--clr-prio-urgent)
 }
 
+.thumbnailWrapper {
+    display: inline-block;
+    position: relative;
+    margin: 5px;
+  }
+  
+  .delete-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(255, 0, 0, 0.8);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
 .subtaskBottom {
     position: relative;
     display: flex;
