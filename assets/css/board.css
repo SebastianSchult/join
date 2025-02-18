@@ -645,6 +645,15 @@ progress{
     transition: all 0.1s ease;
 }
 
+.openCardImagesContainer img{
+    cursor: pointer;
+}
+
+.openCardImagesContainer img:hover {
+    filter: brightness(1.2);
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.15);
+}
+
 .openCardDeleteEditContainer{
     display: flex;
     align-self: flex-end;

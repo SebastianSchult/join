@@ -26,7 +26,6 @@ function openCard(taskId){
     if(task.subtasks.length != 0) {
         renderSubtasksToOpenCard(task);
     }
-    // Neue Funktion: Bilder in der offenen Karte rendern
     if(task.images && task.images.length > 0) {
         renderOpenCardImages(task);
     }

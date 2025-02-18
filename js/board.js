@@ -431,6 +431,7 @@ function renderTaskImages(task) {
         container.appendChild(img);
       });
     }
+    const gallery = new Viewer(container);
   }
 
   
