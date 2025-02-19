@@ -119,6 +119,10 @@ select {
   width: min-content;
 }
 
+.openCardContainer .addTaskBodyRight {
+  left: 0;
+}
+
 .addTaskBodyRight {
   display: flex;
   align-items: flex-end;

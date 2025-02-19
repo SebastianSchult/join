@@ -100,6 +100,11 @@ async function processFile(file, container) {
   renderAddTaskImages(); 
 }
 
+function isEditMode() {
+  const container = document.getElementById('openCardContainer');
+  return container && container.hasAttribute('editing');
+}
+
 
 /**
  * Creates a new HTML image element with the given source.
@@ -299,7 +304,6 @@ function loadImageFromFile(file) {
         img.style.objectFit = "cover";
         img.style.margin = "5px";
         
-        // Optional: Lösch-Button
         const deleteBtn = document.createElement("button");
         deleteBtn.textContent = "X";
         deleteBtn.className = "delete-btn";
@@ -316,10 +320,10 @@ function loadImageFromFile(file) {
     } else {
       container.innerHTML = "<p>No images attached.</p>";
     }
-    
-    // Viewer.js initialisieren
     initializeViewer();
   }
+
+  
 
 document.addEventListener("DOMContentLoaded", addFilepickerListener);
 
