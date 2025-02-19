@@ -98,6 +98,7 @@ function showAddTaskContainer(category='category-0') {
     newTask.category = category;
     if (!document.getElementById('addTaskHoverContainer')) {
         renderBoardAddTaskOverlay();
+        addFilepickerListener();
     }
     let container = document.getElementById('addTaskHoverContainer');
     container.classList.add('showBoard');
