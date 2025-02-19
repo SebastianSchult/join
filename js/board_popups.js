@@ -29,7 +29,6 @@ function openCard(taskId){
     if(task.images && task.images.length > 0) {
         renderOpenCardImages(task);
     }
-    
     toggleBoardOverlay('closeCard()');
 }
 

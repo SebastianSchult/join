@@ -289,6 +289,7 @@ function renderEditContainer(){
     container.innerHTML = createEditHeader();
     container.innerHTML += renderAddTaskMainContentHTML();
     container.innerHTML += createEditFooter(newTask);
+    addFilepickerListener();
 }
 
 
@@ -326,12 +327,70 @@ function renderEditCardAssignedContacts(){
  *
  * @param {number} taskId - The ID of the task to be saved.
  */
-function saveEditedTask(taskId){
+async function saveEditedTask(taskId) {
+    console.log("saveEditedTask: Speichern gestartet für Task:", taskId);
+    await loadTasksFromRemoteStorage();
     collectInformationsForNewCard();
-    let taskToSave = getTaskOutOfId(taskId);
-    taskToSave = newTask;
-    saveTasksToRemoteStorage();
+
+    let taskToSaveIndex = findTaskIndex(taskId);
+    if (taskToSaveIndex === -1) return;
+
+    updateTaskDetails(taskToSaveIndex);
+    updateTaskImages(taskToSaveIndex);
+    
+    await saveTasksToRemoteStorage();
+    finalizeEdit();
+}
+
+/**
+ * Finds the index of the task with the given ID in the 'tasks' array.
+ * If no task is found, prints an error message to the console.
+ *
+ * @param {number} taskId - The ID of the task to find.
+ * @return {number} The index of the task in the 'tasks' array, or -1 if no task is found.
+ */
+function findTaskIndex(taskId) {
+    let index = tasks.findIndex(task => task.id === taskId);
+    if (index === -1) {
+        console.error("saveEditedTask: Kein Task gefunden für ID", taskId);
+    }
+    return index;
+}
+
+/**
+ * Updates the task details at the specified index in the 'tasks' array with the values from 'newTask'.
+ *
+ * @param {number} index - The index of the task in the 'tasks' array to be updated.
+ */
+
+function updateTaskDetails(index) {
+    tasks[index].title = newTask.title;
+    tasks[index].description = newTask.description;
+    tasks[index].dueDate = newTask.dueDate;
+    tasks[index].priority = newTask.priority;
+    tasks[index].assignedTo = [...newTask.assignedTo];
+    tasks[index].subtasks = [...newTask.subtasks];
+}
+
+/**
+ * Updates the task images at the specified index in the 'tasks' array with the values from 'newTask' and 'allImages'.
+ * The images are concatenated and stored as base64 strings in the 'tasks[index].images' array.
+ *
+ * @param {number} index - The index of the task in the 'tasks' array to be updated.
+ */
+function updateTaskImages(index) {
+    tasks[index].images = [...newTask.images, ...allImages.map(image => image.base64)];
+}
+
+/**
+ * Finalizes the edit process by closing the card, displaying a success message,
+ * and clearing the 'allImages' array.
+ */
+
+function finalizeEdit() {
     closeCard();
+    showSuccessMessage();
+    allImages = [];
 }
 
 

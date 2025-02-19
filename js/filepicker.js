@@ -22,13 +22,17 @@ function openFilepicker() {
  * `subtasksImageContainer` element as arguments.
  */
 function addFilepickerListener() {
+  console.log("addFilepickerListener() wird ausgeführt.");
   const filepicker = document.getElementById("filepicker");
   const subtasksImageContainer = document.getElementById(
     "subtasksImageContainer"
   );
+  console.log("subtasksImageContainer:", subtasksImageContainer);
   if (!filepicker) return;
   filepicker.addEventListener("change", async () => {
+    console.log("Filepicker 'change'-Event ausgelöst.");
     const files = filepicker.files;
+    console.log("Ausgewählte Dateien:", files);
     if (files.length > 0) {
       handleFiles(files, subtasksImageContainer);
     }
@@ -278,7 +282,6 @@ function loadImageFromFile(file) {
     const container = document.getElementById("subtasksImageContainer");
     if (!container) return;
     
-    // Falls bereits eine Viewer-Instanz existiert, zerstören wir diese zunächst
     if (window.addTaskViewer) {
       window.addTaskViewer.destroy();
     }
@@ -323,7 +326,22 @@ function loadImageFromFile(file) {
     initializeViewer();
   }
 
-  
+  function getCurrentImageContainer() {
+    // Prüfe zuerst, ob der Edit-Popup-Container existiert
+    const editContainer = document.getElementById("editCardImagesContainer");
+    if (editContainer) {
+      console.log("getCurrentImageContainer: Edit-Container gefunden.");
+      return editContainer;
+    }
+    // Andernfalls verwende den Standardcontainer
+    const standardContainer = document.getElementById("subtasksImageContainer");
+    if (standardContainer) {
+      console.log("getCurrentImageContainer: Standardcontainer gefunden.");
+      return standardContainer;
+    }
+    console.error("getCurrentImageContainer: Kein Container gefunden!");
+    return null;
+  }
 
 document.addEventListener("DOMContentLoaded", addFilepickerListener);
 
