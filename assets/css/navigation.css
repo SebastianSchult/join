@@ -175,6 +175,8 @@
     }
   }
   .nav-wrapper{
+    position: relative;
+    max-height: 100px;
     width: 100%;
     border: none;
     box-shadow: 0px -2px 5.5px rgba(0, 0, 0, .2)
