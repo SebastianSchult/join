@@ -12,11 +12,12 @@
 }
 
 * {
-  margin: 0;
+  margin: 0 auto;
   box-sizing: border-box;
   /* font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; */
   font-family: "Open Sans", sans-serif;
+  max-width: 1440px;
 }
 
 html {

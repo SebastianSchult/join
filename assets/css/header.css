@@ -3,6 +3,11 @@
   --clr-text: #ffffff;
 }
 
+*{
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
 .header-content {
   width: 100%;
   display: flex;
@@ -21,6 +26,7 @@
 }
 
 .header-inner-right {
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;

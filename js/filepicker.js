@@ -268,7 +268,9 @@ function loadImageFromFile(file) {
       const img = await loadImageFromFile(file);
       const { width, height } = calculateScaledDimensions(img, maxWidth, maxHeight);
       const canvas = drawImageOnCanvas(img, width, height);
-      return convertCanvasToDataUrl(canvas, quality);
+      const mimeType = file.type;
+      
+      return canvas.toDataURL(mimeType, quality);
     } catch (error) {
       throw error;
     }
