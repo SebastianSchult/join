@@ -562,3 +562,5 @@ function renderTaskImages(task) {
       container.innerHTML = '<p>No images attached.</p>';
     }
   }
+
+  

@@ -125,3 +125,21 @@ a {
     height: calc(100vh - 145px);
   }
 }
+
+.viewer-toolbar > ul > .viewer-large {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 44px !important;
+  margin-bottom: -3px;
+  margin-top: -3px;
+  width: 44px !important;
+}
+
+.viewer-toolbar > ul > li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 44px !important;
+  width: 44px !important;
+}
