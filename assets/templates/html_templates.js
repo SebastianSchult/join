@@ -406,11 +406,11 @@ function renderAddTaskMainContentHTML() {
 
 
         <div class="addTaskContainer">
-        <div class="addTaskTitles"><span class="bold">Images</span> (optional)
+        <div class="addTaskTitles"><span class="bold">Attachments</span> (optional)
             </div>
             <div id="addImageBottom" class="addImageBottom border-bottom">
-                <div id="imageInputFieldDiv">Add new image</div>
-                <div id="subtaskImgAddPlus" class="subtaskImgDiv pointer" onclick=openFilepicker()>
+                <img src="./assets/img/upload.png" alt="upload" onclick=openFilepicker()>
+                
                 <input type="file" id="filepicker" style="display: none" accept="image/*"  multiple>
                 </div>
             </div>
