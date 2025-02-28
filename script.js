@@ -260,11 +260,4 @@ function goBack() {
 	}
 }
 
-window.addEventListener('load', () => {
-	const viewerContainer = document.getElementById("viewer0"); // Beispiel-ID
-	if (viewerContainer && viewerContainer.getAttribute("aria-hidden") === "true") {
-	  viewerContainer.removeAttribute("aria-hidden");
-	  viewerContainer.setAttribute("inert", ""); // Optional, je nach Bedarf
-	  console.log("aria-hidden entfernt und inert gesetzt.");
-	}
-  });
+

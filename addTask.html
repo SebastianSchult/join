@@ -1,50 +1,54 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="./assets/img/favicon.png" type="image/png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="./assets/img/favicon.png" type="image/png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="assets/css/header.css">
+  <link rel="stylesheet" href="assets/css/navigation.css">
+  <link rel="stylesheet" href="assets/css/contacts.css">
+  <link rel="stylesheet" href="assets/css/board.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.7/viewer.css" 
+        integrity="sha512-9NawOLzuLE2GD22PJ6IPWXEjPalb/FpdH1qMpgXdaDM+0OfxEV75ZCle6KhZi0vM6ZWvMrNnIZv6YnsL+keVmA==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="assets/css/addTask.css">
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="assets/css/header.css" />
-    <link rel="stylesheet" href="assets/css/navigation.css" />
-    <link rel="stylesheet" href="./assets/css/contacts.css">
-    <link rel="stylesheet" href="./assets/css/board.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.7/viewer.css" integrity="sha512-9NawOLzuLE2GD22PJ6IPWXEjPalb/FpdH1qMpgXdaDM+0OfxEV75ZCle6KhZi0vM6ZWvMrNnIZv6YnsL+keVmA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="script.js"></script>
+  <!-- Scripts -->
+  <script src="script.js"></script>
+  <script src="js/addTask.js"></script>
+  <script src="js/addTask_tasks.js"></script>
+  <script src="js/contacts.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/board_drag_and_drop.js"></script>
+  <script src="js/board_popups.js"></script>
+  <script src="js/helper.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="assets/templates/html_templates.js"></script>
+  <script src="js/filepicker.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.7/viewer.min.js" 
+          integrity="sha512-lZD0JiwhtP4UkFD1mc96NiTZ14L7MjyX5Khk8PMxJszXMLvu7kjq1sp4bb0tcL6MY+/4sIuiUxubOqoueHrW4w==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <link rel="stylesheet" href="./assets/css/addTask.css">
-    <script src="./js/addTask.js"></script>
-    <script src="./js/addTask_tasks.js"></script>
-    <script src="./js/contacts.js"></script>
-    <script src="./js/board.js"></script>
-    <script src="./js/board_drag_and_drop.js"></script>
-    <script src="./js/board_popups.js"></script>
-    <script src="./js/helper.js"></script>
-    <script src="./js/storage.js"></script>
-    <script src="./assets/templates/html_templates.js"></script>
-    <script src="./js/filepicker.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.7/viewer.min.js" integrity="sha512-lZD0JiwhtP4UkFD1mc96NiTZ14L7MjyX5Khk8PMxJszXMLvu7kjq1sp4bb0tcL6MY+/4sIuiUxubOqoueHrW4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <title>Join - AddTask</title>
+  <title>Join - AddTask</title>
 </head>
-
 <body onload="addTaskInit()">
-    <div id="bodyContent" class="bodyContent">
-        <header w3-include-html="./assets/templates/header.html" id="header" class="header">
-        </header>
-        <div id="main-wrapper" class="main-wrapper">
-            <nav id="navigation-container"
-                class="navigation-container"></nav>
-            <main id="main" class="main">
-                <div id="addTaskBody" class="addTaskBody">
-                </div>
-            </main>
-        </div>
-        <div id="navigation-container-mobile"></div>
+  <div id="bodyContent" class="bodyContent">
+    <header id="header" class="header">
+    </header>
+    <div id="main-wrapper" class="main-wrapper">
+      <nav id="navigation-container" class="navigation-container">
+      </nav>
+      <main id="main" class="main">
+        <section id="addTaskBody" class="addTaskBody">
+        </section>
+      </main>
     </div>
-
+    <footer>
+    </footer>
+    <div id="navigation-container-mobile"></div>
+  </div>
 </body>
-
 </html>
