@@ -30,6 +30,7 @@ function renderAddTaskHTML() {
   }
 
 
+
 /**
  * Updates the priority styling for the task buttons based on the selected priority.
  *
@@ -395,4 +396,8 @@ function deactivateButton(id){
         btn.removeAttribute("onclick");
     }
 }
+
+
+
+
 

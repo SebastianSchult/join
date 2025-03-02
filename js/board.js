@@ -20,8 +20,6 @@ async function boardInit() {
     getContactsOutOfUsers();
     await loadTasksFromRemoteStorage();
     renderCategories(tasks);
-    // showAddTaskContainer();
-    // openCard(2);
 }
 
 

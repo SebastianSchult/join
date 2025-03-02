@@ -2,12 +2,11 @@ let allImages = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   addFilepickerListener();
-  setupDragAndDrop(); // Drop-Ziel: sichtbarer Container "addImageBottom"
-  renderAddTaskImages(); // Zeigt initial die vorhandenen Bilder an
-  observeContainer(); // Beobachtet, ob der Container später geladen wird
+  setupDragAndDrop();
+  renderAddTaskImages();
+  observeContainer();
 });
 
-// Falls der Filepicker aus irgendeinem Grund später benötigt wird
 setTimeout(addFilepickerListener, 1000);
 
 function openFilepicker() {
@@ -23,11 +22,10 @@ function addFilepickerListener() {
   const filepicker = document.getElementById("filepicker");
   if (!filepicker) return;
   
-  // Manuelle Auswahl
-  filepicker.addEventListener("change", async () => {
-    const files = filepicker.files;
+  filepicker.addEventListener("change", async (event) => {
+    const files = event.target.files;
     if (files.length > 0) {
-      handleFiles(files, getCurrentImageContainer());
+      await handleFiles(files, getCurrentImageContainer());
       // Input zurücksetzen, damit auch dieselbe Datei erneut erkannt wird
       filepicker.value = "";
     }
@@ -35,44 +33,47 @@ function addFilepickerListener() {
 }
 
 function setupDragAndDrop() {
-  const dropArea = document.getElementById("addImageBottom");
-  if (!dropArea) {
-    console.error("Drop-Bereich 'addImageBottom' nicht gefunden!");
-    return;
-  }
-  
-  // Globales Abfangen der Drag‑Events, damit der Browser nicht das Standardverhalten ausführt
-  document.addEventListener("dragover", (event) => {
-    event.preventDefault();
-  });
-  document.addEventListener("drop", (event) => {
-    event.preventDefault();
-  });
-  
-  dropArea.addEventListener("dragover", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    dropArea.classList.add("dragging");
-    console.log("dragover event on addImageBottom");
-  }, true);
-  
-  dropArea.addEventListener("dragleave", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    dropArea.classList.remove("dragging");
-    console.log("dragleave event on addImageBottom");
-  }, true);
-  
-  dropArea.addEventListener("drop", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    dropArea.classList.remove("dragging");
-    const files = event.dataTransfer.files;
-    console.log("Dropped files:", files);
-    if (files.length > 0) {
-      handleFiles(files, getCurrentImageContainer());
+    const dropArea = document.getElementById('subtasksImageContainer');
+    if (!dropArea) {
+        console.error("Drop-Bereich 'subtasksImageContainer' nicht gefunden!");
+        return;
     }
-  }, true);
+    
+    // Highlight-Klasse für visuelles Feedback
+    dropArea.classList.add('drop-zone');
+    
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Highlight drop zone when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => {
+            dropArea.classList.add('drag-active');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => {
+            dropArea.classList.remove('drag-active');
+        }, false);
+    });
+
+    // Handle dropped files
+    dropArea.addEventListener('drop', handleDrop, false);
+}
+
+function preventDefaults (e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+async function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleFiles(files, getCurrentImageContainer());
 }
 
 function handleFiles(files, container) {
@@ -97,10 +98,6 @@ function displayFileError(file) {
 }
 
 async function processFile(file, container) {
-  if (!container) {
-    console.error("Kein Container gefunden zum Anhängen des Bildes.");
-    return;
-  }
   const compressedbase64 = await compressImage(file, 800, 800, 0.8);
   const img = createImageElement(compressedbase64);
   container.appendChild(img);
@@ -154,6 +151,8 @@ function createImageElement(src) {
   img.style.height = "100px";
   img.style.objectFit = "cover";
   img.style.margin = "5px";
+  // Prevent opening in new tab
+  img.onclick = (e) => e.preventDefault();
   return img;
 }
 
@@ -167,16 +166,25 @@ function addImageToArray(file, compressedbase64) {
 
 function renderAddTaskImages() {
   const container = getCurrentImageContainer();
-  if (!container) {
-    console.warn("Kein Container vorhanden zum Rendern der Bilder.");
-    return;
-  }
+  if (!container) return;
   container.innerHTML = "";
   if (allImages.length > 0) {
     allImages.forEach((imageObj, index) => {
       const thumbWrapper = document.createElement("div");
       thumbWrapper.className = "thumbnailWrapper";
-      const img = createImageElement(imageObj.base64);
+      
+      const img = document.createElement("img");
+      img.src = imageObj.base64;
+      img.style.width = "100px";
+      img.style.height = "100px";
+      img.style.objectFit = "cover";
+      img.style.margin = "5px";
+      // Prevent opening in new tab
+      img.onclick = (e) => {
+        e.preventDefault();
+        return false;
+      };
+      
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "X";
       deleteBtn.className = "delete-btn";
@@ -185,6 +193,7 @@ function renderAddTaskImages() {
         allImages.splice(index, 1);
         renderAddTaskImages();
       });
+      
       thumbWrapper.appendChild(img);
       thumbWrapper.appendChild(deleteBtn);
       container.appendChild(thumbWrapper);
@@ -192,21 +201,7 @@ function renderAddTaskImages() {
   } else {
     container.innerHTML = "<p>No images attached.</p>";
   }
-  initializeViewer();
 }
-
-function initializeViewer() {
-  const container = document.getElementById("subtasksImageContainer");
-  if (!container) return;
-  
-  if (window.addTaskViewer) {
-    window.addTaskViewer.destroy();
-  }
-  
-  window.addTaskViewer = new Viewer(container, {
-  });
-}
-
 
 function getCurrentImageContainer() {
   let editContainer = document.getElementById("editCardImagesContainer");
@@ -215,16 +210,8 @@ function getCurrentImageContainer() {
   if (editContainer) return editContainer;
   if (standardContainer) return standardContainer;
 
-  console.warn("Kein Container gefunden! Erstelle neuen Container 'subtasksImageContainer' innerhalb von 'addImageBottom'.");
-  
-  // Versuche, den Container innerhalb von addImageBottom zu erstellen
-  const dropArea = document.getElementById("addImageBottom");
-  if (dropArea) {
-    const newContainer = document.createElement("div");
-    newContainer.id = "subtasksImageContainer";
-    dropArea.appendChild(newContainer);
-    return newContainer;
-  } 
+  console.warn("Kein Container gefunden! Warte auf spätere Erstellung...");
+  return null;
 }
 
 function observeContainer() {
@@ -235,5 +222,6 @@ function observeContainer() {
       observer.disconnect();
     }
   });
+
   observer.observe(document.body, { childList: true, subtree: true });
-}
+} 
