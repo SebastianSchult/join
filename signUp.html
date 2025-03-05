@@ -1,94 +1,106 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="./assets/img/favicon.png" type="image/png">
-
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="assets/css/header.css" />
-    <link rel="stylesheet" href="assets/css/navigation.css" />
-    <link rel="stylesheet" href="./assets/css/signUp.css">
-    <script src="script.js"></script>
-    <script src="./js/storage.js"></script>
-    <script src="./js/signUp.js"></script>
-    <script src="./js/helper.js"></script>
-
-    <title>Join - Sign Up</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="./assets/img/favicon.png" type="image/png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="assets/css/header.css" />
+  <link rel="stylesheet" href="assets/css/navigation.css" />
+  <link rel="stylesheet" href="./assets/css/signUp.css">
+  <script src="script.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/signUp.js"></script>
+  <script src="./js/helper.js"></script>
+  <title>Join - Sign Up</title>
 </head>
-
 <body>
-    <div id="bodyContent" class="bodyContent">
-        <main id="main" class="main">
-            <div id="signUpMainContainer" class="signUpMainContainer">
-                <div class="signUp-page">
-                    <header class="joinLogoSignUpWhite">
-                        <img class="signUpLogo" src="./assets/img/logo-medium_white.png" alt="logo">
-                    </header>
-                    <div class="signUp-box">
-                        <div class="arrowLeft" onclick="redirectToLogin()"><img src="./assets/img/icon-arrow_left.png"
-                                alt="arrow left"></div>
-                        <div class="h1SignUpBox">
-                            <h1 class="signUpH1">Sign up</h1>
-                            <div class="horizontalH1UnderlineSignUp"></div>
-                        </div>
-                        <form class="formDiv" id="login-form" onsubmit="return false">
-                            <div class="innerSignUpBox">
-                                <div class="signUpInputField">
-                                    <input type="text" id="signUpNameInput" placeholder="Name"
-                                        onkeyup="checkIfFormIsValid()" required>
-                                    <div class="mailIcon"><img src="./assets/img/icon-person.png" alt="letter">
-                                    </div>
-                                </div>
-                                <div class="signUpInputField">
-                                    <input type="email" id="signUpEmailInput" placeholder="Email"
-                                        onkeyup="checkIfFormIsValid()" required>
-                                    <div class="mailIcon"><img src="./assets/img/icon-mail.png" alt="letter">
-                                    </div>
-                                </div>
-                                <div class="signUpInputField">
-                                    <input type="password" id="signUpPasswordInput" placeholder="Password"
-                                        onkeyup="checkIfFormIsValid()" required>
-                                    <div class="mailIcon"><img src="./assets/img/icon-lock.png" alt="lock">
-                                    </div>
-                                </div>
-                                <div class="signUpInputField">
-                                    <input type="password" id="signUpPasswordInputConfirm"
-                                        placeholder="Confirm Password" onkeyup="checkIfFormIsValid()" required>
-                                    <div class="mailIcon"><img src="./assets/img/icon-lock.png" alt="lock">
-                                    </div>
-                                </div>
-                                <div class="checkboxBox">
-                                    <input type="checkbox" id="privacyCheckbox" style="display: none;"
-                                        onclick="togglePrivacyPolicyCheckbox()">
-                                    <label for="privacyCheckbox" class="custom-checkbox">
-                                        <img id="checkboxImage" src="./assets/img/icon-check_button_unchecked.png"
-                                            alt="checkbox image">
-                                        I accept the <a href="#">Privacy Policy</a>
-                                    </label><br>
-                                </div>
-                                <button id="registerBtn" class="signUpButtons registerBtn" onclick="addNewUser()"
-                                    disabled="">Sign up</button>
-                            </div>
-                        </form>
+  <div id="bodyContent" class="bodyContent">
+    <main id="main" class="main">
+      <div id="signUpMainContainer" class="signUpMainContainer">
+        <div class="signUp-page">
+          <header class="joinLogoSignUpWhite">
+            <img class="signUpLogo" src="./assets/img/logo-medium_white.png" alt="logo">
+          </header>
+          <div class="signUp-box">
+            <div class="arrowLeft" onclick="redirectToLogin()">
+              <img src="./assets/img/icon-arrow_left.png" alt="arrow left">
+            </div>
+            <div class="h1SignUpBox">
+              <h1 class="signUpH1">Sign up</h1>
+              <div class="horizontalH1UnderlineSignUp"></div>
+            </div>
+            <form class="formDiv" id="login-form" onsubmit="return false">
+              <div class="innerSignUpBox">
+                <!-- Wrapper für Name-Feld -->
+                <div class="input-wrapper">
+                  <div class="signUpInputField">
+                    <input type="text" id="signUpNameInput" placeholder="Name" onkeyup="checkIfFormIsValid()" required>
+                    <div class="mailIcon">
+                      <img src="./assets/img/icon-person.png" alt="letter">
                     </div>
-                    <div class="signUpFooter">
-                        <div class="privacyPolicySignUp" onclick="switchPageNewTab('privacy_external.html');"
-                            target="_blank">
-                            <span>Privacy
-                                policy</span>
-                        </div>
-                        <div class="legalNoticeSignUp" onclick="switchPageNewTab('legal_notice_external.html');"
-                            target="_blank">
-                            <span>Legal
-                                notice</span>
-                        </div>
-                    </div>
+                  </div>
+                  <!-- Fehlermeldung wird hier platziert -->
+                  <span class="error-message"></span>
                 </div>
 
+                <!-- Wrapper für E-Mail-Feld -->
+                <div class="input-wrapper">
+                  <div class="signUpInputField">
+                    <input type="email" id="signUpEmailInput" placeholder="Email" onkeyup="checkIfFormIsValid()" required>
+                    <div class="mailIcon">
+                      <img src="./assets/img/icon-mail.png" alt="letter">
+                    </div>
+                  </div>
+                  <span class="error-message"></span>
+                </div>
+
+                <!-- Wrapper für Passwort-Feld -->
+                <div class="input-wrapper">
+                  <div class="signUpInputField">
+                    <input type="password" id="signUpPasswordInput" placeholder="Password" onkeyup="checkIfFormIsValid()" required>
+                    <div class="mailIcon">
+                      <img src="./assets/img/icon-lock.png" alt="lock">
+                    </div>
+                  </div>
+                  <span class="error-message"></span>
+                </div>
+
+                <!-- Wrapper für Passwort-Bestätigung -->
+                <div class="input-wrapper">
+                  <div class="signUpInputField">
+                    <input type="password" id="signUpPasswordInputConfirm" placeholder="Confirm Password" onkeyup="checkIfFormIsValid()" required>
+                    <div class="mailIcon">
+                      <img src="./assets/img/icon-lock.png" alt="lock">
+                    </div>
+                  </div>
+                  <span class="error-message"></span>
+                </div>
+
+                <!-- Checkbox für Privacy Policy -->
+                <div class="checkboxBox">
+                  <input type="checkbox" id="privacyCheckbox" style="display: none;" onclick="togglePrivacyPolicyCheckbox()">
+                  <label for="privacyCheckbox" class="custom-checkbox">
+                    <img id="checkboxImage" src="./assets/img/icon-check_button_unchecked.png" alt="checkbox image">
+                    I accept the <a href="#">Privacy Policy</a>
+                  </label>
+                  <br>
+                </div>
+                <button id="registerBtn" class="signUpButtons registerBtn" onclick="addNewUser()" disabled>Sign up</button>
+              </div>
+            </form>
+          </div>
+          <div class="signUpFooter">
+            <div class="privacyPolicySignUp" onclick="switchPageNewTab('privacy_external.html');" target="_blank">
+              <span>Privacy policy</span>
             </div>
-        </main>
-    </div>
-    </div>
+            <div class="legalNoticeSignUp" onclick="switchPageNewTab('legal_notice_external.html');" target="_blank">
+              <span>Legal notice</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 </body>
+</html>

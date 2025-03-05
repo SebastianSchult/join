@@ -2,12 +2,11 @@ let allImages = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   addFilepickerListener();
-  setupDragAndDrop(); // Drop-Ziel: sichtbarer Container "addImageBottom"
-  renderAddTaskImages(); // Zeigt initial die vorhandenen Bilder an
-  observeContainer(); // Beobachtet, ob der Container später geladen wird
+  setupDragAndDrop(); 
+  renderAddTaskImages(); 
+  observeContainer(); 
 });
 
-// Falls der Filepicker aus irgendeinem Grund später benötigt wird
 setTimeout(addFilepickerListener, 1000);
 
 function openFilepicker() {
@@ -23,12 +22,10 @@ function addFilepickerListener() {
   const filepicker = document.getElementById("filepicker");
   if (!filepicker) return;
   
-  // Manuelle Auswahl
   filepicker.addEventListener("change", async () => {
     const files = filepicker.files;
     if (files.length > 0) {
       handleFiles(files, getCurrentImageContainer());
-      // Input zurücksetzen, damit auch dieselbe Datei erneut erkannt wird
       filepicker.value = "";
     }
   });
@@ -40,8 +37,6 @@ function setupDragAndDrop() {
     console.error("Drop-Bereich 'addImageBottom' nicht gefunden!");
     return;
   }
-  
-  // Globales Abfangen der Drag‑Events, damit der Browser nicht das Standardverhalten ausführt
   document.addEventListener("dragover", (event) => {
     event.preventDefault();
   });
@@ -217,7 +212,6 @@ function getCurrentImageContainer() {
 
   console.warn("Kein Container gefunden! Erstelle neuen Container 'subtasksImageContainer' innerhalb von 'addImageBottom'.");
   
-  // Versuche, den Container innerhalb von addImageBottom zu erstellen
   const dropArea = document.getElementById("addImageBottom");
   if (dropArea) {
     const newContainer = document.createElement("div");
