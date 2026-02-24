@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  deploy-via-ssh:
     if: ${{ secrets.DEPLOY_SSH_HOST != '' && secrets.DEPLOY_SSH_USER != '' && secrets.DEPLOY_SSH_KEY != '' && secrets.DEPLOY_PATH != '' }}
     runs-on: ubuntu-latest
 
@@ -70,3 +70,29 @@ jobs:
           set -euo pipefail
           port="${DEPLOY_PORT:-22}"
           ssh -p "$port" "$DEPLOY_USER@$DEPLOY_HOST" "$DEPLOY_POST_COMMAND"
+
+  deploy-via-ftp:
+    if: ${{ (secrets.DEPLOY_SSH_HOST == '' || secrets.DEPLOY_SSH_USER == '' || secrets.DEPLOY_SSH_KEY == '' || secrets.DEPLOY_PATH == '') && secrets.DEPLOY_FTP_SERVER != '' && secrets.DEPLOY_FTP_USER != '' && secrets.DEPLOY_FTP_PASSWORD != '' && secrets.DEPLOY_FTP_DIR != '' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy with FTP/FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.DEPLOY_FTP_SERVER }}
+          username: ${{ secrets.DEPLOY_FTP_USER }}
+          password: ${{ secrets.DEPLOY_FTP_PASSWORD }}
+          protocol: ${{ secrets.DEPLOY_FTP_PROTOCOL != '' && secrets.DEPLOY_FTP_PROTOCOL || 'ftps' }}
+          port: ${{ secrets.DEPLOY_FTP_PORT != '' && secrets.DEPLOY_FTP_PORT || 21 }}
+          local-dir: ./
+          server-dir: ${{ secrets.DEPLOY_FTP_DIR }}
+          exclude: |
+            **/.git/**
+            **/.github/**
+            **/.vscode/**
+            **/.DS_Store
+            **/node_modules/**
+            **/js/config.js
