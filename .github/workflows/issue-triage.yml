@@ -1,0 +1,173 @@
+name: Issue Triage
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+  repository-projects: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure triage labels exist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [
+              { name: "needs-triage", color: "C5DEF5", description: "Needs initial triage" },
+              { name: "status: backlog", color: "EDEDED", description: "Backlog item" },
+              { name: "status: ready", color: "BFDADC", description: "Ready for implementation" },
+              { name: "type: bug", color: "D73A4A", description: "Bug or regression" },
+              { name: "type: security", color: "B60205", description: "Security issue" },
+              { name: "type: refactor", color: "5319E7", description: "Refactoring or technical debt" },
+              { name: "type: chore", color: "0E8A16", description: "Tooling/maintenance work" },
+              { name: "type: feature", color: "1D76DB", description: "New feature or enhancement" },
+              { name: "priority: p0", color: "B60205", description: "Critical priority" },
+              { name: "priority: p1", color: "D93F0B", description: "High priority" },
+              { name: "priority: p2", color: "FBCA04", description: "Medium priority" },
+              { name: "priority: p3", color: "0E8A16", description: "Low priority" },
+              { name: "area: auth", color: "0052CC", description: "Authentication and signup/login" },
+              { name: "area: board", color: "006B75", description: "Board and task flow" },
+              { name: "area: contacts", color: "1D76DB", description: "Contacts management" },
+              { name: "area: summary", color: "5319E7", description: "Summary/dashboard" },
+              { name: "area: storage", color: "BFD4F2", description: "Storage, API, Firebase" },
+              { name: "area: ui", color: "F9D0C4", description: "UI and styling" },
+              { name: "area: tooling", color: "C2E0C6", description: "CI/CD and tooling" }
+            ];
+
+            for (const label of labels) {
+              try {
+                await github.rest.issues.updateLabel({
+                  ...context.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+              } catch (error) {
+                if (error.status === 404) {
+                  await github.rest.issues.createLabel({
+                    ...context.repo,
+                    name: label.name,
+                    color: label.color,
+                    description: label.description
+                  });
+                } else {
+                  throw error;
+                }
+              }
+            }
+
+      - name: Apply labels from issue content
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const issueNumber = issue.number;
+            const title = issue.title || "";
+            const body = issue.body || "";
+            const text = `${title}\n${body}`;
+            const lower = text.toLowerCase();
+
+            const existing = new Set(issue.labels.map((l) => l.name));
+            const labels = new Set(["needs-triage", "status: backlog"]);
+
+            const hasTypeLabel = [...existing].some((l) => l.startsWith("type: "));
+            const hasPriorityLabel = [...existing].some((l) => l.startsWith("priority: "));
+            const hasAreaLabel = [...existing].some((l) => l.startsWith("area: "));
+
+            function extractPriority() {
+              let match = title.match(/\[(p[0-3])\]/i);
+              if (match) return match[1].toLowerCase();
+
+              match = body.match(/###\s*Priority[\s\S]*?\b(P[0-3])\b/i);
+              if (match) return match[1].toLowerCase();
+
+              match = text.match(/\b(P[0-3])\b/i);
+              if (match) return match[1].toLowerCase();
+
+              return null;
+            }
+
+            if (!hasPriorityLabel) {
+              const priority = extractPriority();
+              if (priority) labels.add(`priority: ${priority}`);
+            }
+
+            if (!hasTypeLabel) {
+              let typeLabel = null;
+              if (/\[security\]|\bsecurity\b/i.test(title) || /(token|credential|password|auth leak|secret)/i.test(lower)) {
+                typeLabel = "type: security";
+              } else if (/\[bug\]|\bbug\b|\bregression\b/i.test(title)) {
+                typeLabel = "type: bug";
+              } else if (/\[refactor\]|\brefactor\b|\btechnical debt\b/i.test(title)) {
+                typeLabel = "type: refactor";
+              } else if (/\[chore\]|\bchore\b|\bci\b|\bworkflow\b|\bdx\b/i.test(title + " " + body)) {
+                typeLabel = "type: chore";
+              } else if (/\[feature\]|\bfeature\b|\benhancement\b/i.test(title)) {
+                typeLabel = "type: feature";
+              }
+
+              if (typeLabel) labels.add(typeLabel);
+            }
+
+            function setAreaByValue(value) {
+              const normalized = value.toLowerCase();
+              if (normalized.includes("auth")) return "area: auth";
+              if (normalized.includes("board")) return "area: board";
+              if (normalized.includes("contact")) return "area: contacts";
+              if (normalized.includes("summary")) return "area: summary";
+              if (normalized.includes("storage") || normalized.includes("firebase") || normalized.includes("api")) return "area: storage";
+              if (normalized.includes("tool")) return "area: tooling";
+              if (normalized.includes("ui")) return "area: ui";
+              return null;
+            }
+
+            if (!hasAreaLabel) {
+              let areaLabel = null;
+              const areaField = body.match(/###\s*Area\s*\n+([^\n]+)/i);
+              if (areaField) {
+                areaLabel = setAreaByValue(areaField[1].trim());
+              }
+
+              if (!areaLabel) {
+                if (/(login|signup|session|remember me|password|auth)/i.test(lower)) {
+                  areaLabel = "area: auth";
+                } else if (/(board|task|subtask|drag)/i.test(lower)) {
+                  areaLabel = "area: board";
+                } else if (/(contact|contacts)/i.test(lower)) {
+                  areaLabel = "area: contacts";
+                } else if (/(summary|dashboard|greeting)/i.test(lower)) {
+                  areaLabel = "area: summary";
+                } else if (/(firebase|storage|fetch|api|token)/i.test(lower)) {
+                  areaLabel = "area: storage";
+                } else if (/(github action|workflow|ci|lint|pipeline)/i.test(lower)) {
+                  areaLabel = "area: tooling";
+                } else {
+                  areaLabel = "area: ui";
+                }
+              }
+
+              if (areaLabel) labels.add(areaLabel);
+            }
+
+            const toAdd = [...labels].filter((l) => !existing.has(l));
+            if (toAdd.length > 0) {
+              await github.rest.issues.addLabels({
+                ...context.repo,
+                issue_number: issueNumber,
+                labels: toAdd
+              });
+            }
+
+      - name: Add issue to GitHub project (optional)
+        if: ${{ vars.GH_PROJECT_URL != '' && secrets.PROJECT_TOKEN != '' }}
+        uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: ${{ vars.GH_PROJECT_URL }}
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+        continue-on-error: true

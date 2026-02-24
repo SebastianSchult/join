@@ -1,0 +1,70 @@
+name: Refactor Ticket
+description: Technische Schulden abbauen oder Code strukturieren
+title: "[P2][Refactor]: "
+labels:
+  - "type: refactor"
+  - "status: backlog"
+  - "needs-triage"
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0 - Critical
+        - P1 - High
+        - P2 - Medium
+        - P3 - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Auth
+        - Board
+        - Contacts
+        - Summary
+        - Storage
+        - UI
+        - Tooling
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context / Problem
+      description: Warum ist der aktuelle Zustand problematisch?
+      placeholder: "Beispiel: Doppelte Validierungslogik in login.js und signUp.js."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed Refactor
+      description: Geplanter technischer Schnitt
+      placeholder: "Beispiel: Gemeinsames Validation-Modul extrahieren."
+    validations:
+      required: true
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks / Regression Notes
+      description: Worauf muss bei der Umsetzung geachtet werden?
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true

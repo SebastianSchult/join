@@ -1,0 +1,60 @@
+name: Chore / DX Ticket
+description: Tooling, CI, Build, Cleanup oder Dokumentation
+title: "[P3][Chore]: "
+labels:
+  - "type: chore"
+  - "status: backlog"
+  - "needs-triage"
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0 - Critical
+        - P1 - High
+        - P2 - Medium
+        - P3 - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Tooling
+        - UI
+        - Storage
+        - Auth
+        - Board
+        - Contacts
+        - Summary
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Was soll verbessert werden?
+    validations:
+      required: true
+
+  - type: textarea
+    id: value
+    attributes:
+      label: Engineering Value
+      description: Warum ist das sinnvoll?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true

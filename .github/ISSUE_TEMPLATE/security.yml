@@ -1,0 +1,76 @@
+name: Security Ticket
+description: Sicherheitsrisiko oder Sicherheitsluecke melden
+title: "[P0][Security]: "
+labels:
+  - "type: security"
+  - "status: backlog"
+  - "needs-triage"
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Kritikalitaet des Sicherheitsrisikos
+      options:
+        - P0 - Critical
+        - P1 - High
+        - P2 - Medium
+        - P3 - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Betroffener Bereich
+      options:
+        - Auth
+        - Storage
+        - Board
+        - Contacts
+        - Summary
+        - UI
+        - Tooling
+    validations:
+      required: true
+
+  - type: textarea
+    id: risk
+    attributes:
+      label: Risk / Impact
+      description: Welches Risiko entsteht? Was kann ausgenutzt werden?
+      placeholder: "Beispiel: API-Token im Frontend offen sichtbar."
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Affected Files / Scope
+      description: Betroffene Dateien/Funktionen
+      placeholder: |
+        - js/storage.js
+        - js/login.js
+    validations:
+      required: true
+
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Proposed Mitigation
+      description: Technischer Loesungsvorschlag
+      placeholder: "Beispiel: Secrets in Server/Environment verlagern."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Abnahmekriterien
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true

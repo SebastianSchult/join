@@ -1,0 +1,84 @@
+name: Bug Ticket
+description: Defekt melden (funktionaler Fehler oder Regression)
+title: "[P1][Bug]: "
+labels:
+  - "type: bug"
+  - "status: backlog"
+  - "needs-triage"
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Wie kritisch ist der Fehler?
+      options:
+        - P0 - Critical
+        - P1 - High
+        - P2 - Medium
+        - P3 - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Betroffener Bereich
+      options:
+        - Auth
+        - Board
+        - Contacts
+        - Summary
+        - Storage
+        - UI
+        - Tooling
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Kurze Beschreibung des Problems
+      placeholder: "Beispiel: Login funktioniert nach Sign-up nicht mehr."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps To Reproduce
+      description: Reproduzierbare Schritte
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: Erwartetes Verhalten
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: Tatsaechliches Verhalten
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Abnahmekriterien
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
