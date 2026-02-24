@@ -36,8 +36,9 @@ Optional:
 
 Optional:
 
-- `DEPLOY_FTP_PROTOCOL`: `ftp` or `ftps` (default `ftps`)
 - `DEPLOY_FTP_PORT`: port (default `21`)
+
+FTP mode tries `ftps` first and automatically falls back to `ftp` if FTPS login/handshake fails.
 
 For your ALL-INKL example, these values are typically:
 
