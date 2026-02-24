@@ -124,7 +124,8 @@ jobs:
             **/js/config.js
 
       - name: Deploy with FTP (fallback)
-        if: ${{ steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps.outcome == 'failure' }}
+        id: deploy_ftp
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps.outcome != 'success' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ env.DEPLOY_FTP_SERVER }}
@@ -141,3 +142,22 @@ jobs:
             **/.DS_Store
             **/node_modules/**
             **/js/config.js
+
+      - name: Validate FTP/FTPS result
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ftps="${{ steps.deploy_ftps.outcome }}"
+          ftp="${{ steps.deploy_ftp.outcome }}"
+
+          echo "FTPS outcome: ${ftps}"
+          echo "FTP fallback outcome: ${ftp}"
+
+          if [[ "${ftps}" == "success" || "${ftp}" == "success" ]]; then
+            echo "Deployment succeeded via FTP mode."
+            exit 0
+          fi
+
+          echo "Both FTPS primary and FTP fallback failed."
+          exit 1
