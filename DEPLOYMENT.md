@@ -46,6 +46,21 @@ For your ALL-INKL example, these values are typically:
 - `DEPLOY_FTP_USER` = `w01f67fb`
 - `DEPLOY_FTP_DIR` = `/sebastian-schult-dev.de/join/`
 
+## Runtime config secrets (for `js/config.js`)
+
+The deploy workflow generates `js/config.js` on the runner from repository secrets and uploads it to the server on every deploy.
+
+Required:
+
+- `JOIN_APP_STORAGE_TOKEN`
+- `JOIN_APP_BASE_URL`
+- `JOIN_APP_FIREBASE_TASKS_ID`
+- `JOIN_APP_FIREBASE_USERS_ID`
+
+Optional:
+
+- `JOIN_APP_STORAGE_URL` (default: `https://remote-storage.developerakademie.org/item`)
+
 ## What gets deployed
 
 The workflow excludes:
@@ -55,7 +70,6 @@ The workflow excludes:
 - `.vscode/`
 - `.DS_Store`
 - `node_modules/`
-- `js/config.js`
 
 ## Project status sync
 
