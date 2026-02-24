@@ -1,0 +1,303 @@
+name: PR Issue Status Sync
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize, closed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  sync-status:
+    if: ${{ vars.GH_PROJECT_URL != '' && secrets.PROJECT_TOKEN != '' && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Move linked issue in project and labels
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const action = context.payload.action;
+            const pr = context.payload.pull_request;
+
+            let targetStatus = null;
+            if (action === "closed") {
+              if (pr.merged) {
+                targetStatus = "Done";
+              } else {
+                core.info("PR closed without merge. No status change.");
+                return;
+              }
+            } else {
+              targetStatus = "Review";
+            }
+
+            const ghProjectUrl = process.env.GH_PROJECT_URL;
+            const projectMatch = ghProjectUrl.match(/github\.com\/(users|orgs)\/([^/]+)\/projects\/(\d+)/i);
+            if (!projectMatch) {
+              core.setFailed(`Invalid GH_PROJECT_URL format: ${ghProjectUrl}`);
+              return;
+            }
+
+            const [, scope, ownerLogin, projectNumberRaw] = projectMatch;
+            const projectNumber = Number(projectNumberRaw);
+            if (!Number.isInteger(projectNumber)) {
+              core.setFailed(`Invalid project number in GH_PROJECT_URL: ${ghProjectUrl}`);
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = pr.number;
+
+            const prData = await github.graphql(
+              `
+              query($owner: String!, $repo: String!, $prNumber: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $prNumber) {
+                    body
+                    headRefName
+                    closingIssuesReferences(first: 50) {
+                      nodes {
+                        number
+                      }
+                    }
+                  }
+                }
+              }
+              `,
+              { owner, repo, prNumber }
+            );
+
+            const issueNumbers = new Set(
+              (prData.repository.pullRequest.closingIssuesReferences.nodes || []).map((i) => i.number)
+            );
+
+            // Fallback: branch name like "<issue>-feature-name"
+            const headRef = prData.repository.pullRequest.headRefName || "";
+            const branchMatch = headRef.match(/^(\d+)-/);
+            if (branchMatch) {
+              issueNumbers.add(Number(branchMatch[1]));
+            }
+
+            // Fallback: issue references in PR body, for example "#123"
+            const bodyText = prData.repository.pullRequest.body || "";
+            const refs = bodyText.match(/#\d+/g) || [];
+            for (const ref of refs) {
+              issueNumbers.add(Number(ref.replace("#", "")));
+            }
+
+            const issueList = [...issueNumbers].filter((n) => Number.isInteger(n) && n > 0);
+            if (issueList.length === 0) {
+              core.warning("No linked issues detected for PR.");
+              return;
+            }
+
+            async function getProject() {
+              if (scope.toLowerCase() === "users") {
+                const data = await github.graphql(
+                  `
+                  query($login: String!, $number: Int!) {
+                    user(login: $login) {
+                      projectV2(number: $number) {
+                        id
+                        title
+                        fields(first: 50) {
+                          nodes {
+                            ... on ProjectV2SingleSelectField {
+                              id
+                              name
+                              options {
+                                id
+                                name
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  `,
+                  { login: ownerLogin, number: projectNumber }
+                );
+                return data.user?.projectV2;
+              }
+
+              const data = await github.graphql(
+                `
+                query($login: String!, $number: Int!) {
+                  organization(login: $login) {
+                    projectV2(number: $number) {
+                      id
+                      title
+                      fields(first: 50) {
+                        nodes {
+                          ... on ProjectV2SingleSelectField {
+                            id
+                            name
+                            options {
+                              id
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                `,
+                { login: ownerLogin, number: projectNumber }
+              );
+              return data.organization?.projectV2;
+            }
+
+            const project = await getProject();
+            if (!project) {
+              core.setFailed(`Project not found: ${ghProjectUrl}`);
+              return;
+            }
+
+            const statusField = (project.fields.nodes || []).find(
+              (field) => field && field.name && field.name.toLowerCase() === "status"
+            );
+
+            if (!statusField) {
+              core.setFailed(`No 'Status' field found in project '${project.title}'.`);
+              return;
+            }
+
+            function resolveOption(options, status) {
+              const exact = options.find((o) => o.name.toLowerCase() === status.toLowerCase());
+              if (exact) return exact;
+              if (status.toLowerCase() === "review") {
+                return options.find((o) => /review/i.test(o.name));
+              }
+              if (status.toLowerCase() === "done") {
+                return options.find((o) => /done|complete|closed/i.test(o.name));
+              }
+              return null;
+            }
+
+            const statusOption = resolveOption(statusField.options || [], targetStatus);
+            if (!statusOption) {
+              core.setFailed(`No project status option found for '${targetStatus}'.`);
+              return;
+            }
+
+            async function getIssueAndItem(issueNumber) {
+              const data = await github.graphql(
+                `
+                query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    issue(number: $issueNumber) {
+                      id
+                      number
+                      url
+                      projectItems(first: 50) {
+                        nodes {
+                          id
+                          project {
+                            id
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                `,
+                { owner, repo, issueNumber }
+              );
+              return data.repository.issue;
+            }
+
+            async function ensureProjectItem(projectId, issue) {
+              const existing = (issue.projectItems.nodes || []).find((item) => item.project?.id === projectId);
+              if (existing) return existing.id;
+
+              const created = await github.graphql(
+                `
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
+                    item {
+                      id
+                    }
+                  }
+                }
+                `,
+                { projectId, contentId: issue.id }
+              );
+              return created.addProjectV2ItemById.item.id;
+            }
+
+            async function setProjectStatus(projectId, itemId, fieldId, optionId) {
+              await github.graphql(
+                `
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                  updateProjectV2ItemFieldValue(
+                    input: {
+                      projectId: $projectId
+                      itemId: $itemId
+                      fieldId: $fieldId
+                      value: { singleSelectOptionId: $optionId }
+                    }
+                  ) {
+                    projectV2Item {
+                      id
+                    }
+                  }
+                }
+                `,
+                { projectId, itemId, fieldId, optionId }
+              );
+            }
+
+            async function syncIssueLabels(issueNumber, status) {
+              const labelMap = {
+                review: "status: review",
+                done: "status: done",
+              };
+              const target = labelMap[status.toLowerCase()] || null;
+              if (!target) return;
+
+              const removeLabels = ["status: backlog", "status: review", "status: done", "needs-triage"].filter(
+                (label) => label !== target
+              );
+
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                labels: [target],
+              });
+
+              for (const label of removeLabels) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner,
+                    repo,
+                    issue_number: issueNumber,
+                    name: label,
+                  });
+                } catch (error) {
+                  if (error.status !== 404) throw error;
+                }
+              }
+            }
+
+            for (const issueNumber of issueList) {
+              const issue = await getIssueAndItem(issueNumber);
+              if (!issue) {
+                core.warning(`Issue #${issueNumber} not found in repo.`);
+                continue;
+              }
+
+              const itemId = await ensureProjectItem(project.id, issue);
+              await setProjectStatus(project.id, itemId, statusField.id, statusOption.id);
+              await syncIssueLabels(issueNumber, targetStatus);
+              core.info(`Issue #${issueNumber} moved to '${targetStatus}'.`);
+            }
+        env:
+          GH_PROJECT_URL: ${{ vars.GH_PROJECT_URL }}

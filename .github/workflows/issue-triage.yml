@@ -21,6 +21,8 @@ jobs:
             const labels = [
               { name: "needs-triage", color: "C5DEF5", description: "Needs initial triage" },
               { name: "status: backlog", color: "EDEDED", description: "Backlog item" },
+              { name: "status: review", color: "FBCA04", description: "In review / PR open" },
+              { name: "status: done", color: "0E8A16", description: "Completed and merged" },
               { name: "status: ready", color: "BFDADC", description: "Ready for implementation" },
               { name: "type: bug", color: "D73A4A", description: "Bug or regression" },
               { name: "type: security", color: "B60205", description: "Security issue" },
