@@ -12,42 +12,83 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy-via-ssh:
-    if: ${{ secrets.DEPLOY_SSH_HOST != '' && secrets.DEPLOY_SSH_USER != '' && secrets.DEPLOY_SSH_KEY != '' && secrets.DEPLOY_PATH != '' }}
+  deploy:
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_SSH_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+      DEPLOY_SSH_USER: ${{ secrets.DEPLOY_SSH_USER }}
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      DEPLOY_SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      DEPLOY_POST_COMMAND: ${{ secrets.DEPLOY_POST_COMMAND }}
+      DEPLOY_FTP_SERVER: ${{ secrets.DEPLOY_FTP_SERVER }}
+      DEPLOY_FTP_USER: ${{ secrets.DEPLOY_FTP_USER }}
+      DEPLOY_FTP_PASSWORD: ${{ secrets.DEPLOY_FTP_PASSWORD }}
+      DEPLOY_FTP_PROTOCOL: ${{ secrets.DEPLOY_FTP_PROTOCOL }}
+      DEPLOY_FTP_PORT: ${{ secrets.DEPLOY_FTP_PORT }}
+      DEPLOY_FTP_DIR: ${{ secrets.DEPLOY_FTP_DIR }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select deploy mode
+        id: mode
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${DEPLOY_SSH_HOST}" && -n "${DEPLOY_SSH_USER}" && -n "${DEPLOY_SSH_KEY}" && -n "${DEPLOY_PATH}" ]]; then
+            echo "mode=ssh" >> "$GITHUB_OUTPUT"
+            echo "ftp_protocol=ftps" >> "$GITHUB_OUTPUT"
+            echo "ftp_port=21" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ -n "${DEPLOY_FTP_SERVER}" && -n "${DEPLOY_FTP_USER}" && -n "${DEPLOY_FTP_PASSWORD}" && -n "${DEPLOY_FTP_DIR}" ]]; then
+            protocol="${DEPLOY_FTP_PROTOCOL:-ftps}"
+            port="${DEPLOY_FTP_PORT:-21}"
+            echo "mode=ftp" >> "$GITHUB_OUTPUT"
+            echo "ftp_protocol=${protocol}" >> "$GITHUB_OUTPUT"
+            echo "ftp_port=${port}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "mode=none" >> "$GITHUB_OUTPUT"
+          echo "ftp_protocol=ftps" >> "$GITHUB_OUTPUT"
+          echo "ftp_port=21" >> "$GITHUB_OUTPUT"
+
+      - name: Fail when deploy secrets are missing
+        if: ${{ steps.mode.outputs.mode == 'none' }}
+        shell: bash
+        run: |
+          echo "No valid deploy secret set found."
+          echo "Configure SSH secrets (DEPLOY_SSH_*) or FTP secrets (DEPLOY_FTP_*)."
+          exit 1
+
       - name: Setup SSH key
+        if: ${{ steps.mode.outputs.mode == 'ssh' }}
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          ssh-private-key: ${{ env.DEPLOY_SSH_KEY }}
 
       - name: Add deploy host to known_hosts
+        if: ${{ steps.mode.outputs.mode == 'ssh' }}
         shell: bash
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
         run: |
           set -euo pipefail
-          port="${DEPLOY_PORT:-22}"
+          port="${DEPLOY_SSH_PORT:-22}"
           mkdir -p ~/.ssh
-          ssh-keyscan -p "$port" "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -p "$port" "$DEPLOY_SSH_HOST" >> ~/.ssh/known_hosts
 
       - name: Deploy with rsync
+        if: ${{ steps.mode.outputs.mode == 'ssh' }}
         shell: bash
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_SSH_USER }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
         run: |
           set -euo pipefail
-          port="${DEPLOY_PORT:-22}"
+          port="${DEPLOY_SSH_PORT:-22}"
 
-          ssh -p "$port" "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p '$DEPLOY_PATH'"
+          ssh -p "$port" "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST" "mkdir -p '$DEPLOY_PATH'"
 
           rsync -az --delete \
             --exclude ".git/" \
@@ -56,39 +97,27 @@ jobs:
             --exclude ".DS_Store" \
             --exclude "node_modules/" \
             --exclude "js/config.js" \
-            ./ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
+            ./ "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST:$DEPLOY_PATH"
 
       - name: Run remote post-deploy command (optional)
-        if: ${{ secrets.DEPLOY_POST_COMMAND != '' }}
+        if: ${{ steps.mode.outputs.mode == 'ssh' && env.DEPLOY_POST_COMMAND != '' }}
         shell: bash
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_SSH_USER }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
-          DEPLOY_POST_COMMAND: ${{ secrets.DEPLOY_POST_COMMAND }}
         run: |
           set -euo pipefail
-          port="${DEPLOY_PORT:-22}"
-          ssh -p "$port" "$DEPLOY_USER@$DEPLOY_HOST" "$DEPLOY_POST_COMMAND"
-
-  deploy-via-ftp:
-    if: ${{ (secrets.DEPLOY_SSH_HOST == '' || secrets.DEPLOY_SSH_USER == '' || secrets.DEPLOY_SSH_KEY == '' || secrets.DEPLOY_PATH == '') && secrets.DEPLOY_FTP_SERVER != '' && secrets.DEPLOY_FTP_USER != '' && secrets.DEPLOY_FTP_PASSWORD != '' && secrets.DEPLOY_FTP_DIR != '' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+          port="${DEPLOY_SSH_PORT:-22}"
+          ssh -p "$port" "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST" "$DEPLOY_POST_COMMAND"
 
       - name: Deploy with FTP/FTPS
+        if: ${{ steps.mode.outputs.mode == 'ftp' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.DEPLOY_FTP_SERVER }}
-          username: ${{ secrets.DEPLOY_FTP_USER }}
-          password: ${{ secrets.DEPLOY_FTP_PASSWORD }}
-          protocol: ${{ secrets.DEPLOY_FTP_PROTOCOL != '' && secrets.DEPLOY_FTP_PROTOCOL || 'ftps' }}
-          port: ${{ secrets.DEPLOY_FTP_PORT != '' && secrets.DEPLOY_FTP_PORT || 21 }}
+          server: ${{ env.DEPLOY_FTP_SERVER }}
+          username: ${{ env.DEPLOY_FTP_USER }}
+          password: ${{ env.DEPLOY_FTP_PASSWORD }}
+          protocol: ${{ steps.mode.outputs.ftp_protocol }}
+          port: ${{ steps.mode.outputs.ftp_port }}
           local-dir: ./
-          server-dir: ${{ secrets.DEPLOY_FTP_DIR }}
+          server-dir: ${{ env.DEPLOY_FTP_DIR }}
           exclude: |
             **/.git/**
             **/.github/**
