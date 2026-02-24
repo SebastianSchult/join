@@ -167,9 +167,11 @@ jobs:
             }
 
       - name: Add issue to GitHub project (optional)
-        if: ${{ vars.GH_PROJECT_URL != '' && secrets.PROJECT_TOKEN != '' }}
+        if: ${{ vars.GH_PROJECT_URL != '' && env.PROJECT_TOKEN != '' }}
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: ${{ vars.GH_PROJECT_URL }}
           github-token: ${{ secrets.PROJECT_TOKEN }}
+        env:
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         continue-on-error: true
