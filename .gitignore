@@ -12,3 +12,6 @@ dev.nix
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# Local runtime config (contains secrets; never commit)
+js/config.js
