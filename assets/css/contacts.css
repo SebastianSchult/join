@@ -346,15 +346,17 @@ input::placeholder {
   display: flex;
   width: 22.313rem;
   height: 3.5rem;
-  border: 0.063rem;
+  border: 0.063rem solid #4589ff;
   border-radius: 0.625rem;
-  border-color: #4589ff;
   padding: 1rem 0.625rem 1rem 0.625rem;
   background-color: #4589ff;
   gap: 0.625rem;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  color: white;
+  font: inherit;
+  text-align: center;
 }
 
 .button-add-contact img {
@@ -376,6 +378,11 @@ input::placeholder {
 .button-add-contact:hover {
   background-color: #005dff;
   scale: 1.1 ;
+}
+
+.button-add-contact:focus-visible {
+  outline: 3px solid #2a3647;
+  outline-offset: 2px;
 }
 
 .contact-list {
@@ -409,12 +416,23 @@ input::placeholder {
   border-radius: 0.625rem;
   padding: 0.938rem 1.5rem 0.938rem 1.5rem;
   gap: 2.188rem;
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
 }
 
 .contact-card:hover {
   background-color: #4589ff;
   color: white;
   cursor: pointer;
+}
+
+.contact-card:focus-visible {
+  outline: 3px solid #2a3647;
+  outline-offset: 2px;
 }
 
 .contact-card:hover .profile-badge-group {
@@ -539,6 +557,11 @@ input::placeholder {
   align-items: center;
   color: #2a3647;
   cursor: pointer;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
 }
 
 .icon-edit:hover {
@@ -559,6 +582,11 @@ input::placeholder {
   align-items: center;
   color: #2a3647;
   cursor: pointer;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
 }
 
 .icon-delete:hover {
@@ -568,6 +596,13 @@ input::placeholder {
 .icon-delete img {
   height: 1.5rem;
   width: 1.5rem;
+}
+
+.icon-edit:focus-visible,
+.icon-delete:focus-visible {
+  outline: 2px solid #2a3647;
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 .contact-information {
@@ -996,6 +1031,11 @@ input::placeholder {
     font-size: 16px;
     cursor: pointer;
     padding: 8px;
+    border: none;
+    background-color: transparent;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
     }
 
     .editDiv:hover {
@@ -1010,11 +1050,23 @@ input::placeholder {
       font-size: 16px;
       cursor: pointer;
       padding: 8px;
+      border: none;
+      background-color: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
   }
 }
 
 .deleteDiv:hover {
   scale: 1.1;
+}
+
+.editDiv:focus-visible,
+.deleteDiv:focus-visible {
+  outline: 2px solid #2a3647;
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 @media screen and (max-width: 580px) {
