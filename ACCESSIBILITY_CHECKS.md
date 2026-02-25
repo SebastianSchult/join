@@ -21,11 +21,14 @@ Gate:
 - `categories:accessibility >= 0.50`
 
 If the score is below the threshold on any checked page, the job fails.
+CI also prints a short page-level summary (PASS/FAIL + top failing audits) in the workflow logs.
 
 ## Run locally
 
 ```bash
+npm install
 npm run a11y:ci
+npm run a11y:report
 ```
 
 Requirements:
@@ -38,5 +41,6 @@ Requirements:
 
 - Lighthouse prints one result per page URL.
 - The accessibility category score is shown for each page.
+- `npm run a11y:report` prints page-level PASS/FAIL against the configured threshold.
 - Failing assertions list the page and threshold mismatch.
 - CI uploads `.lighthouseci` artifacts for deeper inspection when needed.
