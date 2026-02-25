@@ -31,12 +31,6 @@ jobs:
             node --check "$f"
           done
 
-      - name: Install lint dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-audit --no-fund
-
       - name: Guardrail check for duplicate inline HTML attributes in templates
         shell: bash
         run: |

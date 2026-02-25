@@ -1,0 +1,45 @@
+.viewer-footer {
+  width: 100% !important;
+  max-width: 100vw;
+  box-sizing: border-box;
+  padding-inline: 12px;
+}
+
+.viewer-toolbar {
+  width: 100%;
+  overflow: hidden;
+}
+
+.viewer-toolbar > ul {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.viewer-toolbar > ul > li {
+  flex: 0 0 auto;
+}
+
+.viewer-navbar {
+  width: min(480px, 100%);
+  margin: 0 auto;
+}
+
+@media (max-width: 700px) {
+  .viewer-footer {
+    padding-inline: 8px;
+  }
+
+  .viewer-toolbar > ul {
+    justify-content: flex-start;
+  }
+}

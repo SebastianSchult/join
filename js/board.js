@@ -531,7 +531,28 @@ function renderTaskImages(task) {
         container.appendChild(img);
       });
     }
-    const gallery = new Viewer(container);
+    if (window.openCardViewer) {
+      window.openCardViewer.destroy();
+    }
+
+    window.openCardViewer = new Viewer(container, {
+      navbar: false,
+      title: false,
+      tooltip: false,
+      toolbar: {
+        zoomIn: 1,
+        zoomOut: 1,
+        oneToOne: 0,
+        reset: 1,
+        prev: 1,
+        play: 0,
+        next: 1,
+        rotateLeft: 1,
+        rotateRight: 1,
+        flipHorizontal: 0,
+        flipVertical: 0,
+      },
+    });
   }
 
   

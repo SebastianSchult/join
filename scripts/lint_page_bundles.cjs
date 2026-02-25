@@ -4,39 +4,37 @@ const fs = require("fs");
 const path = require("path");
 
 async function main() {
-  const eslintModule = tryLoadEslint();
-  if (!eslintModule) {
-    console.error(
-      "ESLint is not installed. Run `npm install` (or `npm install --no-save eslint@^8.57.1`) first."
-    );
+  const pageBundles = collectPageBundles();
+  if (pageBundles.missingScripts.length > 0) {
+    console.error("Missing local scripts referenced in HTML pages:");
+    for (const entry of pageBundles.missingScripts) {
+      console.error(`- ${entry}`);
+    }
     process.exit(1);
   }
 
-  const { ESLint } = eslintModule;
+  const eslintModule = tryLoadEslint();
+  if (eslintModule) {
+    await runEslintGuardrail(eslintModule, pageBundles.bundles);
+    return;
+  }
+
+  runFallbackRedeclareGuardrail(pageBundles.bundles);
+}
+
+function collectPageBundles() {
   const pageFiles = fs
     .readdirSync(process.cwd())
     .filter((file) => file.endsWith(".html"))
     .sort();
 
-  const eslint = new ESLint({
-    useEslintrc: true,
-    ignore: false,
-    overrideConfig: {
-      rules: {
-        "no-undef": "error",
-        "no-redeclare": "error",
-      },
-    },
-  });
-
-  const lintResults = [];
+  const bundles = [];
   const missingScripts = [];
 
   for (const pageFile of pageFiles) {
     const htmlPath = path.resolve(process.cwd(), pageFile);
     const htmlContent = fs.readFileSync(htmlPath, "utf8");
     const scriptSources = extractScriptSources(htmlContent);
-
     const bundleParts = [];
 
     for (const source of scriptSources) {
@@ -68,26 +66,40 @@ async function main() {
       continue;
     }
 
-    const bundleSource = bundleParts.join("\n");
-    const virtualFilePath = path.resolve(
-      process.cwd(),
-      ".lint-page-bundles",
-      `${path.basename(pageFile, ".html")}.bundle.js`
-    );
-
-    const pageResults = await eslint.lintText(bundleSource, {
-      filePath: virtualFilePath,
+    bundles.push({
+      pageFile,
+      bundleSource: bundleParts.join("\n"),
+      virtualFilePath: path.resolve(
+        process.cwd(),
+        ".lint-page-bundles",
+        `${path.basename(pageFile, ".html")}.bundle.js`
+      ),
     });
-
-    lintResults.push(...pageResults);
   }
 
-  if (missingScripts.length > 0) {
-    console.error("Missing local scripts referenced in HTML pages:");
-    for (const entry of missingScripts) {
-      console.error(`- ${entry}`);
-    }
-    process.exit(1);
+  return { bundles, missingScripts };
+}
+
+async function runEslintGuardrail(eslintModule, bundles) {
+  const { ESLint } = eslintModule;
+  const eslint = new ESLint({
+    useEslintrc: true,
+    ignore: false,
+    overrideConfig: {
+      rules: {
+        "no-undef": "error",
+        "no-redeclare": "error",
+      },
+    },
+  });
+
+  const lintResults = [];
+
+  for (const bundle of bundles) {
+    const pageResults = await eslint.lintText(bundle.bundleSource, {
+      filePath: bundle.virtualFilePath,
+    });
+    lintResults.push(...pageResults);
   }
 
   const formatter = await eslint.loadFormatter("stylish");
@@ -104,10 +116,88 @@ async function main() {
   console.log("ESLint page-bundle guardrail passed.");
 }
 
+function runFallbackRedeclareGuardrail(bundles) {
+  const findings = [];
+
+  for (const bundle of bundles) {
+    const sanitizedSource = stripComments(bundle.bundleSource);
+    const declarations = collectTopLevelDeclarations(sanitizedSource);
+    const seenByName = new Map();
+
+    for (const declaration of declarations) {
+      if (!seenByName.has(declaration.name)) {
+        seenByName.set(declaration.name, declaration);
+        continue;
+      }
+
+      const first = seenByName.get(declaration.name);
+      findings.push({
+        pageFile: bundle.pageFile,
+        name: declaration.name,
+        firstLine: first.line,
+        duplicateLine: declaration.line,
+      });
+    }
+  }
+
+  if (findings.length > 0) {
+    console.error(
+      `Fallback page-bundle guardrail failed: duplicate declarations detected (${findings.length}).`
+    );
+    for (const finding of findings) {
+      console.error(
+        `- ${finding.pageFile}: '${finding.name}' first declared at line ${finding.firstLine}, redeclared at line ${finding.duplicateLine}`
+      );
+    }
+    process.exit(1);
+  }
+
+  console.log(
+    "Fallback page-bundle guardrail passed (ESLint unavailable; duplicate declaration check only)."
+  );
+}
+
+function collectTopLevelDeclarations(source) {
+  const declarations = [];
+
+  collectRegexDeclarations(
+    source,
+    /\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g,
+    declarations
+  );
+  collectRegexDeclarations(
+    source,
+    /\bclass\s+([A-Za-z_$][\w$]*)\s*/g,
+    declarations
+  );
+
+  return declarations;
+}
+
+function collectRegexDeclarations(source, pattern, target) {
+  let match;
+  while ((match = pattern.exec(source)) !== null) {
+    target.push({
+      name: match[1],
+      line: getLineNumber(source, match.index),
+    });
+  }
+}
+
+function stripComments(source) {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, (match) => " ".repeat(match.length))
+    .replace(/\/\/[^\n]*/g, (match) => " ".repeat(match.length));
+}
+
+function getLineNumber(source, index) {
+  return source.slice(0, index).split("\n").length;
+}
+
 function tryLoadEslint() {
   try {
     return require("eslint");
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }
@@ -134,6 +224,6 @@ function normalizeScriptSource(src) {
 }
 
 main().catch((error) => {
-  console.error("Failed to run ESLint page-bundle guardrail:", error);
+  console.error("Failed to run page-bundle guardrail:", error);
   process.exit(1);
 });

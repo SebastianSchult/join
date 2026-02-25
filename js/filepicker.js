@@ -243,8 +243,28 @@ function initializeViewer() {
     window.addTaskViewer.destroy();
   }
   
-  window.addTaskViewer = new Viewer(container, {
-  });
+  window.addTaskViewer = new Viewer(container, getDefaultViewerOptions());
+}
+
+function getDefaultViewerOptions() {
+  return {
+    navbar: false,
+    title: false,
+    tooltip: false,
+    toolbar: {
+      zoomIn: 1,
+      zoomOut: 1,
+      oneToOne: 0,
+      reset: 1,
+      prev: 1,
+      play: 0,
+      next: 1,
+      rotateLeft: 1,
+      rotateRight: 1,
+      flipHorizontal: 0,
+      flipVertical: 0,
+    },
+  };
 }
 
 
