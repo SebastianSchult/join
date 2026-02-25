@@ -1,4 +1,10 @@
 @media (max-width: 801px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
   body,
   .bodyContent,
   .main-wrapper,
@@ -8,6 +14,20 @@
   .main-summary,
   .sub-main-summary {
     overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  .main > *,
+  #addTaskBody,
+  .greetingContainer-and-subMainSummary,
+  .button-container,
+  .contacts-container,
+  .contact-list,
+  .contact-card,
+  .right-side,
+  .openCardContainer,
+  .openCardContainer[editing] {
+    min-width: 0;
     max-width: 100%;
   }
 
@@ -60,6 +80,9 @@
   .openEditDeleteResponsive,
   .add-contact-button,
   .button-add-contact,
+  .addTaskBtn,
+  .addTaskBtnBoard,
+  .dropdownOption,
   .cancelButton,
   .createButton,
   .icon-edit,
@@ -118,6 +141,8 @@
   .contact-card {
     min-height: var(--ui-touch-target-min);
     align-items: center;
+    width: 100%;
+    max-width: 100%;
   }
 
   .add-contact,
@@ -132,6 +157,32 @@
   .summary-box {
     gap: var(--ui-space-xl);
     padding: var(--ui-space-md);
+  }
+
+  .button-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    max-width: 100%;
+    gap: var(--ui-space-sm);
+  }
+
+  .square-button,
+  .urgentAndDate,
+  .urgent,
+  #toDoButton {
+    width: 100%;
+    max-width: 396px;
+  }
+
+  .add-contact-button {
+    right: var(--ui-space-md);
+    bottom: calc(var(--ui-space-4xl) + var(--ui-space-md));
+  }
+
+  .editDelete {
+    width: auto;
+    min-width: 160px;
+    right: var(--ui-space-md);
   }
 }
 
@@ -158,6 +209,17 @@
     width: 100%;
     justify-items: center;
     padding-inline: var(--ui-space-sm);
+  }
+
+  .addTaskBodyTop,
+  .addTaskBodyBottom {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .add-contact-button,
+  .editDelete {
+    right: var(--ui-space-sm);
   }
 
   .urgent,
