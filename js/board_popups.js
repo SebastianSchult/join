@@ -63,9 +63,11 @@ function renderContactsToOpenCard(task) {
 
 	task["assignedTo"].forEach((id) => {
 		contacts.filter((contact) => {
-			if (contact["id"] == id)
+			if (contact["id"] == id) {
+        const safeContactName = escapeHtml(contact["name"]);
 				content.innerHTML += /*html*/ `
-                    <div class="openCardAssignedToContact">${renderAssignedToButtonsHTML(contact)}${contact.name}</div>`;
+                    <div class="openCardAssignedToContact">${renderAssignedToButtonsHTML(contact)}${safeContactName}</div>`;
+      }
 		});
 	});
 }

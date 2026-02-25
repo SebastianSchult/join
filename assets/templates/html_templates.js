@@ -130,33 +130,28 @@ function renderSummaryHTML() {
  * @return {string} The HTML code for the task card.
  */
 function renderTasksHTML(task) {
+  const safeTaskId = toSafeInteger(task && task.id);
+  const safeTaskType = escapeHtml(task && task.type);
+  const safeTaskTitle = escapeHtml(task && task.title);
+  const safeTaskDescription = escapeHtml(task && task.description);
+
   return /*html*/ `
-      <div draggable="true" ondragstart="startDragging(${
-        task.id
-      })" ondragend="stopDragging()" id="${
-    task.id
-  }" class="card" onclick="openCard(${task.id})">
+      <div draggable="true" ondragstart="startDragging(${safeTaskId})" ondragend="stopDragging()" id="${safeTaskId}" class="card" onclick="openCard(${safeTaskId})">
           <div class="cardTopContainer">
-              <div id="cardType${task.id}" class="cardType">${task.type}</div>
-              <div class="cardTitle">${task.title}</div>
-              <div id="cardText${task.id}" class="cardText">${
-    task.description
-  }</div>
+              <div id="cardType${safeTaskId}" class="cardType">${safeTaskType}</div>
+              <div class="cardTitle">${safeTaskTitle}</div>
+              <div id="cardText${safeTaskId}" class="cardText">${safeTaskDescription}</div>
           </div>
           <div class="cardBottomContainer">
-              <div id="cardSubtask${task.id}" class="cardSubtasks"></div>
+              <div id="cardSubtask${safeTaskId}" class="cardSubtasks"></div>
               <div class="assignedToAndPriority">
-                  <div id="cardAssignedToContainerId${
-                    task.id
-                  }" class="cardAssignedToContainer"></div>
+                  <div id="cardAssignedToContainerId${safeTaskId}" class="cardAssignedToContainer"></div>
                   <div class="cardPriority">${setPriorityImage(
                     task.priority
                   )}</div>
               </div>
               <!-- Neuer Container für Bilder -->
-              <div id="cardImagesContainer${
-                task.id
-              }" class="cardImagesContainer"></div>
+              <div id="cardImagesContainer${safeTaskId}" class="cardImagesContainer"></div>
           </div>
       </div>`;
 }
@@ -178,9 +173,14 @@ function renderEmptyCategoryHTML(name) {
  * @return {string} The HTML code for the profile badge.
  */
 function renderAssignedToButtonsHTML(contact) {
+  const contactName =
+    contact && typeof contact.name === "string" ? contact.name : "";
+  const safeContactColor = sanitizeCssColor(contact && contact.contactColor);
+  const safeInitials = escapeHtml(getInitials(contactName));
+
   return /*html*/ `<div class="profile-badge-group" style="background-color: ${
-    contact.contactColor
-  }">${getInitials(contact.name)}</div>`;
+    safeContactColor
+  }">${safeInitials}</div>`;
 }
 
 /**
@@ -452,22 +452,29 @@ function renderAddTaskFooterHTML() {
  * @return {string} The HTML string for the open card.
  */
 function renderOpenCardHTML(task) {
+  const safeTaskId = toSafeInteger(task && task.id);
+  const safeTaskType = escapeHtml(task && task.type);
+  const safeTaskTitle = escapeHtml(task && task.title);
+  const safeTaskDescription = escapeHtml(task && task.description);
+  const safeTaskDueDate = escapeHtml(task && task.dueDate);
+  const safeTaskPriority = escapeHtml(task && task.priority);
+
   return /*html*/ `
       <div class="boardAddTaskCloseHoverOuterContainer">
           <div class="boardAddTaskCloseHoverContainer" onclick="closeCard()"></div>
       </div>
       <div class="openCardInnerContainer">
-          <div id="openCardType${task.id}" class="cardType">${task.type}</div>
-          <div class="cardTitle">${task.title}</div>
-          <div class="openCardDescription">${task.description}</div>
+          <div id="openCardType${safeTaskId}" class="cardType">${safeTaskType}</div>
+          <div class="cardTitle">${safeTaskTitle}</div>
+          <div class="openCardDescription">${safeTaskDescription}</div>
           <div class="openCardTextBox">
               <span class="openCardText">Due Date:</span>
-              <span class="openCardValue">${task.dueDate}</span>
+              <span class="openCardValue">${safeTaskDueDate}</span>
           </div>
           <div class="openCardTextBox">
               <span class="openCardText">Priority:</span>
               <div class="openCardPriority">
-                  <span class="openCardValue">${task.priority}</span>
+                  <span class="openCardValue">${safeTaskPriority}</span>
                   <div class="openCardPriorityImage">${setPriorityImage(
                     task.priority
                   )}</div>
@@ -477,16 +484,12 @@ function renderOpenCardHTML(task) {
           <div id="openCardSubtasksContainer"></div>
           <div id="openCardImagesContainer" class="openCardImagesContainer"></div>
           <div class="openCardDeleteEditContainer">
-              <div class="openCardDeleteContainer" onclick='openCardDelete(${
-                task.id
-              })'>
+              <div class="openCardDeleteContainer" onclick='openCardDelete(${safeTaskId})'>
                   <div class="openCardImgDiv pointer" id="openCardImgDelete"></div>
                   <span>Delete</span>
               </div>
               <div class="vLine"></div>
-              <div class="openCardEditContainer" onclick='openCardEdit(${
-                task.id
-              })'>
+              <div class="openCardEditContainer" onclick='openCardEdit(${safeTaskId})'>
                   <div class="openCardImgDiv pointer" id="openCardImgEdit"></div>
                   <span>Edit</span>
               </div>
@@ -501,11 +504,14 @@ function renderOpenCardHTML(task) {
  * @return {string} The HTML string for the subtask in edit mode.
  */
 function editSubtaskHTML(subtask) {
+  const safeSubtaskId = toSafeInteger(subtask && subtask.id);
+  const safeSubtaskText = escapeHtml(subtask && subtask.subtaskText);
+
   return /*html*/ `
-        <input type="text" id="subtaskEditInputField" value="${subtask.subtaskText}">
+        <input type="text" id="subtaskEditInputField" value="${safeSubtaskText}">
         <div class="subtaskCheckboxes">
-        <div class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${subtask.id})"> </div><div class="vLine"></div>
-            <div class="subtaskImgDiv pointer" id="subtaskImgAddCheck" onclick="saveEditSubtask(${subtask.id})"> </div>
+        <div class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${safeSubtaskId})"> </div><div class="vLine"></div>
+            <div class="subtaskImgDiv pointer" id="subtaskImgAddCheck" onclick="saveEditSubtask(${safeSubtaskId})"> </div>
         </div>`;
 }
 
@@ -541,13 +547,16 @@ function renderSubtaskInputFieldHTML() {
  * @param {Object} subtask - The subtask object containing the details to render.
  */
 function renderSubtaskHTML(outputContainer, subtask) {
+  const safeSubtaskId = toSafeInteger(subtask && subtask.id);
+  const safeSubtaskText = escapeHtml(subtask && subtask.subtaskText);
+
   outputContainer.innerHTML += /*html*/ `
-        <div class="subTaskOutputDiv" id="subtask${subtask.id}" ondblclick="editSubtask(${subtask.id})">
-        <div class="subtaskText">${subtask.subtaskText}</div>
+        <div class="subTaskOutputDiv" id="subtask${safeSubtaskId}" ondblclick="editSubtask(${safeSubtaskId})">
+        <div class="subtaskText">${safeSubtaskText}</div>
             <div class="subtaskCheckboxes">
-                <div class="subtaskImgDiv pointer" id="subtaskImgEdit" onclick="editSubtask(${subtask.id})"> </div>
+                <div class="subtaskImgDiv pointer" id="subtaskImgEdit" onclick="editSubtask(${safeSubtaskId})"> </div>
                 <div class="vLine"></div>
-                <div class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${subtask.id})"> </div>
+                <div class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${safeSubtaskId})"> </div>
             </div>
         </div>`;
 }

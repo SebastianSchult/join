@@ -61,10 +61,14 @@ function renderCategories(arrayToSearchIn) {
  * @param {Object} task - The task object containing the description to be rendered.
  * @return {void} This function does not return anything.
  */
- function renderTaskDescription(task){
+function renderTaskDescription(task){
     let descriptionContainer = document.getElementById('cardText' + task['id']);
+    if (!descriptionContainer) return;
+
+    const taskDescription =
+      task && typeof task.description === "string" ? task.description : "";
     let cardText = "";
-    let taskDescriptionSplitted = task.description.split(' ');
+    let taskDescriptionSplitted = taskDescription.split(' ');
 
     taskDescriptionSplitted.forEach((word) => {
         if (cardText.length + word.length <= 46) cardText = cardText + " " + word;
@@ -72,9 +76,9 @@ function renderCategories(arrayToSearchIn) {
 
     cardText = cardText.substring(1);
 
-    if (cardText.length != task.description.length) cardText = cardText + " ..."; 
+    if (cardText.length != taskDescription.length) cardText = cardText + " ..."; 
 
-    descriptionContainer.innerHTML = cardText;
+    descriptionContainer.textContent = cardText;
 }
 
 
@@ -206,20 +210,43 @@ function setCardType(task){
  */
 function renderSubtasksToOpenCard(task){
     let container = document.getElementById('openCardSubtasksContainer');
-    container.innerHTML = /*html*/`<span class="openCardText">Subtasks:</span><div id="openCardSubtasks"></div>`
+    if (!container) return;
+
+    container.innerHTML = '';
+    const title = document.createElement('span');
+    title.className = 'openCardText';
+    title.textContent = 'Subtasks:';
+    const content = document.createElement('div');
+    content.id = 'openCardSubtasks';
+
+    container.appendChild(title);
+    container.appendChild(content);
     container.classList.add("openCardSubtasksContainer");
-    let content = document.getElementById('openCardSubtasks');
 
-    content.innerHTML = '';
-    task['subtasks'].forEach((subtask, index) => {
-        let completed = subtask['completed'] ? 'completed' : '';
+    const safeTaskId = toSafeInteger(task && task.id);
+    const subtasks = Array.isArray(task && task.subtasks) ? task.subtasks : [];
 
-        content.innerHTML += /*html*/`
-        <div class="openCardSubtask" ${completed}>
-            <div class="openCardSubtaskImgContainer" onclick="setSubtaskState(${task.id}, ${index})"></div>
-            ${subtask['subtaskText']}
-        </div>`
-    })
+    subtasks.forEach((subtask, index) => {
+        const subtaskRow = document.createElement('div');
+        subtaskRow.className = 'openCardSubtask';
+        if (subtask && subtask.completed === true) {
+            subtaskRow.setAttribute('completed', '');
+        }
+
+        const checkbox = document.createElement('div');
+        checkbox.className = 'openCardSubtaskImgContainer';
+        checkbox.addEventListener('click', () => setSubtaskState(safeTaskId, index));
+
+        const textNode = document.createElement('span');
+        textNode.textContent =
+            subtask && typeof subtask.subtaskText === 'string'
+                ? subtask.subtaskText
+                : '';
+
+        subtaskRow.appendChild(checkbox);
+        subtaskRow.appendChild(textNode);
+        content.appendChild(subtaskRow);
+    });
 }
 
 
@@ -304,7 +331,7 @@ function setTaskValuesToFields(){
     document.getElementById('addTaskEnterTitleInput').value = newTask['title'];
     document.getElementById('addTaskDescriptionInput').value = newTask['description'];
     document.getElementById('addTaskDueDateInput').value = newTask['dueDate'];
-    document.getElementById('dropdown-category-title').innerHTML = newTask['type'];
+    document.getElementById('dropdown-category-title').textContent = newTask['type'];
     setPriorityAppearance(newTask['priority']);
     renderEditCardAssignedContacts();
 }
@@ -420,9 +447,11 @@ function createEditHeader(){
  * @return {string} The HTML code for the edit task footer.
  */
 function createEditFooter(task){
+    const safeTaskId = toSafeInteger(task && task.id);
+
     return /*html*/`
     <div class="addTaskBodyRight">
-        <div class="createBtn addTaskBtn" onclick="saveEditedTask(${task.id}); doNotClose(event)">
+        <div class="createBtn addTaskBtn" onclick="saveEditedTask(${safeTaskId}); doNotClose(event)">
             <span class="addTaskBtnText">Ok</span>
             <div class="createBtnImg"></div>
         </div>
