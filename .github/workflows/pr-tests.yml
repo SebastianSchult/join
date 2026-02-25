@@ -27,3 +27,173 @@ jobs:
           for f in $files script.js; do
             node --check "$f"
           done
+
+      - name: Guardrail check for implicit globals in core scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require("fs");
+
+          const files = [
+            "script.js",
+            "js/login.js",
+            "js/contacts.js",
+            "js/summary.js",
+          ];
+
+          const jsKeywords = new Set([
+            "if",
+            "else",
+            "for",
+            "while",
+            "do",
+            "switch",
+            "case",
+            "break",
+            "continue",
+            "return",
+            "function",
+            "class",
+            "new",
+            "const",
+            "let",
+            "var",
+            "try",
+            "catch",
+            "finally",
+            "throw",
+            "await",
+            "async",
+            "typeof",
+            "instanceof",
+            "in",
+            "of",
+            "this",
+            "null",
+            "true",
+            "false",
+          ]);
+
+          const allowedGlobals = new Set([
+            "window",
+            "document",
+            "console",
+            "location",
+            "history",
+            "localStorage",
+            "sessionStorage",
+            "setTimeout",
+            "clearTimeout",
+            "setInterval",
+            "clearInterval",
+            "fetch",
+            "JSON",
+            "Math",
+            "Date",
+            "Promise",
+            "Array",
+            "Object",
+            "Number",
+            "String",
+            "Boolean",
+          ]);
+
+          function stripComments(source) {
+            return source
+              .replace(/\/\*[\s\S]*?\*\//g, (block) => " ".repeat(block.length))
+              .replace(/\/\/.*$/gm, "");
+          }
+
+          function addIdentifiers(text, target) {
+            const matches = text.match(/[A-Za-z_$][\w$]*/g) || [];
+            for (const match of matches) {
+              if (!jsKeywords.has(match)) {
+                target.add(match);
+              }
+            }
+          }
+
+          function collectDeclaredIdentifiers(source) {
+            const declared = new Set();
+            const code = stripComments(source);
+
+            const lines = code.split(/\r?\n/);
+            for (const line of lines) {
+              const varDeclaration = line.match(/^\s*(?:let|const|var)\s+(.+)$/);
+              if (varDeclaration) {
+                const parts = varDeclaration[1].split(",");
+                for (const part of parts) {
+                  const lhs = part.split("=")[0];
+                  addIdentifiers(lhs, declared);
+                }
+              }
+            }
+
+            const functionRegex = /\bfunction\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/g;
+            for (const match of code.matchAll(functionRegex)) {
+              declared.add(match[1]);
+              addIdentifiers(match[2], declared);
+            }
+
+            const catchRegex = /\bcatch\s*\(\s*([A-Za-z_$][\w$]*)\s*\)/g;
+            for (const match of code.matchAll(catchRegex)) {
+              declared.add(match[1]);
+            }
+
+            return declared;
+          }
+
+          const knownIdentifiers = new Set(allowedGlobals);
+          const strippedByFile = new Map();
+
+          for (const file of files) {
+            const source = fs.readFileSync(file, "utf8");
+            strippedByFile.set(file, stripComments(source));
+
+            const declared = collectDeclaredIdentifiers(source);
+            for (const identifier of declared) {
+              knownIdentifiers.add(identifier);
+            }
+          }
+
+          const violations = [];
+
+          for (const [file, source] of strippedByFile.entries()) {
+            const lines = source.split(/\r?\n/);
+
+            lines.forEach((line, lineIndex) => {
+              const lineNumber = lineIndex + 1;
+
+              const loopMatch = line.match(/for\s*\(\s*([A-Za-z_$][\w$]*)\s+(?:of|in)\b/);
+              if (loopMatch) {
+                const loopVariable = loopMatch[1];
+                if (!knownIdentifiers.has(loopVariable)) {
+                  violations.push(
+                    `${file}:${lineNumber} undeclared loop variable '${loopVariable}'`
+                  );
+                }
+              }
+
+              const assignmentMatch = line.match(/^\s*([A-Za-z_$][\w$]*)\s*=(?!=)/);
+              if (assignmentMatch) {
+                const assignmentTarget = assignmentMatch[1];
+                if (!knownIdentifiers.has(assignmentTarget)) {
+                  violations.push(
+                    `${file}:${lineNumber} undeclared assignment target '${assignmentTarget}'`
+                  );
+                }
+              }
+            });
+          }
+
+          if (violations.length > 0) {
+            console.error("Implicit global guardrail failed:");
+            for (const violation of violations) {
+              console.error(`- ${violation}`);
+            }
+            process.exit(1);
+          }
+
+          console.log("Implicit global guardrail passed.");
+          NODE

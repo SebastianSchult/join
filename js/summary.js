@@ -1,3 +1,5 @@
+"use strict";
+
 let loggedUser;
 let globalCapitalizedName;
 let dayTime;
@@ -31,7 +33,7 @@ async function summaryInit() {
  * Retrieves the currently logged in user by calling the getCurrentUser function and assigns it to the loggedUser variable.
  */
 function getLoggedUser() {
-    currentUser = getCurrentUser();
+    const currentUser = getCurrentUser();
     if (currentUser) {
         loggedUser = currentUser.username
     }
