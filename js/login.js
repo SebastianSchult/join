@@ -45,11 +45,29 @@ function checkIfUserWasPreviouslyRegistered() {
 }
 
 /**
- * Asynchronously loads the users from the 'contacts' item in local storage and parses it into a JavaScript object.
- * @return {Promise<void>} A promise that resolves when the users have been loaded and parsed.
+ * Asynchronously loads users from Firebase and migrates legacy plaintext passwords.
+ *
+ * @return {Promise<void>} A promise that resolves when users are loaded and migrated if needed.
  */
 async function loadUsers() {
     users = await firebaseGetItem(FIREBASE_USERS_ID);
+
+    if (!Array.isArray(users)) {
+        users = [];
+        return;
+    }
+
+    const migration = await migrateLegacyPlaintextPasswords(users);
+    if (migration.changed) {
+        await firebaseUpdateItem(users, FIREBASE_USERS_ID);
+    }
+}
+
+function findUserByEmail(email) {
+    const normalizedEmail = normalizeAuthEmail(email);
+    return users.find(
+        (user) => normalizeAuthEmail(user.mail) === normalizedEmail
+    );
 }
 
 /**
@@ -92,24 +110,36 @@ function hideOverlay() {
 }
 
 /**
- * Logs in a user by finding the user with matching email and password in the users array.
+ * Logs in a user by verifying the password hash stored for the account.
  * If a matching user is found, it sets the current user and switches the page to 'summary.html'.
  *
  * @return {boolean} Returns false to prevent the form from submitting again.
  */
 async function loginUser() {
-    let email = document.getElementById('loginEmailInput').value;
-    let password = document.getElementById('loginPasswordInput').value;
-    await loadUsers();
-    let loggedUser = users.find(user => user.mail == email && user.password == password);
-    users = [];
-    if (loggedUser) {
-        setCurrentUser(loggedUser.name); // sessionStorage
-        setRememberMe(loggedUser.name); // localStorage
-        switchPage('summary.html');
-    } else {
-        showUserMessage('Invalid email or password. Please try again.');
+    const email = document.getElementById('loginEmailInput').value;
+    const password = document.getElementById('loginPasswordInput').value;
+
+    try {
+        await loadUsers();
+        const user = findUserByEmail(email);
+        const isValidPassword = user
+            ? await verifyPasswordCredentials(user, password)
+            : false;
+        users = [];
+
+        if (isValidPassword) {
+            setCurrentUser(user.name); // sessionStorage
+            setRememberMe(user.name); // localStorage
+            switchPage('summary.html');
+        } else {
+            showUserMessage('Invalid email or password. Please try again.');
+        }
+    } catch (error) {
+        users = [];
+        console.error('Login failed:', error);
+        showUserMessage('Login failed. Please try again.');
     }
+
     return false;
 }
 
@@ -269,15 +299,29 @@ function validatePasswordConfirm() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('signUpNameInput').addEventListener('blur', validateName);
-  document.getElementById('signUpEmailInput').addEventListener('blur', validateEmail);
-  document.getElementById('signUpPasswordInput').addEventListener('blur', validatePassword);
-  document.getElementById('signUpPasswordInputConfirm').addEventListener('blur', validatePasswordConfirm);
-  
-  document.getElementById('signUpNameInput').addEventListener('keyup', checkIfFormIsValid);
-  document.getElementById('signUpEmailInput').addEventListener('keyup', checkIfFormIsValid);
-  document.getElementById('signUpPasswordInput').addEventListener('keyup', checkIfFormIsValid);
-  document.getElementById('signUpPasswordInputConfirm').addEventListener('keyup', checkIfFormIsValid);
+    const nameInput = document.getElementById('signUpNameInput');
+    if (nameInput) {
+        nameInput.addEventListener('blur', validateName);
+        nameInput.addEventListener('keyup', checkIfFormIsValid);
+    }
+    
+    const emailInput = document.getElementById('signUpEmailInput');
+    if (emailInput) {
+        emailInput.addEventListener('blur', validateEmail);
+        emailInput.addEventListener('keyup', checkIfFormIsValid);
+    }
+    
+    const passwordInput = document.getElementById('signUpPasswordInput');
+    if (passwordInput) {
+        passwordInput.addEventListener('blur', validatePassword);
+        passwordInput.addEventListener('keyup', checkIfFormIsValid);
+    }
+    
+    const passwordConfirmInput = document.getElementById('signUpPasswordInputConfirm');
+    if (passwordConfirmInput) {
+        passwordConfirmInput.addEventListener('blur', validatePasswordConfirm);
+        passwordConfirmInput.addEventListener('keyup', checkIfFormIsValid);
+    }
 });
   
 /**
@@ -304,5 +348,4 @@ function checkIfFormIsValid() {
     return false;
   }
 }
-
 

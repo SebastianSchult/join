@@ -4,35 +4,24 @@ let newMail = '';
 let newPassword = '';
 let newPasswordConfirm = '';
 
-let newUser = {
-    id: '',
-    name: '',
-    mail: '',
-    password: '',
-    contactColor: '',
-    phone: '+49 0123 456789'
-};
-
-// --- Bestehende Funktionen ---
-
-async function saveNewUser() {
-    users = await firebaseGetItem(FIREBASE_USERS_ID);
-    users.push(newUser);
-}
-
 function getInputValues() {
-    newUsername = document.getElementById('signUpNameInput').value;
-    newMail = document.getElementById('signUpEmailInput').value;
+    newUsername = document.getElementById('signUpNameInput').value.trim();
+    newMail = document.getElementById('signUpEmailInput').value.trim();
     newPassword = document.getElementById('signUpPasswordInput').value;
     newPasswordConfirm = document.getElementById('signUpPasswordInputConfirm').value;
 }
 
-function setNewUserValues() {
-    newUser.name = newUsername;
-    newUser.mail = newMail;
-    newUser.password = newPassword;
-    newUser.id = findFreeId(users);
-    newUser.contactColor = generateRandomColor();
+async function buildNewUser() {
+    const passwordCredentials = await createPasswordCredentials(newPassword);
+
+    return {
+        id: findFreeId(users),
+        name: newUsername,
+        mail: normalizeAuthEmail(newMail),
+        contactColor: generateRandomColor(),
+        phone: '+49 0123 456789',
+        ...passwordCredentials,
+    };
 }
 
 async function addNewUser() {
@@ -43,26 +32,32 @@ async function addNewUser() {
     
     users = await firebaseGetItem(FIREBASE_USERS_ID);
     getInputValues();
-    setNewUserValues();
     if (!checkPasswordsEqual()) {
         showUserMessage('Passwords do not match!');
     } else if (checkMailExist(newMail)) {
         showUserMessage('The mail already exists!');
     } else {
-        localStorage.setItem('newMail', newUser.mail);
-        localStorage.setItem('hasJustSignedUp','');
-        users.push(newUser);
-        await firebaseUpdateItem(users, FIREBASE_USERS_ID);
-        showUserMessage('You Signed Up successfully!');
-        setTimeout(() => {
-            switchPage('index.html');
-        }, 3000);
+        try {
+            const userToCreate = await buildNewUser();
+            localStorage.setItem('newMail', userToCreate.mail);
+            localStorage.setItem('hasJustSignedUp','');
+            users.push(userToCreate);
+            await firebaseUpdateItem(users, FIREBASE_USERS_ID);
+            showUserMessage('You Signed Up successfully!');
+            setTimeout(() => {
+                switchPage('index.html');
+            }, 3000);
+        } catch (error) {
+            console.error('Failed to securely create user:', error);
+            showUserMessage('Sign up failed. Please try again.');
+        }
     }
 }
 
 function checkMailExist(mailToCheck) {
+    const normalizedMail = normalizeAuthEmail(mailToCheck);
     for (let i = 0; i < users.length; i++) {
-        if (users[i].mail === mailToCheck) {
+        if (normalizeAuthEmail(users[i].mail) === normalizedMail) {
             return true;
         }
     }
@@ -231,17 +226,28 @@ function validatePasswordConfirm() {
   }
 }
 
-// --- Eventlistener hinzufügen ---
 document.addEventListener('DOMContentLoaded', function() {
-  // onBlur-Events für die Validierung der Felder
-  document.getElementById('signUpNameInput').addEventListener('blur', validateName);
-  document.getElementById('signUpEmailInput').addEventListener('blur', validateEmail);
-  document.getElementById('signUpPasswordInput').addEventListener('blur', validatePassword);
-  document.getElementById('signUpPasswordInputConfirm').addEventListener('blur', validatePasswordConfirm);
-
-  // Optionale onKeyUp-Listener, um das Formular fortlaufend zu prüfen
-  document.getElementById('signUpNameInput').addEventListener('keyup', checkIfFormIsValid);
-  document.getElementById('signUpEmailInput').addEventListener('keyup', checkIfFormIsValid);
-  document.getElementById('signUpPasswordInput').addEventListener('keyup', checkIfFormIsValid);
-  document.getElementById('signUpPasswordInputConfirm').addEventListener('keyup', checkIfFormIsValid);
+    const nameInput = document.getElementById('signUpNameInput');
+    if (nameInput) {
+        nameInput.addEventListener('blur', validateName);
+        nameInput.addEventListener('keyup', checkIfFormIsValid);
+    }
+    
+    const emailInput = document.getElementById('signUpEmailInput');
+    if (emailInput) {
+        emailInput.addEventListener('blur', validateEmail);
+        emailInput.addEventListener('keyup', checkIfFormIsValid);
+    }
+    
+    const passwordInput = document.getElementById('signUpPasswordInput');
+    if (passwordInput) {
+        passwordInput.addEventListener('blur', validatePassword);
+        passwordInput.addEventListener('keyup', checkIfFormIsValid);
+    }
+    
+    const passwordConfirmInput = document.getElementById('signUpPasswordInputConfirm');
+    if (passwordConfirmInput) {
+        passwordConfirmInput.addEventListener('blur', validatePasswordConfirm);
+        passwordConfirmInput.addEventListener('keyup', checkIfFormIsValid);
+    }
 });

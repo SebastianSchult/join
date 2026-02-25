@@ -88,17 +88,6 @@ function getNextId(contactsArray) {
 
 
 /**
- * Returns the first name from a given full name string for use as a default password.
- *
- * @param {string} name - The full name string.
- * @return {string} The first name extracted from the full name string.
- */
-function getFirstNameForDefaultPassword(name) {
-  return name.split(" ")[0];
-}
-
-
-/**
  * Finds the maximum id in the contactsArray and returns the next id.
  */
 function getNextId(contactsArray) {
