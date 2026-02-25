@@ -79,17 +79,11 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install accessibility check dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-audit --no-fund
-
       - name: Run Lighthouse accessibility baseline
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm run a11y:ci
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.cjs
+          uploadArtifacts: false
 
       - name: Print Lighthouse accessibility summary
         if: always()

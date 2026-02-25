@@ -8,6 +8,7 @@ It also includes a semantic audit guardrail for critical/serious WCAG blockers.
 Workflow: `.github/workflows/pr-tests.yml`
 
 Job: `accessibility-baseline`
+Runner action: `treosh/lighthouse-ci-action@v12`
 
 Pages checked:
 
