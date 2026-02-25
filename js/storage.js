@@ -37,10 +37,88 @@ function assertConfig(requiredKeys) {
     }
 }
 
-function assertResponseOk(response, context) {
-    if (!response.ok) {
-        throw new Error(`${context} failed with status ${response.status}`);
+function normalizeFetchOptions(options = {}) {
+    const normalizedOptions = { ...options };
+
+    // Defensive normalization in case a caller accidentally uses `header` instead of `headers`.
+    if (
+        normalizedOptions.header &&
+        !normalizedOptions.headers &&
+        typeof normalizedOptions.header === "object"
+    ) {
+        normalizedOptions.headers = normalizedOptions.header;
     }
+
+    delete normalizedOptions.header;
+    return normalizedOptions;
+}
+
+function parseResponsePayload(responseText) {
+    if (typeof responseText !== "string" || responseText.trim() === "") {
+        return null;
+    }
+
+    try {
+        return JSON.parse(responseText);
+    } catch (error) {
+        return responseText;
+    }
+}
+
+function getResponseErrorDetail(payload) {
+    if (!payload) {
+        return "";
+    }
+
+    if (typeof payload === "string") {
+        return payload;
+    }
+
+    if (typeof payload === "object") {
+        if (typeof payload.message === "string") {
+            return payload.message;
+        }
+        if (typeof payload.error === "string") {
+            return payload.error;
+        }
+    }
+
+    return "";
+}
+
+function createFetchHttpError(response, context, payload) {
+    const statusText = response.statusText ? ` ${response.statusText}` : "";
+    const detail = getResponseErrorDetail(payload);
+    const detailSuffix = detail ? `: ${detail}` : "";
+    const error = new Error(
+        `${context} failed with status ${response.status}${statusText}${detailSuffix}`
+    );
+
+    error.status = response.status;
+    error.context = context;
+    error.payload = payload;
+    return error;
+}
+
+async function fetchJson(url, options = {}, context = "fetchJson") {
+    let response;
+
+    try {
+        response = await fetch(url, normalizeFetchOptions(options));
+    } catch (error) {
+        const networkError = new Error(`${context} network error: ${error.message}`);
+        networkError.cause = error;
+        throw networkError;
+    }
+
+    const responseText = await response.text();
+    const payload = parseResponsePayload(responseText);
+
+    if (!response.ok) {
+        throw createFetchHttpError(response, context, payload);
+    }
+
+    return payload;
 }
 
 function getFirebaseUrl(path = "_") {
@@ -56,15 +134,17 @@ function getFirebaseUrl(path = "_") {
  * @return {Promise<Object>} Firebase response payload.
  */
 async function firebaseCreateItem(jsonArray, path = "_") {
-    const response = await fetch(getFirebaseUrl(path), {
+    return fetchJson(
+        getFirebaseUrl(path),
+        {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(jsonArray),
-    });
-    assertResponseOk(response, "firebaseCreateItem");
-    return response.json();
+        },
+        "firebaseCreateItem"
+    );
 }
 
 /**
@@ -75,15 +155,17 @@ async function firebaseCreateItem(jsonArray, path = "_") {
  * @return {Promise<Object>} Firebase response payload.
  */
 async function firebaseUpdateItem(jsonArray, path = "_") {
-    const response = await fetch(getFirebaseUrl(path), {
+    return fetchJson(
+        getFirebaseUrl(path),
+        {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(jsonArray),
-    });
-    assertResponseOk(response, "firebaseUpdateItem");
-    return response.json();
+        },
+        "firebaseUpdateItem"
+    );
 }
 
 /**
@@ -93,9 +175,7 @@ async function firebaseUpdateItem(jsonArray, path = "_") {
  * @return {Promise<Object>} A Promise that resolves to the retrieved item as a JSON object.
  */
 async function firebaseGetItem(path = "_") {
-    const response = await fetch(getFirebaseUrl(path));
-    assertResponseOk(response, "firebaseGetItem");
-    return response.json();
+    return fetchJson(getFirebaseUrl(path), {}, "firebaseGetItem");
 }
 
 function normalizeFirebaseArrayPayload(payload) {
@@ -187,10 +267,8 @@ async function firebaseGetArraySafe(path = "_", options = {}) {
 async function remoteStorageGetItem(key) {
     assertConfig(["STORAGE_TOKEN"]);
     const url = `${STORAGE_URL}?key=${key}&token=${STORAGE_TOKEN}`;
-    const response = await fetch(url);
-    assertResponseOk(response, "remoteStorageGetItem");
-    const responseAsJson = await response.json();
-    if (responseAsJson.data) {
+    const responseAsJson = await fetchJson(url, {}, "remoteStorageGetItem");
+    if (responseAsJson && responseAsJson.data) {
         return responseAsJson.data.value;
     }
     throw new Error(`Could not find data with the key "${key}"`);
@@ -232,13 +310,15 @@ function restoreUsersOnFirebase() {
 async function remoteStorageSetItem(key, value) {
     assertConfig(["STORAGE_TOKEN"]);
     const payload = { key, value, token: STORAGE_TOKEN };
-    const response = await fetch(STORAGE_URL, {
+    return fetchJson(
+        STORAGE_URL,
+        {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-    });
-    assertResponseOk(response, "remoteStorageSetItem");
-    return response.json();
+        },
+        "remoteStorageSetItem"
+    );
 }
