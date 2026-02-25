@@ -301,24 +301,22 @@ async function saveEditedContact(id) {
     return;
   }
 
-  let users = loadResult.data;
-  const userIndex = users.findIndex((contact) => contact.id === id);
+  const sourceUsers = loadResult.data;
+  const userIndex = sourceUsers.findIndex((contact) => contact.id === id);
 
   if (userIndex !== -1) {
-    const user = users[userIndex];
+    const user = sourceUsers[userIndex];
 
     user.name = document.getElementById("contactName").value;
-    user.mail = document.getElementById("contactMail").value;
+    user.mail = normalizeEmailForContactFlow(
+      document.getElementById("contactMail").value
+    );
     user.phone = document.getElementById("contactPhone").value;
 
-
-    await firebaseUpdateItem(users, FIREBASE_USERS_ID);
-    users = [];
+    await firebaseUpdateItem(sourceUsers, FIREBASE_USERS_ID);
     closeOverlay("editContact");
     displaySuccessMessage("Contact successfully edited");
-    setTimeout(() => {
-      window.location.reload();
-    }, 2500);
+    applyContactsMutationResult(sourceUsers, id);
   }
 }
 
@@ -374,16 +372,14 @@ async function deleteContact(id) {
     return;
   }
 
-  let users = loadResult.data;
-  const userIndex = users.findIndex((user) => user.id === id);
+  const sourceUsers = loadResult.data;
+  const userIndex = sourceUsers.findIndex((user) => user.id === id);
   if (userIndex !== -1) {
-    users.splice(userIndex, 1);
-    await firebaseUpdateItem(users, FIREBASE_USERS_ID);
-    users = [];
+    sourceUsers.splice(userIndex, 1);
+    await firebaseUpdateItem(sourceUsers, FIREBASE_USERS_ID);
+    deleteContactFromLocalStorage(id);
     displaySuccessMessage("Contact successfully deleted");
-    setTimeout(() => {
-      window.location.reload();
-    }, 3000);
+    applyContactsMutationResult(sourceUsers);
   }
 }
 
@@ -394,8 +390,31 @@ async function deleteContact(id) {
  * @param {number} id - The unique identifier of the contact to be removed.
  * @return {void} This function does not return anything.
  */
-function removeContact(id) {
-  deleteContactFromLocalStorage(id);
-  deleteContact(id);
-  contactsInit();
+async function removeContact(id) {
+  await deleteContact(id);
+}
+
+
+/**
+ * Updates local contact state and re-renders contacts after successful mutations.
+ *
+ * @param {Array} sourceUsers - Updated user array from Firebase flow.
+ * @param {number|null} selectedContactId - Contact to keep selected after rerender.
+ * @returns {void}
+ */
+function applyContactsMutationResult(sourceUsers, selectedContactId = null) {
+  users = Array.isArray(sourceUsers) ? sourceUsers : [];
+  getContactsOutOfUsers();
+  loadContacts();
+
+  if (selectedContactId == null) {
+    return;
+  }
+
+  const hasSelectedContact = contacts.some(
+    (contact) => contact.id === selectedContactId
+  );
+  if (hasSelectedContact) {
+    openContactDetails(selectedContactId);
+  }
 }
