@@ -3,6 +3,7 @@ let newUsername = '';
 let newMail = '';
 let newPassword = '';
 let newPasswordConfirm = '';
+let users = [];
 
 function getInputValues() {
     newUsername = document.getElementById('signUpNameInput').value.trim();

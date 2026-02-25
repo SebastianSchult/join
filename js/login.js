@@ -1,6 +1,8 @@
 /**
  * Initializes the login process by including HTML, setting default inputs, and starting an animation.
  */
+let users = [];
+
 async function loginInit() {
     checkIfUserIsRemembered();
 
@@ -140,12 +142,12 @@ async function loginUser() {
             setRememberMe(user.name); // localStorage
             switchPage('summary.html');
         } else {
-            showUserMessage('Invalid email or password. Please try again.');
+            showGlobalUserMessage('Invalid email or password. Please try again.');
         }
     } catch (error) {
         users = [];
         console.error('Login failed:', error);
-        showUserMessage('Login failed. Please try again.');
+        showGlobalUserMessage('Login failed. Please try again.');
     }
 
     return false;
@@ -189,170 +191,4 @@ function loginAsGuest() {
  */
 function gotoSignUp() {
     switchPage('signUp.html');
-}
-
-/**
- * Shows an error message for the given inputElement by creating a .error-message span and adding the message text to it.
- * Adds the 'error' class to the inputElement for CSS styling.
- * If an error message already exists, overwrites the text content of the existing error message.
- * @param {HTMLInputElement} inputElement - The element to show the error message for.
- * @param {string} message - The error message to display.
- */
-function showError(inputElement, message) {
-  const container = inputElement.closest('.signUpInputField');
-  let errorEl = container.querySelector('.error-message');
-  if (!errorEl) {
-    errorEl = document.createElement('span');
-    errorEl.className = 'error-message';
-    container.appendChild(errorEl);
-  }
-  errorEl.textContent = message;
-  inputElement.classList.add('error');
-}
-
-/**
- * Clears any error message for the given inputElement by removing the text content from the containing
- * .error-message span and removing the 'error' class from the inputElement.
- * @param {HTMLInputElement} inputElement - The element to clear any error message for.
- */
-function clearError(inputElement) {
-  const container = inputElement.closest('.signUpInputField');
-  const errorEl = container.querySelector('.error-message');
-  if (errorEl) {
-    errorEl.textContent = '';
-  }
-  inputElement.classList.remove('error');
-}
-
-/**
- * Validates the name input field by checking against a regex pattern that allows letters and spaces.
- * Displays an error message if the input is empty or does not match the pattern.
- * Clears any error message if the input is valid.
- *
- * @return {boolean} Returns true if the name input is valid, false otherwise.
- */
-
-function validateName() {
-  const nameInput = document.getElementById('signUpNameInput');
-  const nameValue = nameInput.value.trim();
-  const nameRegex = /^[A-Za-zäöüÄÖÜß\s]+$/;
-  if (nameValue === '' || !nameRegex.test(nameValue)) {
-    showError(nameInput, 'Bitte geben Sie einen gültigen Namen ein.');
-    return false;
-  } else {
-    clearError(nameInput);
-    return true;
-  }
-}
-
-/**
- * Validates the email input field by checking if the value matches a standard email format.
- * Displays an error message if the input is empty or does not match the regex pattern.
- * Clears the error message if the input is valid.
- * 
- * @return {boolean} Returns true if the email is valid, false otherwise.
- */
-
-function validateEmail() {
-  const emailInput = document.getElementById('signUpEmailInput');
-  const emailValue = emailInput.value.trim();
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-  if (emailValue === '' || !emailRegex.test(emailValue)) {
-    showError(emailInput, 'Bitte geben Sie eine gültige E-Mail-Adresse ein.');
-    return false;
-  } else {
-    clearError(emailInput);
-    return true;
-  }
-}
-
-/**
- * Checks if the password input has a value.
- * If the password input is empty, an error message is displayed.
- * Clears any error message if the input has a value.
- * @return {boolean} true if the password input has a value, false if not.
- */
-function validatePassword() {
-  const passwordInput = document.getElementById('signUpPasswordInput');
-  const passwordValue = passwordInput.value;
-  if (passwordValue === '') {
-    showError(passwordInput, 'Bitte geben Sie ein Passwort ein.');
-    return false;
-  } else {
-    clearError(passwordInput);
-    return true;
-  }
-}
-
-/**
- * Validates that the password confirmation input matches the password input.
- * If the confirmation input is empty or does not match the password, an error message is displayed.
- * Clears any error message if the inputs match.
- *
- * @return {boolean} Returns true if the password confirmation matches the password, false otherwise.
- */
-
-function validatePasswordConfirm() {
-  const passwordInput = document.getElementById('signUpPasswordInput');
-  const passwordConfirmInput = document.getElementById('signUpPasswordInputConfirm');
-  const passwordValue = passwordInput.value;
-  const confirmValue = passwordConfirmInput.value;
-  if (confirmValue === '' || passwordValue !== confirmValue) {
-    showError(passwordConfirmInput, 'Passwörter stimmen nicht überein.');
-    return false;
-  } else {
-    clearError(passwordConfirmInput);
-    return true;
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const nameInput = document.getElementById('signUpNameInput');
-    if (nameInput) {
-        nameInput.addEventListener('blur', validateName);
-        nameInput.addEventListener('keyup', checkIfFormIsValid);
-    }
-    
-    const emailInput = document.getElementById('signUpEmailInput');
-    if (emailInput) {
-        emailInput.addEventListener('blur', validateEmail);
-        emailInput.addEventListener('keyup', checkIfFormIsValid);
-    }
-    
-    const passwordInput = document.getElementById('signUpPasswordInput');
-    if (passwordInput) {
-        passwordInput.addEventListener('blur', validatePassword);
-        passwordInput.addEventListener('keyup', checkIfFormIsValid);
-    }
-    
-    const passwordConfirmInput = document.getElementById('signUpPasswordInputConfirm');
-    if (passwordConfirmInput) {
-        passwordConfirmInput.addEventListener('blur', validatePasswordConfirm);
-        passwordConfirmInput.addEventListener('keyup', checkIfFormIsValid);
-    }
-});
-  
-/**
- * Checks if the form is valid by verifying the form's validity, the privacy policy confirmation,
- * und durch die individuellen Validierungsfunktionen.
- *
- * @return {boolean} Returns true if the form is valid and false otherwise.
- */
-function checkIfFormIsValid() {
-  const form = document.getElementById('login-form');
-  const btn = document.getElementById('registerBtn');
-  if (
-    form.checkValidity() &&
-    checkPrivacyPolicyConfirmation() &&
-    validateEmail() &&
-    validateName() &&
-    validatePassword() &&
-    validatePasswordConfirm()
-  ) {
-    btn.disabled = false;
-    return true;
-  } else {
-    btn.disabled = true;
-    return false;
-  }
 }
