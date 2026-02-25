@@ -4,6 +4,7 @@
  * @param {number} taskId - The ID of the task to open.
  */
 function openCard(taskId){
+    const opener = document.activeElement;
     if (!document.getElementById('openCardContainer')){
         let newDiv = document.createElement('div');
         setAttributes(newDiv, {
@@ -30,6 +31,16 @@ function openCard(taskId){
         renderOpenCardImages(task);
     }
     toggleBoardOverlay('closeCard()');
+    activateFocusLayer(openCardContainer, {
+        opener,
+        initialFocus: '.boardAddTaskCloseHoverContainer',
+        onEscape: () => {
+            if (typeof closeOpenDropdowns === "function" && closeOpenDropdowns({ restoreFocus: true })) {
+                return;
+            }
+            closeCard();
+        },
+    });
 }
 
 
@@ -39,6 +50,12 @@ function openCard(taskId){
  */
 async function closeCard(){
     let openCardContainer = document.getElementById('openCardContainer');
+    if (!openCardContainer) {
+        deactivateFocusLayer({ restoreFocus: true });
+        toggleBoardOverlay('disable');
+        return;
+    }
+    deactivateFocusLayer({ restoreFocus: true });
     openCardContainer.remove();
     openCardContainer.classList.add('d-none');
     openCardContainer.removeAttribute('editing');
@@ -87,6 +104,12 @@ function renderBoardAddTaskOverlay(){
     document.getElementById('addTaskBodyRight').innerHTML += renderAddTaskFooterHTML();
     setTodayDateAsMin();
     setPriority('medium');
+    if (typeof registerAddTaskKeyboardAccessibility === "function") {
+        registerAddTaskKeyboardAccessibility();
+    }
+    if (typeof initializeDropdownAccessibilityState === "function") {
+        initializeDropdownAccessibilityState();
+    }
     renderContactsToDropdown();
     checkValidity();
 }
@@ -97,6 +120,7 @@ function renderBoardAddTaskOverlay(){
  * If the container does not exist, it will be created and rendered.
  */
 function showAddTaskContainer(category='category-0') {
+    const opener = document.activeElement;
     newTask.category = category;
     if (!document.getElementById('addTaskHoverContainer')) {
         renderBoardAddTaskOverlay();
@@ -110,6 +134,16 @@ function showAddTaskContainer(category='category-0') {
     let container = document.getElementById('addTaskHoverContainer');
     container.classList.add('showBoard');
     toggleBoardOverlay("hideAddTaskContainer()");
+    activateFocusLayer(container, {
+        opener,
+        initialFocus: '.boardAddTaskCloseHoverContainer, #addTaskEnterTitleInput',
+        onEscape: () => {
+            if (typeof closeOpenDropdowns === "function" && closeOpenDropdowns({ restoreFocus: true })) {
+                return;
+            }
+            hideAddTaskContainer();
+        },
+    });
 }
 
 
@@ -118,8 +152,14 @@ function showAddTaskContainer(category='category-0') {
  *
  */
 function hideAddTaskContainer(){
+    if(!document.getElementById('addTaskHoverContainer')){
+        deactivateFocusLayer({ restoreFocus: true });
+        toggleBoardOverlay('disable');
+        return;
+    }
     if(document.getElementById('addTaskHoverContainer')){
         let container = document.getElementById('addTaskHoverContainer');
+        deactivateFocusLayer({ restoreFocus: true });
         container.classList.remove('showBoard');
         container.classList.add('hideBoard');
         toggleBoardOverlay('disable');
