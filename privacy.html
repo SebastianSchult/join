@@ -21,10 +21,10 @@
     <title>Join - Privacy Policy</title>
 </head>
 
-<body onload="privacyInit()">
+<body data-init="privacyInit">
     <div id="bodyContent" class="bodyContent">
         <div class="header-content">
-            <img class="header-logo" src="./assets/img/logo-small_white.png" alt="join-logo" onclick="switchPage('summary.html')" />
+            <img class="header-logo" src="./assets/img/logo-small_white.png" alt="join-logo" data-action="switch-page" data-url="summary.html" />
             <div class="header-inner-right">
                 <span class="header-kanban-writing">Kanban Project Management Tool</span>
             </div>
@@ -37,7 +37,7 @@
                 <div class="privacy-wrapper">
                     <div class="h1PrivacyBox">
                         <h1>Privacy Policy</h1>
-                        <img src="./assets/img/icon-arrow_left.png" alt="going-back arrow" onclick="goBack()">
+                        <img src="./assets/img/icon-arrow_left.png" alt="going-back arrow" data-action="go-back">
                     </div>
                     <p>Last updated: April 20, 2024</p>
                     <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure

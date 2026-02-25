@@ -20,7 +20,7 @@
     <title>Join - Help</title>
 </head>
 
-<body onload="helpInit()">
+<body data-init="helpInit">
     <div id="bodyContent" class="bodyContent">
         <header w3-include-html="./assets/templates/header.html" id="header" class="header">
         </header>
@@ -31,7 +31,7 @@
                 <div class="help-page">
                     <div class="help-page-header">
                         <h1>Help</h1>
-                        <img src="./assets/img/icon-arrow_left.png" onclick="goBack()">
+                        <img src="./assets/img/icon-arrow_left.png" data-action="go-back">
                     </div>
 
                     <div>

@@ -437,7 +437,7 @@ function finalizeEdit() {
 function createEditHeader(){
     return /*html*/`
 <div class="boardEditTaskHeader">
-    <button type="button" class="boardAddTaskCloseHoverContainer" onclick="closeCard()" aria-label="Close edit card"></button>
+    <button type="button" class="boardAddTaskCloseHoverContainer" data-action="close-card" aria-label="Close edit card"></button>
  </div>
     `
 }
@@ -454,7 +454,7 @@ function createEditFooter(task){
 
     return /*html*/`
     <div class="addTaskBodyRight">
-        <button type="button" class="createBtn addTaskBtn" onclick="saveEditedTask(${safeTaskId}); doNotClose(event)">
+        <button type="button" class="createBtn addTaskBtn" data-action="save-edited-task" data-task-id="${safeTaskId}" data-stop-propagation="true">
             <span class="addTaskBtnText">Ok</span>
             <span class="createBtnImg"></span>
         </button>

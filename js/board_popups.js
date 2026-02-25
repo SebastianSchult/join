@@ -10,7 +10,7 @@ function openCard(taskId){
         setAttributes(newDiv, {
             'id': 'openCardContainer',
             'class': 'openCardContainer',
-            'onclick': 'doNotClose(event)'
+            'data-stop-propagation': 'true'
         });
         document.body.appendChild(newDiv);
     }
@@ -30,7 +30,7 @@ function openCard(taskId){
     if(task.images && task.images.length > 0) {
         renderOpenCardImages(task);
     }
-    toggleBoardOverlay('closeCard()');
+    toggleBoardOverlay('close-card');
     activateFocusLayer(openCardContainer, {
         opener,
         initialFocus: '.boardAddTaskCloseHoverContainer',
@@ -95,7 +95,7 @@ function renderContactsToOpenCard(task) {
  */
 function renderBoardAddTaskOverlay(){
     let newDiv = document.createElement('div');
-    setAttributes(newDiv, {'id': 'addTaskHoverContainer', 'class': 'addTaskHoverContainer', 'onclick': 'doNotClose(event)'});
+    setAttributes(newDiv, {'id': 'addTaskHoverContainer', 'class': 'addTaskHoverContainer', 'data-stop-propagation': 'true'});
     document.body.appendChild(newDiv);
 
     let container = document.getElementById('addTaskHoverContainer');
@@ -133,7 +133,7 @@ function showAddTaskContainer(category='category-0') {
     }
     let container = document.getElementById('addTaskHoverContainer');
     container.classList.add('showBoard');
-    toggleBoardOverlay("hideAddTaskContainer()");
+    toggleBoardOverlay("hide-add-task-container");
     activateFocusLayer(container, {
         opener,
         initialFocus: '.boardAddTaskCloseHoverContainer, #addTaskEnterTitleInput',
@@ -173,16 +173,16 @@ function hideAddTaskContainer(){
 /**
  * Toggles the board overlay visibility based on the provided function to call.
  *
- * @param {string} functionToCall - The function to be called on overlay click.
+ * @param {string} actionName - Delegated action to trigger on overlay click.
  */
-function toggleBoardOverlay(functionToCall){
+function toggleBoardOverlay(actionName){
     let overlay = document.getElementById('boardOverlay')
     if (overlay.classList.contains('d-none')){
         overlay.classList.remove('d-none')
-        overlay.setAttribute('onclick', functionToCall);
-    } else if (functionToCall == 'disable') {
+        overlay.dataset.action = actionName;
+    } else if (actionName == 'disable') {
         overlay.classList.add('d-none')
-        overlay.removeAttribute('onclick');
+        delete overlay.dataset.action;
     }
 }
 

@@ -6,7 +6,7 @@
  */
 function generateContactsContainerHTML() {
     return /*html*/ ` 
-    <div id="contactMainEdit" class="contact-main-edit" onclick="doNotClose(event)">
+    <div id="contactMainEdit" class="contact-main-edit" data-stop-propagation="true">
 
   </div>
   <div class="contact-list-container">
@@ -14,12 +14,12 @@ function generateContactsContainerHTML() {
       <div id="addContactContainer" class="hidden">
       </div>
   </div>
-  <button type="button" class="add-contact-button" onclick="addContactCard()" aria-label="Add new contact">
+  <button type="button" class="add-contact-button" data-action="add-contact-card" aria-label="Add new contact">
     <img src="./assets/img/Secondary mobile contact V1.png" alt="">
   </button>
   <div class="contacts-container-outer">
     <div class="contacts-container" id="contacts-container"> 
-            <div id="button-add-contact-card" class="button-add-contact" onclick="addContactCard(); doNotClose(event)">
+            <div id="button-add-contact-card" class="button-add-contact" data-action="add-contact-card" data-stop-propagation="true">
                 <div class="add-new-contact">Add new contact</div>
                 <img src="./assets/img/icon-person_add.png" alt="icon-person_add.png">
             </div>
@@ -27,7 +27,7 @@ function generateContactsContainerHTML() {
         </div>
     </div>
   </div>
-  <section class="right-side d-none" id="rightSide" onclick="closeEditDelete()">
+  <section class="right-side d-none" id="rightSide" data-action="close-edit-delete">
   
   </section>
       `;
@@ -42,7 +42,7 @@ function renderAddContactsHTML() {
     return /*html*/ `
           <div class="add-contact-header">
               <div class="add-contact-header-close">
-                  <button type="button" class="icon-action-button" onclick="closeOverlay('addContact')" aria-label="Close add contact form">
+                  <button type="button" class="icon-action-button" data-action="close-overlay" data-overlay-id="addContact" aria-label="Close add contact form">
                       <img src="./assets/img/icon-close_white.png" alt="">
                   </button>
               </div>
@@ -58,7 +58,7 @@ function renderAddContactsHTML() {
                       <img src="./assets/img/add.contact-badge.png" alt="">
                   </div>
               </div>
-              <form onsubmit="saveContact(); return false" class="add-contact-input-group">
+              <form data-submit-action="save-contact" class="add-contact-input-group">
                   <div class="input-frame">
                       <label class="sr-only" for="contactName">Name</label>
                       <input id="contactName" type="text" placeholder="Name" autocomplete="name" autofocus required>
@@ -75,8 +75,8 @@ function renderAddContactsHTML() {
                       <img src="./assets/img/icon-call.png" alt="">
                   </div>
                   <div id="addContactButton" class="addContactButton">
-                      <button type="button" class="cancelButton" onclick="closeOverlay('addContact')" onmouseover="changeCancelIcon()"
-                          onmouseout="restoreCancelIcon()">Cancel
+                      <button type="button" class="cancelButton" data-action="close-overlay" data-overlay-id="addContact" data-hover-action="change-cancel-icon"
+                          data-leave-action="restore-cancel-icon">Cancel
                           <img id="cancelIcon" src="./assets/img/icon-cancel.png" alt="">
                       </button>
                       <button type="submit" id="createBtn" class="createButton">Create contact
@@ -102,7 +102,7 @@ function renderEditContactHTML(id, name, contactColor) {
     return /*html*/ `
           <div class="edit-contact-header">
               <div class="edit-contact-header-close">
-                  <button type="button" class="icon-action-button" onclick="closeOverlay('editContact')" aria-label="Close edit contact form">
+                  <button type="button" class="icon-action-button" data-action="close-overlay" data-overlay-id="editContact" aria-label="Close edit contact form">
                       <img src="./assets/img/icon-close_white.png" alt="">
                   </button>
               </div>
@@ -121,7 +121,7 @@ function renderEditContactHTML(id, name, contactColor) {
             </div>
                   </div>
               </div>
-              <form action="" onsubmit="saveEditedContact(${safeContactId}); return false" class="add-contact-input-group">
+              <form action="" data-submit-action="save-edited-contact" data-contact-id="${safeContactId}" class="add-contact-input-group">
                   <div class="input-frame">
                       <label class="sr-only" for="contactName">Name</label>
                       <input id="contactName" type="text" placeholder="Name" autocomplete="name" autofocus required>
@@ -138,8 +138,8 @@ function renderEditContactHTML(id, name, contactColor) {
                       <img src="./assets/img/icon-call.png" alt="">
                   </div>
                   <div id="addContactButton" class="addContactButton">
-                      <button type="button" class="cancelButton" onclick="closeOverlay('editContact')" onmouseover="changeCancelIcon()"
-                          onmouseout="restoreCancelIcon()">Cancel
+                      <button type="button" class="cancelButton" data-action="close-overlay" data-overlay-id="editContact" data-hover-action="change-cancel-icon"
+                          data-leave-action="restore-cancel-icon">Cancel
                           <img id="cancelIcon" src="./assets/img/icon-cancel.png" alt="">
                       </button>
                       <button class="createButton" type="submit">Save
@@ -177,7 +177,7 @@ function generateContactCardHTML(
     const safeShorterMail = escapeHtml(shorterMail);
 
     return /*html*/ `
-      <div class="contact-card" id="contact-card-${safeContactId}" onclick="openContactDetails(${safeContactId})">
+      <div class="contact-card" id="contact-card-${safeContactId}" data-action="open-contact-details" data-contact-id="${safeContactId}">
         <div class="profile-badge-group" style="background-color: ${safeProfileColor}">${safeInitials}</div>
         <div>
           <span class="contact-card-name">${safeFormattedName}</span><br>
@@ -210,7 +210,7 @@ function generateContactDetailsHTML(name, email, phone, id, color) {
       <div class="contact-Details">
         <div class="contact-details-header-and-button">
           <div class="contact-details-header-responsive">Contact Information</div>
-          <button type="button" class="contact-details-back-button" onclick="openContactDetails(${safeContactId})" aria-label="Back to contact list">
+          <button type="button" class="contact-details-back-button" data-action="open-contact-details" data-contact-id="${safeContactId}" aria-label="Back to contact list">
             <img src="./assets/img/icon-arrow_left.png">
           </button>
         </div>
@@ -223,10 +223,10 @@ function generateContactDetailsHTML(name, email, phone, id, color) {
           <div class="contact-details-name-group">
             <div class="contact-details-name">${safeContactName}</div>
             <div class="contact-details-icons">
-              <div class="icon-edit" onclick="editContact(${safeContactId})">
+              <div class="icon-edit" data-action="edit-contact" data-contact-id="${safeContactId}">
                 <img src="./assets/img/icon-edit.png" alt="">Edit
               </div>
-              <div class="icon-delete" onclick="removeContact(${safeContactId})">
+              <div class="icon-delete" data-action="remove-contact" data-contact-id="${safeContactId}">
                 <img src="./assets/img/icon-delete.png" alt="">Delete
               </div>
             </div>
@@ -244,15 +244,15 @@ function generateContactDetailsHTML(name, email, phone, id, color) {
             <div class="contact-phone-container-phone">${safePhone}</div>
           </div>
         </div>
-        <button type="button" class="openEditDeleteResponsive" id="openEditDeleteResponsive" onclick="openEditDelete(); doNotClose(event)" aria-label="Open contact actions menu">
+        <button type="button" class="openEditDeleteResponsive" id="openEditDeleteResponsive" data-action="open-edit-delete" data-stop-propagation="true" aria-label="Open contact actions menu">
           <img src="./assets/img/Menu Contact options.png" alt="">
         </button>
-        <div class="editDelete d-none" id="editDelete" onclick="doNotClose(event)">
-          <div class="editDiv" onclick="editContact(${safeContactId})">
+        <div class="editDelete d-none" id="editDelete" data-stop-propagation="true">
+          <div class="editDiv" data-action="edit-contact" data-contact-id="${safeContactId}">
             <img src="./assets/img/icon-edit.png" alt="">
             <span>Edit</span>
             </div>
-          <div class="deleteDiv" onclick="removeContact(${safeContactId})">
+          <div class="deleteDiv" data-action="remove-contact" data-contact-id="${safeContactId}">
               <img src="./assets/img/icon-delete.png" alt="">
               <span>Delete</span>
             </div>

@@ -136,7 +136,7 @@ function renderTasksHTML(task) {
   const safeTaskDescription = escapeHtml(task && task.description);
 
   return /*html*/ `
-      <a draggable="true" ondragstart="startDragging(${safeTaskId})" ondragend="stopDragging()" id="${safeTaskId}" class="card" href="#" onclick="openCard(${safeTaskId}); return false;">
+      <a draggable="true" id="${safeTaskId}" class="card" href="#" data-action="open-card" data-task-id="${safeTaskId}" data-prevent-default="true" data-dragstart-action="start-dragging" data-dragend-action="stop-dragging">
           <div class="cardTopContainer">
               <div id="cardType${safeTaskId}" class="cardType">${safeTaskType}</div>
               <div class="cardTitle">${safeTaskTitle}</div>
@@ -202,7 +202,7 @@ function renderLoginPageHTML() {
         </div>
         <div class="signUpField">
             <span>Not a join user yet?</span>
-            <button class="loginButtons signUpButton" onclick="renderSignUp()">Sign up</button>
+            <button type="button" class="loginButtons signUpButton" data-action="goto-signup">Sign up</button>
         </div>
     </header>
     <div class=" login-page">
@@ -212,7 +212,7 @@ function renderLoginPageHTML() {
                 <div class="horizontalH1Underline"></div>
             </div>
             <div class="formDiv">
-                <form onsubmit="loginUser(); return false;">
+                <form data-submit-action="login-user">
                     <div class=" innerLoginBox">
                         <div class="loginEmailBox">
                             <label class="sr-only" for="loginEmailInput">Email</label>
@@ -232,9 +232,9 @@ function renderLoginPageHTML() {
                             Remember me</label><br>
                     </div>
                     <div class="loginButtonsBox">
-                        <button class="loginButtons loginButtonUser" onclick="login()">Log in</button>
+                        <button type="submit" class="loginButtons loginButtonUser">Log in</button>
                         <!--TODO-->
-                        <button class="loginButtons loginButtonGuest">Guest log in</button>
+                        <button type="button" class="loginButtons loginButtonGuest" data-action="login-guest">Guest log in</button>
                     </div>
                 </form>
                 <!-- TODO darf nur angzeigt werden, wenn Nachricht wirklich da (z.B. you are signed up now!) -->
@@ -243,7 +243,7 @@ function renderLoginPageHTML() {
         </div>
         <div class="signUpField-mobile ">
             <span>Not a join user yet?</span>
-            <button class="loginButtons signUpButton signUpButton-mobile" onclick="renderSignUpPage()">Sign up</button>
+            <button type="button" class="loginButtons signUpButton signUpButton-mobile" data-action="goto-signup">Sign up</button>
         </div>
         <div class="loginFooter">
             <a class="privacyPolicy" href="./privacy_external.html" target="_blank" rel="noopener noreferrer"><span>Privacy policy</span></a>
@@ -269,7 +269,7 @@ function renderSignUpPageHTML() {
         </header>
         <div class="signUp-page">
             <div class="signUp-box">
-                <button type="button" class="arrowLeft" onclick="redirectToLogin()" aria-label="Back to login"><img src="./assets/img/icon-arrow_left.png" alt="arrow left"></button>
+                <button type="button" class="arrowLeft" data-action="redirect-to-login" aria-label="Back to login"><img src="./assets/img/icon-arrow_left.png" alt="arrow left"></button>
 
                 <div class="h1SignUpBox">
                     <h1 class="signUpH1">Sign up</h1>
@@ -277,7 +277,7 @@ function renderSignUpPageHTML() {
                 </div>
 
                 <div class="formDiv">
-                    <form onsubmit="addUser(); return false">
+                    <form data-submit-action="add-new-user">
                         <div class="innerSignUpBox">
                             <div class="signUpEmailBox">
                                 <label class="sr-only" for="signUpEmailInput">Email</label>
@@ -320,7 +320,7 @@ function renderBoardAddTaskHeaderHTML() {
   return /*html*/ `
     <div class="boardAddTaskHeader">
     <div class="boardAddTaskHeaderText">Add Task</div>
-    <button type="button" class="boardAddTaskCloseHoverContainer" onclick="hideAddTaskContainer()" aria-label="Close add task overlay"></button>
+    <button type="button" class="boardAddTaskCloseHoverContainer" data-action="hide-add-task-container" aria-label="Close add task overlay"></button>
  </div>`;
 }
 
@@ -359,7 +359,7 @@ function renderAddTaskMainContentHTML() {
                     <div class="addTaskDueDateInputContainer border-bottom pointer" id="addTaskDueDateInputContainer">
                         <label class="sr-only" for="addTaskDueDateInput">Due date</label>
                         <input class="addTaskDueDateInput" id="addTaskDueDateInput" type="date" aria-describedby="requiredDueDate" aria-invalid="false" value="">
-                        <button type="button" class="addTaskDueDateImage" onclick="addTaskDueDateOpenCalendear()" aria-label="Open due date picker"></button>
+                        <button type="button" class="addTaskDueDateImage" data-action="open-due-date-picker" aria-label="Open due date picker"></button>
                     </div>
                     <div class="addTaskRequired" id="requiredDueDate" role="alert" aria-live="polite"></div>
                 </div>
@@ -369,15 +369,15 @@ function renderAddTaskMainContentHTML() {
         <div class="addTaskPriority">
             <div class="addTaskTitles bold">Priority</div>
             <div class="addTaskPriorityButtonContainer">
-                <button type="button" id="addTaskPriorityButtonurgent" class="addTaskPriorityButton" onclick="setPriority('urgent')">
+                <button type="button" id="addTaskPriorityButtonurgent" class="addTaskPriorityButton" data-action="set-priority" data-priority="urgent">
                     <span class="priorityButtonText">Urgent</span>
                     <img src="./assets/img/icon-priority_urgent.png" alt="Priority urgent">
                 </button>
-                <button type="button" id="addTaskPriorityButtonmedium" class="addTaskPriorityButton" onclick="setPriority('medium')">
+                <button type="button" id="addTaskPriorityButtonmedium" class="addTaskPriorityButton" data-action="set-priority" data-priority="medium">
                     <span class="priorityButtonText">Medium</span>
                     <img src="./assets/img/icon-priority_medium.png" alt="Priority medium">
                 </button>
-                <button type="button" id="addTaskPriorityButtonlow" class="addTaskPriorityButton" onclick="setPriority('low')">
+                <button type="button" id="addTaskPriorityButtonlow" class="addTaskPriorityButton" data-action="set-priority" data-priority="low">
                     <span class="priorityButtonText">Low</span>
                     <img src="./assets/img/icon-priority_low.png" alt="Priority low">
                 </button>
@@ -386,7 +386,7 @@ function renderAddTaskMainContentHTML() {
         </div>
         <div class="addTaskContainer">
             <div class="addTaskTitle"><span class="bold">Assigned to</span> (optional)</div>
-            <button type="button" class="addTask-dropdown-contact pointer border-bottom" onclick="doNotClose(event); renderArrow('custom-arrow-assignedTo', 'dropdown-content-assignedTo')">
+            <button type="button" class="addTask-dropdown-contact pointer border-bottom" data-action="toggle-addtask-dropdown" data-arrow-container="custom-arrow-assignedTo" data-content-container="dropdown-content-assignedTo" data-stop-propagation="true">
                 <span class="addTask-custom-select">
                     <span id="dropdown-assignedTo-title">Select contacts to assign</span>
                     <span class="addTask-custom-arrow" id="custom-arrow-assignedTo">
@@ -394,13 +394,13 @@ function renderAddTaskMainContentHTML() {
                     </span>
                 </span>
             </button>
-                <div class="addTask-dropdown-content d-none" onclick="doNotClose(event)" id="dropdown-content-assignedTo">
+                <div class="addTask-dropdown-content d-none" data-stop-propagation="true" id="dropdown-content-assignedTo">
                 </div>
                 <div id="assignedContactsContainer" class="assignedContactsContainer cardAssignedToContainer d-none"></div>
         </div>
         <div class="addTaskContainer ">
             <div class="addTaskTitle bold">Category </div>
-            <button type="button" class="addTask-dropdown-category pointer border-bottom" onclick="doNotClose(event); renderArrow('custom-arrow-category', 'dropdown-content-category')">
+            <button type="button" class="addTask-dropdown-category pointer border-bottom" data-action="toggle-addtask-dropdown" data-arrow-container="custom-arrow-category" data-content-container="dropdown-content-category" data-stop-propagation="true">
                 <span class="addTask-custom-select">
                     <span id="dropdown-category-title">Select task category</span>
                         <span class="addTask-custom-arrow" id="custom-arrow-category">
@@ -408,15 +408,15 @@ function renderAddTaskMainContentHTML() {
                     </span>
                 </span>
             </button>
-            <div class="addTask-dropdown-content d-none no-scroll" onclick="doNotClose(event)" id="dropdown-content-category">
-                <button type="button" class="dropdownOption" onclick="chooseCategory('Technical Task')">Technical Task</button>
-                <button type="button" class="dropdownOption" onclick="chooseCategory('User Story')">User Story</button>
+            <div class="addTask-dropdown-content d-none no-scroll" data-stop-propagation="true" id="dropdown-content-category">
+                <button type="button" class="dropdownOption" data-action="choose-category" data-category="Technical Task">Technical Task</button>
+                <button type="button" class="dropdownOption" data-action="choose-category" data-category="User Story">User Story</button>
             </div>
         </div>
         <div class="addTaskContainer">
             <div class="addTaskTitles"><span class="bold">Subtasks</span> (optional)
             </div>
-            <button type="button" id="subtaskBottom" class="subtaskBottom border-bottom" onclick="renderSubtaskInputField()">
+            <button type="button" id="subtaskBottom" class="subtaskBottom border-bottom" data-action="render-subtask-input-field">
                 <span id="subtaskInputFieldDiv">Add new subtask</span>
                 <span id="subtaskImgAddPlus" class="subtaskImgDiv pointer"></span>
             </button>
@@ -427,7 +427,7 @@ function renderAddTaskMainContentHTML() {
         <div class="addTaskContainer">
             <div class="addTaskTitles"><span class="bold">Attachments</span> (optional)</div>
             <div id="addImageBottom" class="addImageBottom border-bottom">
-            <button type="button" class="uploadImageButton" onclick="openFilepicker()" aria-label="Upload attachment">
+            <button type="button" class="uploadImageButton" data-action="open-filepicker" aria-label="Upload attachment">
             <img src="./assets/img/upload.png" alt="upload">
             </button>
             <input type="file" id="filepicker" style="display: none" accept="image/*" multiple dropzone="copy">
@@ -443,7 +443,7 @@ function renderAddTaskMainContentHTML() {
 function renderAddTaskFooterHTML() {
   return /*html*/ `
             <div class="addTaskBtnContainer">
-                <button type="button" class="clearBtn addTaskBtn" onclick="clearFormular()">
+                <button type="button" class="clearBtn addTaskBtn" data-action="clear-formular">
                     <span class="addTaskBtnText">Clear</span>
                     <span class="clearBtnImg"></span>
                 </button>
@@ -470,7 +470,7 @@ function renderOpenCardHTML(task) {
 
   return /*html*/ `
       <div class="boardAddTaskCloseHoverOuterContainer">
-          <button type="button" class="boardAddTaskCloseHoverContainer" onclick="closeCard()" aria-label="Close task details"></button>
+          <button type="button" class="boardAddTaskCloseHoverContainer" data-action="close-card" aria-label="Close task details"></button>
       </div>
       <div class="openCardInnerContainer">
           <div id="openCardType${safeTaskId}" class="cardType">${safeTaskType}</div>
@@ -493,12 +493,12 @@ function renderOpenCardHTML(task) {
           <div id="openCardSubtasksContainer"></div>
           <div id="openCardImagesContainer" class="openCardImagesContainer"></div>
           <div class="openCardDeleteEditContainer">
-              <button type="button" class="openCardDeleteContainer" onclick='openCardDelete(${safeTaskId})'>
+              <button type="button" class="openCardDeleteContainer" data-action="open-card-delete" data-task-id="${safeTaskId}">
                   <span class="openCardImgDiv pointer" id="openCardImgDelete"></span>
                   <span>Delete</span>
               </button>
               <div class="vLine"></div>
-              <button type="button" class="openCardEditContainer" onclick='openCardEdit(${safeTaskId})'>
+              <button type="button" class="openCardEditContainer" data-action="open-card-edit" data-task-id="${safeTaskId}">
                   <span class="openCardImgDiv pointer" id="openCardImgEdit"></span>
                   <span>Edit</span>
               </button>
@@ -520,8 +520,8 @@ function editSubtaskHTML(subtask) {
         <label class="sr-only" for="subtaskEditInputField">Edit subtask</label>
         <input type="text" id="subtaskEditInputField" value="${safeSubtaskText}">
         <div class="subtaskCheckboxes">
-        <button type="button" class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${safeSubtaskId})" aria-label="Delete subtask"></button><div class="vLine"></div>
-            <button type="button" class="subtaskImgDiv pointer" id="subtaskImgAddCheck" onclick="saveEditSubtask(${safeSubtaskId})" aria-label="Save subtask"></button>
+        <button type="button" class="subtaskImgDiv pointer" id="subtaskImgDelete" data-action="delete-subtask" data-subtask-id="${safeSubtaskId}" aria-label="Delete subtask"></button><div class="vLine"></div>
+            <button type="button" class="subtaskImgDiv pointer" id="subtaskImgAddCheck" data-action="save-edit-subtask" data-subtask-id="${safeSubtaskId}" aria-label="Save subtask"></button>
         </div>`;
 }
 
@@ -538,11 +538,11 @@ function editSubtaskHTML(subtask) {
 function renderSubtaskInputFieldHTML() {
   return /*html*/ `
      <label class="sr-only" for="subtaskInputField">Subtask</label>
-     <input type="text" id="subtaskInputField" placeholder="Add new subtask" onclick="doNotClose(event)">
+     <input type="text" id="subtaskInputField" placeholder="Add new subtask" data-stop-propagation="true">
      <div class="subtaskAddOrCancel">
-         <button type="button" id="subtaskImgAddCheck" class="subtaskImgDiv pointer" onclick="subtaskAddOrCancel('add'); doNotClose(event)" aria-label="Add subtask"></button>
+         <button type="button" id="subtaskImgAddCheck" class="subtaskImgDiv pointer" data-action="subtask-add-or-cancel" data-option="add" data-stop-propagation="true" aria-label="Add subtask"></button>
          <div class="vLine"></div>
-         <button type="button" id="subtaskImgAddCancel" class="subtaskImgDiv pointer" onclick="subtaskAddOrCancel('cancel'); doNotClose(event)" aria-label="Cancel subtask input"></button>
+         <button type="button" id="subtaskImgAddCancel" class="subtaskImgDiv pointer" data-action="subtask-add-or-cancel" data-option="cancel" data-stop-propagation="true" aria-label="Cancel subtask input"></button>
      </div>`;
 }
 
@@ -562,12 +562,12 @@ function renderSubtaskHTML(outputContainer, subtask) {
   const safeSubtaskText = escapeHtml(subtask && subtask.subtaskText);
 
   outputContainer.innerHTML += /*html*/ `
-        <div class="subTaskOutputDiv" id="subtask${safeSubtaskId}" ondblclick="editSubtask(${safeSubtaskId})">
+        <div class="subTaskOutputDiv" id="subtask${safeSubtaskId}" data-dblclick-action="edit-subtask" data-subtask-id="${safeSubtaskId}">
         <div class="subtaskText">${safeSubtaskText}</div>
             <div class="subtaskCheckboxes">
-                <button type="button" class="subtaskImgDiv pointer" id="subtaskImgEdit" onclick="editSubtask(${safeSubtaskId})" aria-label="Edit subtask"></button>
+                <button type="button" class="subtaskImgDiv pointer" id="subtaskImgEdit" data-action="edit-subtask" data-subtask-id="${safeSubtaskId}" aria-label="Edit subtask"></button>
                 <div class="vLine"></div>
-                <button type="button" class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${safeSubtaskId})" aria-label="Delete subtask"></button>
+                <button type="button" class="subtaskImgDiv pointer" id="subtaskImgDelete" data-action="delete-subtask" data-subtask-id="${safeSubtaskId}" aria-label="Delete subtask"></button>
             </div>
         </div>`;
 }

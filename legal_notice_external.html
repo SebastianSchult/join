@@ -26,10 +26,10 @@
     <title>Join - Legal Notice External</title>
 </head>
 
-<body onload="privacyInit()">
+<body data-init="privacyInit">
     <div id="bodyContent" class="bodyContent">
         <div class="header-content">
-            <img class="header-logo" src="./assets/img/logo-small_white.png" alt="join-logo" onclick="switchPage('index.html')"/>
+            <img class="header-logo" src="./assets/img/logo-small_white.png" alt="join-logo" data-action="switch-page" data-url="index.html"/>
             <div class="header-inner-right">
                 <span class="header-kanban-writing">Kanban Project Management Tool</span>
             </div>
@@ -41,7 +41,7 @@
                 <div class="legal_notice-wrapper">
                     <div class="h1LegalNoticeBox">
                         <h1>Legal Notice</h1>
-                        <img src="./assets/img/icon-arrow_left.png" alt="going-back arrow" onclick="goBack()">
+                        <img src="./assets/img/icon-arrow_left.png" alt="going-back arrow" data-action="go-back">
                     </div>
                     <div>
                         <div class="imprint1">

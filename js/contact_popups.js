@@ -216,7 +216,7 @@ function addContactCard() {
     renderAddContacts();
   }
   document.getElementById("addContact").innerHTML = renderAddContactsHTML();
-  addOverlay("closeOverlay('addContact')");
+  addOverlay("addContact");
   activateFocusLayer("addContact", {
     opener: contactOverlayOpener,
     initialFocus: "#contactName",
@@ -227,17 +227,18 @@ function addContactCard() {
 
 /**
  * Creates an overlay element and appends it to the document body. The overlay element
- * has a class of "overlay" and an onclick attribute set to the provided functionToAdd.
+ * has a class of "overlay" and delegated close action data attributes.
  * Additionally, the overflow style of the document body is set to "hidden" to prevent
  * scrolling while the overlay is active.
  *
- * @param {string} functionToAdd - The function to be called when the overlay is clicked.
+ * @param {string} overlayId - The overlay container id to close on overlay click.
  * @return {void} This function does not return a value.
  */
-function addOverlay(functionToAdd) {
+function addOverlay(overlayId) {
   const overlay = document.createElement("div");
   overlay.classList.add("overlay");
-  overlay.setAttribute("onclick", functionToAdd);
+  overlay.dataset.action = "close-overlay";
+  overlay.dataset.overlayId = overlayId;
 
   document.body.appendChild(overlay);
   document.body.style.overflow = "hidden";
@@ -285,7 +286,7 @@ function renderAddContacts() {
   newDiv.id = "addContact";
   setAttributes(newDiv, {
     class: "add-contact",
-    onclick: "doNotClose(event)",
+    "data-stop-propagation": "true",
   });
   document.getElementById("addContactContainer").appendChild(newDiv);
 }
@@ -426,7 +427,7 @@ function editContactCard(contact) {
     contact.name,
     contact.contactColor
   );
-  addOverlay("closeOverlay('editContact')");
+  addOverlay("editContact");
   activateFocusLayer("editContact", {
     opener: contactOverlayOpener,
     initialFocus: "#contactName",

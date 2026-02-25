@@ -26,20 +26,20 @@
             <img class="signUpLogo" src="./assets/img/logo-medium_white.png" alt="logo">
           </header>
           <div class="signUp-box">
-            <button type="button" class="arrowLeft" onclick="redirectToLogin()" aria-label="Back to login">
+            <button type="button" class="arrowLeft" data-action="redirect-to-login" aria-label="Back to login">
               <img src="./assets/img/icon-arrow_left.png" alt="arrow left">
             </button>
             <div class="h1SignUpBox">
               <h1 class="signUpH1">Sign up</h1>
               <div class="horizontalH1UnderlineSignUp"></div>
             </div>
-            <form class="formDiv" id="login-form" onsubmit="return false">
+            <form class="formDiv" id="login-form" data-submit-action="add-new-user">
               <div class="innerSignUpBox">
                 <!-- Wrapper für Name-Feld -->
                 <div class="input-wrapper">
                   <div class="signUpInputField">
                     <label class="sr-only" for="signUpNameInput">Name</label>
-                    <input type="text" id="signUpNameInput" placeholder="Name" aria-describedby="signUpNameError" aria-invalid="false" autocomplete="name" onkeyup="checkIfFormIsValid()" required>
+                    <input type="text" id="signUpNameInput" placeholder="Name" aria-describedby="signUpNameError" aria-invalid="false" autocomplete="name" required>
                     <div class="mailIcon">
                       <img src="./assets/img/icon-person.png" alt="letter">
                     </div>
@@ -52,7 +52,7 @@
                 <div class="input-wrapper">
                   <div class="signUpInputField">
                     <label class="sr-only" for="signUpEmailInput">Email</label>
-                    <input type="email" id="signUpEmailInput" placeholder="Email" aria-describedby="signUpEmailError" aria-invalid="false" autocomplete="email" onkeyup="checkIfFormIsValid()" required>
+                    <input type="email" id="signUpEmailInput" placeholder="Email" aria-describedby="signUpEmailError" aria-invalid="false" autocomplete="email" required>
                     <div class="mailIcon">
                       <img src="./assets/img/icon-mail.png" alt="letter">
                     </div>
@@ -64,7 +64,7 @@
                 <div class="input-wrapper">
                   <div class="signUpInputField">
                     <label class="sr-only" for="signUpPasswordInput">Password</label>
-                    <input type="password" id="signUpPasswordInput" placeholder="Password" aria-describedby="signUpPasswordError" aria-invalid="false" autocomplete="new-password" onkeyup="checkIfFormIsValid()" required>
+                    <input type="password" id="signUpPasswordInput" placeholder="Password" aria-describedby="signUpPasswordError" aria-invalid="false" autocomplete="new-password" required>
                     <div class="mailIcon">
                       <img src="./assets/img/icon-lock.png" alt="lock">
                     </div>
@@ -76,7 +76,7 @@
                 <div class="input-wrapper">
                   <div class="signUpInputField">
                     <label class="sr-only" for="signUpPasswordInputConfirm">Confirm password</label>
-                    <input type="password" id="signUpPasswordInputConfirm" placeholder="Confirm Password" aria-describedby="signUpPasswordConfirmError" aria-invalid="false" autocomplete="new-password" onkeyup="checkIfFormIsValid()" required>
+                    <input type="password" id="signUpPasswordInputConfirm" placeholder="Confirm Password" aria-describedby="signUpPasswordConfirmError" aria-invalid="false" autocomplete="new-password" required>
                     <div class="mailIcon">
                       <img src="./assets/img/icon-lock.png" alt="lock">
                     </div>
@@ -86,24 +86,24 @@
 
                 <!-- Checkbox für Privacy Policy -->
                 <div class="checkboxBox">
-                  <input type="checkbox" id="privacyCheckbox" style="display: none;" onclick="togglePrivacyPolicyCheckbox()">
+                  <input type="checkbox" id="privacyCheckbox" style="display: none;" data-action="toggle-privacy-policy-checkbox">
                   <label for="privacyCheckbox" class="custom-checkbox">
                     <img id="checkboxImage" src="./assets/img/icon-check_button_unchecked.png" alt="checkbox image">
                     I accept the <a href="#">Privacy Policy</a>
                   </label>
                   <br>
                 </div>
-                <button id="registerBtn" class="signUpButtons registerBtn" onclick="addNewUser()" disabled>Sign up</button>
+                <button type="submit" id="registerBtn" class="signUpButtons registerBtn" disabled>Sign up</button>
               </div>
             </form>
           </div>
           <div class="signUpFooter">
-            <div class="privacyPolicySignUp" onclick="switchPageNewTab('privacy_external.html');" target="_blank">
+            <button type="button" class="privacyPolicySignUp" data-action="open-new-tab" data-url="privacy_external.html">
               <span>Privacy policy</span>
-            </div>
-            <div class="legalNoticeSignUp" onclick="switchPageNewTab('legal_notice_external.html');" target="_blank">
+            </button>
+            <button type="button" class="legalNoticeSignUp" data-action="open-new-tab" data-url="legal_notice_external.html">
               <span>Legal notice</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
