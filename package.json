@@ -4,7 +4,8 @@
   "scripts": {
     "lint:js": "node scripts/lint_page_bundles.cjs",
     "lint:templates": "node scripts/check_duplicate_template_attributes.cjs",
-    "lint": "npm run lint:js && npm run lint:templates",
+    "lint:ui-tokens": "node scripts/check_ui_tokens_alignment.cjs",
+    "lint": "npm run lint:templates && npm run lint:ui-tokens && npm run lint:js",
     "a11y:ci": "npx --yes @lhci/cli autorun --config=./lighthouserc.cjs"
   },
   "devDependencies": {

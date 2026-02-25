@@ -1,7 +1,7 @@
 :root {
-  --addTaskGap-8: 8px;
-  --addTaskGap-12: 12px;
-  --addTaskGap-24: 24px;
+  --addTaskGap-8: var(--ui-space-xs);
+  --addTaskGap-12: var(--ui-space-sm-md);
+  --addTaskGap-24: var(--ui-space-lg);
   --clr-prio-urgent: #ff3d00;
   --clr-prio-medium: #ffa800;
   --clr-prio-low: #7ae229;
@@ -10,8 +10,8 @@
   --clr-contact-hover: #d2e3ff;
   --clr-border: #d1d1d1;
   --clr-border-hover: var(--clr-contact-marked);
-  --padding-1216: 12px 16px 12px 16px;
-  --padding-0616: 6px 16px 6px 16px;
+  --padding-1216: var(--ui-space-sm-md) var(--ui-space-md);
+  --padding-0616: var(--ui-space-2xs) var(--ui-space-md);
   --clr-btn-border: #647188;
   --addTask-transistion: all 0.1s ease;
 }
@@ -76,7 +76,7 @@ select {
 }
 
 #addTaskDescriptionInput {
-  padding: 18px 16px;
+  padding: 18px var(--ui-space-md);
 }
 
 .addTaskRequired {
@@ -96,7 +96,7 @@ select {
   flex-direction: row;
   width: 100%;
 
-  padding: 20px 0;
+  padding: var(--ui-content-gap-lg) 0;
   font-size: 1.188rem;
   gap: var(--addTaskGap-24);
 
@@ -114,7 +114,7 @@ select {
   flex-direction: column;
   gap: var(--addTaskGap-24);
   overflow-y: auto;
-  padding: 44px 10px 0 24px;
+  padding: 44px var(--ui-space-sm) 0 var(--ui-space-lg);
   cursor: default;
   width: min-content;
 }
@@ -149,7 +149,7 @@ select {
   width: 100px;
   height: 60px;
   border: 1px solid var(--clr-btn-border);
-  padding: 16px 10px 16px 10px;
+  padding: var(--ui-space-md) var(--ui-space-sm);
   border-radius: 10px;
   font-size: 1.438rem;
   transition: var(--addTask-transistion);
@@ -157,7 +157,7 @@ select {
 
 .clearBtn {
   display: flex;
-  gap: 10px;
+  gap: var(--ui-space-sm);
   background-color: #fff;
   color: var(--clr-btn-border);
   cursor: pointer;
@@ -186,7 +186,7 @@ select {
 
 .createBtn {
   display: flex;
-  gap: 4px;
+  gap: var(--ui-space-xxs);
   background-color: var(--clr-contact-marked);
   color: white;
   width: max-content;

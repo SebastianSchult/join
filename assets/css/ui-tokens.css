@@ -1,6 +1,7 @@
 :root {
-  /* Responsive breakpoints */
+  /* Responsive breakpoints (single source of truth for CSS/JS) */
   --ui-bp-mobile-max: 801px;
+  --ui-bp-mobile-min: 802px;
   --ui-bp-navigation-tablet-max: 950px;
   --ui-bp-phone-max: 560px;
   --ui-bp-content-narrow-max: 500px;
@@ -9,14 +10,17 @@
   /* Spacing scale */
   --ui-space-0: 0;
   --ui-space-xxs: 4px;
+  --ui-space-2xs: 6px;
   --ui-space-xs: 8px;
   --ui-space-sm: 10px;
+  --ui-space-sm-md: 12px;
   --ui-space-md: 16px;
   --ui-space-lg: 24px;
   --ui-space-xl: 32px;
   --ui-space-2xl: 40px;
   --ui-space-3xl: 48px;
   --ui-space-4xl: 64px;
+  --ui-space-5xl: 72px;
 
   /* Layout rhythm */
   --ui-page-inline: 88px;

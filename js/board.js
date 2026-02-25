@@ -474,8 +474,8 @@ function displayEmptyTask(taskId, categoryId){
     let cardWidth = "min-width: "+  document.getElementById(taskId).clientWidth + "px";
     let cardStyle = cardHeight + "; " + cardWidth;
     const boardColumnsMaxWidth =
-      typeof getResponsiveBreakpointPx === "function"
-        ? getResponsiveBreakpointPx("--ui-bp-board-columns-max", 1400)
+      typeof getUiBreakpointValue === "function"
+        ? getUiBreakpointValue("boardColumnsMax")
         : 1400;
 
     let newDiv = document.createElement('div');

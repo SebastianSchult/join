@@ -9,7 +9,16 @@ const COOKIEBOT_CONFIG_MAX_RETRIES = 30;
 const UI_BREAKPOINT_VARIABLES = Object.freeze({
 	mobileMax: "--ui-bp-mobile-max",
 	navigationTabletMax: "--ui-bp-navigation-tablet-max",
+	phoneMax: "--ui-bp-phone-max",
+	contentNarrowMax: "--ui-bp-content-narrow-max",
 	boardColumnsMax: "--ui-bp-board-columns-max",
+});
+const UI_BREAKPOINT_FALLBACKS = Object.freeze({
+	mobileMax: 801,
+	navigationTabletMax: 950,
+	phoneMax: 560,
+	contentNarrowMax: 500,
+	boardColumnsMax: 1400,
 });
 
 initializeLegacyRuntimeFallbacks();
@@ -605,11 +614,7 @@ function renderStandardNavigation(){
  * @return {void} This function does not return anything.
  */
 function setIsSmallerThan802(){
-	if (isViewportAtMost(UI_BREAKPOINT_VARIABLES.mobileMax, 801)) {
-		isSmallerThan802 = true;
-	} else {
-		isSmallerThan802 = false;
-	}
+	isSmallerThan802 = isUiBreakpointAtMost("mobileMax");
 }
 
 
@@ -640,6 +645,35 @@ function getResponsiveBreakpointPx(cssVariableName, fallbackPx) {
  */
 function isViewportAtMost(cssVariableName, fallbackPx) {
 	return window.innerWidth <= getResponsiveBreakpointPx(cssVariableName, fallbackPx);
+}
+
+
+/**
+ * Resolves a breakpoint value by key from the shared UI breakpoint registry.
+ *
+ * @param {keyof UI_BREAKPOINT_VARIABLES} breakpointKey - Named breakpoint key.
+ * @returns {number} Breakpoint value in pixels.
+ */
+function getUiBreakpointValue(breakpointKey) {
+	const cssVariableName = UI_BREAKPOINT_VARIABLES[breakpointKey];
+	const fallbackPx = UI_BREAKPOINT_FALLBACKS[breakpointKey];
+	if (!cssVariableName || !Number.isFinite(fallbackPx)) {
+		console.warn(`Unknown UI breakpoint key: ${String(breakpointKey)}`);
+		return 0;
+	}
+
+	return getResponsiveBreakpointPx(cssVariableName, fallbackPx);
+}
+
+
+/**
+ * Checks viewport width against a shared UI breakpoint key.
+ *
+ * @param {keyof UI_BREAKPOINT_VARIABLES} breakpointKey - Named breakpoint key.
+ * @returns {boolean} True if viewport width is at/below the breakpoint.
+ */
+function isUiBreakpointAtMost(breakpointKey) {
+	return window.innerWidth <= getUiBreakpointValue(breakpointKey);
 }
 
 
@@ -726,11 +760,10 @@ function showInitials() {
  * Function to handle opening the small menu based on screen width.
  */
 function openSmallMenu() {
-	let screenWidth = window.innerWidth;
 	let smallMenu = getDiv("smallMenu");
 	let smallMenuMobile = getDiv("smallMenuMobile");
 
-	if (screenWidth <= getResponsiveBreakpointPx(UI_BREAKPOINT_VARIABLES.mobileMax, 801)) {
+	if (isUiBreakpointAtMost("mobileMax")) {
 		smallMenu.classList.remove("d-none");
 		smallMenuMobile.classList.toggle("d-none");
 	} else {
