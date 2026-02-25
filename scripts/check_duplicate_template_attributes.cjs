@@ -4,12 +4,17 @@ const fs = require("fs");
 const path = require("path");
 
 const files = [];
-const roots = ["js", "assets/templates"];
+const roots = [
+  { dir: "js", extensions: [".js"] },
+  { dir: "assets/templates", extensions: [".js", ".html"] },
+];
 
 for (const root of roots) {
-  collectJsFiles(root);
+  collectFiles(root.dir, root.extensions);
 }
+
 files.push("script.js");
+collectRootHtmlFiles(".");
 
 const violations = [];
 const tagRegex = /<(?!\/|!)([A-Za-z][\w:-]*)(?=[\s/>])([^<>]*)>/g;
@@ -57,18 +62,30 @@ if (violations.length > 0) {
 
 console.log("Duplicate attribute guardrail passed.");
 
-function collectJsFiles(dir) {
+function collectFiles(dir, extensions) {
   if (!fs.existsSync(dir)) return;
   const entries = fs.readdirSync(dir, { withFileTypes: true });
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      collectJsFiles(fullPath);
-    } else if (entry.isFile() && fullPath.endsWith(".js")) {
+      collectFiles(fullPath, extensions);
+    } else if (
+      entry.isFile() &&
+      extensions.some((extension) => fullPath.endsWith(extension))
+    ) {
       files.push(fullPath);
     }
   }
+}
+
+function collectRootHtmlFiles(dir) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  entries.forEach((entry) => {
+    if (entry.isFile() && entry.name.endsWith(".html")) {
+      files.push(path.join(dir, entry.name));
+    }
+  });
 }
 
 function parseAttributeNames(attributeText) {
