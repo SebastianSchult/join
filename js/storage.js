@@ -126,6 +126,12 @@ function getFirebaseUrl(path = "_") {
     return `${BASE_URL}${path}.json`;
 }
 
+function getFirebaseEntityPath(path = "_", entityId = "") {
+    const normalizedPath = String(path || "_").replace(/\/+$/, "");
+    const normalizedId = encodeURIComponent(String(entityId));
+    return `${normalizedPath}/${normalizedId}`;
+}
+
 /**
  * Asynchronously creates an item in Firebase using the given JSON array and path.
  *
@@ -169,6 +175,79 @@ async function firebaseUpdateItem(jsonArray, path = "_") {
 }
 
 /**
+ * Updates selected entries of a Firebase collection without overwriting the full node.
+ *
+ * @param {Object} patchPayload - Object map of key => value updates.
+ * @param {string} [path="_"] - Collection path.
+ * @returns {Promise<Object>} Firebase response payload.
+ */
+async function firebasePatchCollection(patchPayload, path = "_") {
+    return fetchJson(
+        getFirebaseUrl(path),
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(patchPayload),
+        },
+        "firebasePatchCollection"
+    );
+}
+
+/**
+ * Writes one entity to a collection path using its id.
+ *
+ * @param {Object} entity - Entity payload containing an `id`.
+ * @param {string} [path="_"] - Collection path.
+ * @returns {Promise<Object>} Firebase response payload.
+ */
+async function firebaseSetEntity(entity, path = "_") {
+    if (!entity || typeof entity !== "object") {
+        throw new Error("firebaseSetEntity requires an entity object.");
+    }
+    if (entity.id === null || entity.id === undefined || entity.id === "") {
+        throw new Error("firebaseSetEntity requires entity.id.");
+    }
+
+    return fetchJson(
+        getFirebaseUrl(getFirebaseEntityPath(path, entity.id)),
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(entity),
+        },
+        "firebaseSetEntity"
+    );
+}
+
+/**
+ * Deletes one entity from a collection path by id.
+ *
+ * @param {string|number} entityId - Entity id.
+ * @param {string} [path="_"] - Collection path.
+ * @returns {Promise<Object>} Firebase response payload.
+ */
+async function firebaseDeleteEntity(entityId, path = "_") {
+    if (entityId === null || entityId === undefined || entityId === "") {
+        throw new Error("firebaseDeleteEntity requires entityId.");
+    }
+
+    return fetchJson(
+        getFirebaseUrl(getFirebaseEntityPath(path, entityId)),
+        {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        },
+        "firebaseDeleteEntity"
+    );
+}
+
+/**
  * Retrieves an item from Firebase using the provided path.
  *
  * @param {string} [path="_"] - The path (the id) to the item in Firebase.
@@ -190,6 +269,55 @@ function normalizeFirebaseArrayPayload(payload) {
     }
 
     return [];
+}
+
+/**
+ * Creates a high-entropy numeric ID and avoids collisions in a known list.
+ *
+ * @param {Array<Object>} [existingItems=[]] - Existing entities with `id`.
+ * @returns {number} Collision-safe numeric id.
+ */
+function generateCollisionSafeId(existingItems = []) {
+    const knownIds = new Set();
+
+    if (Array.isArray(existingItems)) {
+        existingItems.forEach((item) => {
+            const numericId = Number(item && item.id);
+            if (Number.isSafeInteger(numericId)) {
+                knownIds.add(numericId);
+            }
+        });
+    }
+
+    for (let attempt = 0; attempt < 10; attempt++) {
+        const timestampPart = Date.now() * 1000000;
+        const randomPart = getRandomInt(0, 999999);
+        const candidateId = timestampPart + randomPart;
+
+        if (Number.isSafeInteger(candidateId) && !knownIds.has(candidateId)) {
+            return candidateId;
+        }
+    }
+
+    return Date.now() * 1000 + getRandomInt(0, 999);
+}
+
+function getRandomInt(min, max) {
+    const normalizedMin = Math.ceil(min);
+    const normalizedMax = Math.floor(max);
+    const range = normalizedMax - normalizedMin + 1;
+
+    if (
+        window.crypto &&
+        typeof window.crypto.getRandomValues === "function" &&
+        range > 0
+    ) {
+        const values = new Uint32Array(1);
+        window.crypto.getRandomValues(values);
+        return normalizedMin + (values[0] % range);
+    }
+
+    return normalizedMin + Math.floor(Math.random() * range);
 }
 
 function showGlobalUserMessage(message) {

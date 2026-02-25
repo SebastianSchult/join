@@ -17,22 +17,22 @@ async function saveContact() {
 
   try {
     createBtn.disabled = true;
-    const newId = getNextId(users);
-    users.push({
+    const sourceUsers = Array.isArray(users) ? users : [];
+    const newId = generateCollisionSafeId(sourceUsers);
+    const newContact = {
       id: newId,
       name: contactName.value,
       mail: normalizeEmailForContactFlow(enteredMail),
       phone: contactPhone.value,
       contactColor: generateRandomColor(),
-    });
+    };
 
-    await firebaseUpdateItem(users, FIREBASE_USERS_ID);
-    getContactsOutOfUsers();
-    users = [];
+    await firebaseSetEntity(newContact, FIREBASE_USERS_ID);
+    sourceUsers.push(newContact);
     resetContactForm();
     closeOverlay("addContact");
     displaySuccessMessage("Contact successfully created");
-    loadContacts();
+    applyContactsMutationResult(sourceUsers, newContact.id);
   } catch (error) {
     console.error("Error saving contact:", error);
     showGlobalUserMessage("Could not save contact. Please try again.");
@@ -313,7 +313,7 @@ async function saveEditedContact(id) {
     );
     user.phone = document.getElementById("contactPhone").value;
 
-    await firebaseUpdateItem(sourceUsers, FIREBASE_USERS_ID);
+    await firebaseSetEntity(user, FIREBASE_USERS_ID);
     closeOverlay("editContact");
     displaySuccessMessage("Contact successfully edited");
     applyContactsMutationResult(sourceUsers, id);
@@ -374,13 +374,15 @@ async function deleteContact(id) {
 
   const sourceUsers = loadResult.data;
   const userIndex = sourceUsers.findIndex((user) => user.id === id);
-  if (userIndex !== -1) {
-    sourceUsers.splice(userIndex, 1);
-    await firebaseUpdateItem(sourceUsers, FIREBASE_USERS_ID);
-    deleteContactFromLocalStorage(id);
-    displaySuccessMessage("Contact successfully deleted");
-    applyContactsMutationResult(sourceUsers);
+  if (userIndex === -1) {
+    return;
   }
+
+  sourceUsers.splice(userIndex, 1);
+  await firebaseDeleteEntity(id, FIREBASE_USERS_ID);
+  deleteContactFromLocalStorage(id);
+  displaySuccessMessage("Contact successfully deleted");
+  applyContactsMutationResult(sourceUsers);
 }
 
 

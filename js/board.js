@@ -260,6 +260,7 @@ function renderSubtasksToOpenCard(task){
 function setSubtaskState(taskId, subtaskIndex){
     let task = getTaskOutOfId(taskId);
     task['subtasks'][subtaskIndex]['completed'] = !task['subtasks'][subtaskIndex]['completed'];
+    queueTaskUpsert(taskId);
     let openCardSubtasks = document.getElementsByClassName('openCardSubtask');
 
     for (let i = 0; i < openCardSubtasks.length; i++) {
@@ -284,6 +285,7 @@ function openCardDelete(taskId){
             break;
         }
     }
+    queueTaskDelete(taskId);
     closeCard();
     renderCategories(tasks);
 }
@@ -402,6 +404,7 @@ function updateTaskDetails(index) {
     tasks[index].priority = newTask.priority;
     tasks[index].assignedTo = [...newTask.assignedTo];
     tasks[index].subtasks = [...newTask.subtasks];
+    queueTaskUpsert(tasks[index].id);
 }
 
 /**
