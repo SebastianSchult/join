@@ -215,12 +215,14 @@ function renderLoginPageHTML() {
                 <form onsubmit="loginUser(); return false;">
                     <div class=" innerLoginBox">
                         <div class="loginEmailBox">
-                            <input type="email" id="loginEmailInput" placeholder="Email" required>
+                            <label class="sr-only" for="loginEmailInput">Email</label>
+                            <input type="email" id="loginEmailInput" placeholder="Email" autocomplete="email" required>
                             <div class="mailIcon"><img src="./assets/img/icon-mail.png" alt="letter"></div>
                         </div>
 
                         <div class="loginPasswordBox">
-                            <input type="password" id="loginPasswordInput" placeholder="Password" required>
+                            <label class="sr-only" for="loginPasswordInput">Password</label>
+                            <input type="password" id="loginPasswordInput" placeholder="Password" autocomplete="current-password" required>
                             <div class="mailIcon"><img src="./assets/img/icon-lock.png" alt="lock"></div>
                         </div>
                     </div>
@@ -267,7 +269,7 @@ function renderSignUpPageHTML() {
         </header>
         <div class="signUp-page">
             <div class="signUp-box">
-                <div class="arrowLeft"><img src="./assets/img/icon-arrow_left.png" alt="arrow left"></div>
+                <button type="button" class="arrowLeft" onclick="redirectToLogin()" aria-label="Back to login"><img src="./assets/img/icon-arrow_left.png" alt="arrow left"></button>
 
                 <div class="h1SignUpBox">
                     <h1 class="signUpH1">Sign up</h1>
@@ -278,12 +280,14 @@ function renderSignUpPageHTML() {
                     <form onsubmit="addUser(); return false">
                         <div class="innerSignUpBox">
                             <div class="signUpEmailBox">
-                                <input type="email" id="signUpEmailInput" placeholder="Email" required>
+                                <label class="sr-only" for="signUpEmailInput">Email</label>
+                                <input type="email" id="signUpEmailInput" placeholder="Email" autocomplete="email" required>
                                 <div class="mailIcon"><img src="./assets/img/icon-mail.png" alt="letter"></div>
                             </div>
 
                             <div class="signUpPasswordBox">
-                                <input type="password" id="signUpPasswordInput" placeholder="Password" required>
+                                <label class="sr-only" for="signUpPasswordInput">Password</label>
+                                <input type="password" id="signUpPasswordInput" placeholder="Password" autocomplete="new-password" required>
                                 <div class="mailIcon"><img src="./assets/img/icon-lock.png" alt="lock"></div>
                             </div>
                         </div>
@@ -336,13 +340,15 @@ function renderAddTaskMainContentHTML() {
   return /*html*/ `<div class="addTaskBodyLeft">
         <div class="addTaskBodyTop">
             <div class="addTaskAddTitleContainer">
-                <input type="text" id="addTaskEnterTitleInput" placeholder="Enter a title" required>
-                <div class="addTaskRequired" id="requiredTitle"></div>
+                <label class="sr-only" for="addTaskEnterTitleInput">Task title</label>
+                <input type="text" id="addTaskEnterTitleInput" placeholder="Enter a title" aria-describedby="requiredTitle" aria-invalid="false" required>
+                <div class="addTaskRequired" id="requiredTitle" role="alert" aria-live="polite"></div>
             </div>
             <div class="addTaskDescription">
                 <div class="addTaskTitles"><span class="bold">Description</span> (optional)</div>
                 <div>
                 <div class="textAreaContainer">
+                    <label class="sr-only" for="addTaskDescriptionInput">Task description</label>
                     <textarea id="addTaskDescriptionInput" type="text" placeholder="Enter a description"></textarea>
                 </div>
             </div>
@@ -351,10 +357,11 @@ function renderAddTaskMainContentHTML() {
                 <div class="addTaskTitles"><span class="bold">Due date</span></div>
                 <div>
                     <div class="addTaskDueDateInputContainer border-bottom pointer" id="addTaskDueDateInputContainer">
-                        <input class="addTaskDueDateInput" id="addTaskDueDateInput" type="date"  value="">
+                        <label class="sr-only" for="addTaskDueDateInput">Due date</label>
+                        <input class="addTaskDueDateInput" id="addTaskDueDateInput" type="date" aria-describedby="requiredDueDate" aria-invalid="false" value="">
                         <button type="button" class="addTaskDueDateImage" onclick="addTaskDueDateOpenCalendear()" aria-label="Open due date picker"></button>
                     </div>
-                    <div class="addTaskRequired" id="requiredDueDate"></div>
+                    <div class="addTaskRequired" id="requiredDueDate" role="alert" aria-live="polite"></div>
                 </div>
             </div>
         </div>
@@ -510,10 +517,11 @@ function editSubtaskHTML(subtask) {
   const safeSubtaskText = escapeHtml(subtask && subtask.subtaskText);
 
   return /*html*/ `
+        <label class="sr-only" for="subtaskEditInputField">Edit subtask</label>
         <input type="text" id="subtaskEditInputField" value="${safeSubtaskText}">
         <div class="subtaskCheckboxes">
-        <button type="button" class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${safeSubtaskId})"></button><div class="vLine"></div>
-            <button type="button" class="subtaskImgDiv pointer" id="subtaskImgAddCheck" onclick="saveEditSubtask(${safeSubtaskId})"></button>
+        <button type="button" class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${safeSubtaskId})" aria-label="Delete subtask"></button><div class="vLine"></div>
+            <button type="button" class="subtaskImgDiv pointer" id="subtaskImgAddCheck" onclick="saveEditSubtask(${safeSubtaskId})" aria-label="Save subtask"></button>
         </div>`;
 }
 
@@ -529,11 +537,12 @@ function editSubtaskHTML(subtask) {
  */
 function renderSubtaskInputFieldHTML() {
   return /*html*/ `
+     <label class="sr-only" for="subtaskInputField">Subtask</label>
      <input type="text" id="subtaskInputField" placeholder="Add new subtask" onclick="doNotClose(event)">
      <div class="subtaskAddOrCancel">
-         <button type="button" id="subtaskImgAddCheck" class="subtaskImgDiv pointer" onclick="subtaskAddOrCancel('add'); doNotClose(event)"></button>
+         <button type="button" id="subtaskImgAddCheck" class="subtaskImgDiv pointer" onclick="subtaskAddOrCancel('add'); doNotClose(event)" aria-label="Add subtask"></button>
          <div class="vLine"></div>
-         <button type="button" id="subtaskImgAddCancel" class="subtaskImgDiv pointer" onclick="subtaskAddOrCancel('cancel'); doNotClose(event)"></button>
+         <button type="button" id="subtaskImgAddCancel" class="subtaskImgDiv pointer" onclick="subtaskAddOrCancel('cancel'); doNotClose(event)" aria-label="Cancel subtask input"></button>
      </div>`;
 }
 
@@ -556,9 +565,9 @@ function renderSubtaskHTML(outputContainer, subtask) {
         <div class="subTaskOutputDiv" id="subtask${safeSubtaskId}" ondblclick="editSubtask(${safeSubtaskId})">
         <div class="subtaskText">${safeSubtaskText}</div>
             <div class="subtaskCheckboxes">
-                <button type="button" class="subtaskImgDiv pointer" id="subtaskImgEdit" onclick="editSubtask(${safeSubtaskId})"></button>
+                <button type="button" class="subtaskImgDiv pointer" id="subtaskImgEdit" onclick="editSubtask(${safeSubtaskId})" aria-label="Edit subtask"></button>
                 <div class="vLine"></div>
-                <button type="button" class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${safeSubtaskId})"></button>
+                <button type="button" class="subtaskImgDiv pointer" id="subtaskImgDelete" onclick="deleteSubtask(${safeSubtaskId})" aria-label="Delete subtask"></button>
             </div>
         </div>`;
 }

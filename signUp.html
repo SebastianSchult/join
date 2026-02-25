@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="./assets/img/favicon.png" type="image/png">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./assets/css/accessibility.css">
   <link rel="stylesheet" href="assets/css/header.css" />
   <link rel="stylesheet" href="assets/css/navigation.css" />
   <link rel="stylesheet" href="./assets/css/signUp.css">
@@ -25,9 +26,9 @@
             <img class="signUpLogo" src="./assets/img/logo-medium_white.png" alt="logo">
           </header>
           <div class="signUp-box">
-            <div class="arrowLeft" onclick="redirectToLogin()">
+            <button type="button" class="arrowLeft" onclick="redirectToLogin()" aria-label="Back to login">
               <img src="./assets/img/icon-arrow_left.png" alt="arrow left">
-            </div>
+            </button>
             <div class="h1SignUpBox">
               <h1 class="signUpH1">Sign up</h1>
               <div class="horizontalH1UnderlineSignUp"></div>
@@ -37,46 +38,50 @@
                 <!-- Wrapper für Name-Feld -->
                 <div class="input-wrapper">
                   <div class="signUpInputField">
-                    <input type="text" id="signUpNameInput" placeholder="Name" onkeyup="checkIfFormIsValid()" required>
+                    <label class="sr-only" for="signUpNameInput">Name</label>
+                    <input type="text" id="signUpNameInput" placeholder="Name" aria-describedby="signUpNameError" aria-invalid="false" autocomplete="name" onkeyup="checkIfFormIsValid()" required>
                     <div class="mailIcon">
                       <img src="./assets/img/icon-person.png" alt="letter">
                     </div>
                   </div>
                   <!-- Fehlermeldung wird hier platziert -->
-                  <span class="error-message"></span>
+                  <span id="signUpNameError" class="error-message" aria-live="polite"></span>
                 </div>
 
                 <!-- Wrapper für E-Mail-Feld -->
                 <div class="input-wrapper">
                   <div class="signUpInputField">
-                    <input type="email" id="signUpEmailInput" placeholder="Email" onkeyup="checkIfFormIsValid()" required>
+                    <label class="sr-only" for="signUpEmailInput">Email</label>
+                    <input type="email" id="signUpEmailInput" placeholder="Email" aria-describedby="signUpEmailError" aria-invalid="false" autocomplete="email" onkeyup="checkIfFormIsValid()" required>
                     <div class="mailIcon">
                       <img src="./assets/img/icon-mail.png" alt="letter">
                     </div>
                   </div>
-                  <span class="error-message"></span>
+                  <span id="signUpEmailError" class="error-message" aria-live="polite"></span>
                 </div>
 
                 <!-- Wrapper für Passwort-Feld -->
                 <div class="input-wrapper">
                   <div class="signUpInputField">
-                    <input type="password" id="signUpPasswordInput" placeholder="Password" onkeyup="checkIfFormIsValid()" required>
+                    <label class="sr-only" for="signUpPasswordInput">Password</label>
+                    <input type="password" id="signUpPasswordInput" placeholder="Password" aria-describedby="signUpPasswordError" aria-invalid="false" autocomplete="new-password" onkeyup="checkIfFormIsValid()" required>
                     <div class="mailIcon">
                       <img src="./assets/img/icon-lock.png" alt="lock">
                     </div>
                   </div>
-                  <span class="error-message"></span>
+                  <span id="signUpPasswordError" class="error-message" aria-live="polite"></span>
                 </div>
 
                 <!-- Wrapper für Passwort-Bestätigung -->
                 <div class="input-wrapper">
                   <div class="signUpInputField">
-                    <input type="password" id="signUpPasswordInputConfirm" placeholder="Confirm Password" onkeyup="checkIfFormIsValid()" required>
+                    <label class="sr-only" for="signUpPasswordInputConfirm">Confirm password</label>
+                    <input type="password" id="signUpPasswordInputConfirm" placeholder="Confirm Password" aria-describedby="signUpPasswordConfirmError" aria-invalid="false" autocomplete="new-password" onkeyup="checkIfFormIsValid()" required>
                     <div class="mailIcon">
                       <img src="./assets/img/icon-lock.png" alt="lock">
                     </div>
                   </div>
-                  <span class="error-message"></span>
+                  <span id="signUpPasswordConfirmError" class="error-message" aria-live="polite"></span>
                 </div>
 
                 <!-- Checkbox für Privacy Policy -->

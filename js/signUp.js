@@ -158,6 +158,15 @@ function showError(inputElement, message) {
       errorEl.className = 'error-message';
       container.parentNode.insertBefore(errorEl, container.nextSibling);
   }
+  if (!errorEl.id && inputElement.id) {
+      errorEl.id = `${inputElement.id}Error`;
+  }
+  errorEl.setAttribute('role', 'alert');
+  errorEl.setAttribute('aria-live', 'polite');
+  if (errorEl.id) {
+      inputElement.setAttribute('aria-describedby', errorEl.id);
+  }
+  inputElement.setAttribute('aria-invalid', 'true');
   errorEl.textContent = message;
   inputElement.classList.add('error');
 }
@@ -167,7 +176,11 @@ function clearError(inputElement) {
   let errorEl = container.nextElementSibling;
   if (errorEl && errorEl.classList.contains('error-message')) {
       errorEl.textContent = '';
+      if (errorEl.id) {
+          inputElement.setAttribute('aria-describedby', errorEl.id);
+      }
   }
+  inputElement.setAttribute('aria-invalid', 'false');
   inputElement.classList.remove('error');
 }
 

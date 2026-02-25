@@ -14,9 +14,9 @@ function generateContactsContainerHTML() {
       <div id="addContactContainer" class="hidden">
       </div>
   </div>
-  <div class="add-contact-button" onclick="addContactCard()">
+  <button type="button" class="add-contact-button" onclick="addContactCard()" aria-label="Add new contact">
     <img src="./assets/img/Secondary mobile contact V1.png" alt="">
-  </div>
+  </button>
   <div class="contacts-container-outer">
     <div class="contacts-container" id="contacts-container"> 
             <div id="button-add-contact-card" class="button-add-contact" onclick="addContactCard(); doNotClose(event)">
@@ -42,7 +42,9 @@ function renderAddContactsHTML() {
     return /*html*/ `
           <div class="add-contact-header">
               <div class="add-contact-header-close">
-                  <img onclick="closeOverlay('addContact')" src="./assets/img/icon-close_white.png" alt="closeAddContact">
+                  <button type="button" class="icon-action-button" onclick="closeOverlay('addContact')" aria-label="Close add contact form">
+                      <img src="./assets/img/icon-close_white.png" alt="">
+                  </button>
               </div>
           </div>
           <div class="add-contact-header-logo">
@@ -58,23 +60,26 @@ function renderAddContactsHTML() {
               </div>
               <form onsubmit="saveContact(); return false" class="add-contact-input-group">
                   <div class="input-frame">
-                      <input id="contactName" type="text" placeholder="Name" autofocus required>
+                      <label class="sr-only" for="contactName">Name</label>
+                      <input id="contactName" type="text" placeholder="Name" autocomplete="name" autofocus required>
                       <img src="./assets/img/icon-person.png" alt="">
                   </div>
                   <div class="input-frame">
-                      <input id="contactMail" type="email" placeholder="Email" autofocus required>
+                      <label class="sr-only" for="contactMail">Email</label>
+                      <input id="contactMail" type="email" placeholder="Email" autocomplete="email" autofocus required>
                       <img src="./assets/img/icon-mail.png" alt="">
                   </div>
                   <div class="input-frame">
-                      <input id="contactPhone" pattern="[0-9]*" type="tel" placeholder="Phone" autofocus required>
+                      <label class="sr-only" for="contactPhone">Phone</label>
+                      <input id="contactPhone" pattern="[0-9]*" type="tel" placeholder="Phone" autocomplete="tel" autofocus required>
                       <img src="./assets/img/icon-call.png" alt="">
                   </div>
                   <div id="addContactButton" class="addContactButton">
-                      <button class="cancelButton" onclick="closeOverlay('addContact')" onmouseover="changeCancelIcon()"
+                      <button type="button" class="cancelButton" onclick="closeOverlay('addContact')" onmouseover="changeCancelIcon()"
                           onmouseout="restoreCancelIcon()">Cancel
                           <img id="cancelIcon" src="./assets/img/icon-cancel.png" alt="">
                       </button>
-                      <button id="createBtn" class="createButton">Create contact
+                      <button type="submit" id="createBtn" class="createButton">Create contact
                           <img id="createIcon" src="./assets/img/icon-check.png" alt="">
                       </button>
                   </div>
@@ -97,7 +102,9 @@ function renderEditContactHTML(id, name, contactColor) {
     return /*html*/ `
           <div class="edit-contact-header">
               <div class="edit-contact-header-close">
-                  <img onclick="closeOverlay('editContact')" src="./assets/img/icon-close_white.png" alt="closeAddContact">
+                  <button type="button" class="icon-action-button" onclick="closeOverlay('editContact')" aria-label="Close edit contact form">
+                      <img src="./assets/img/icon-close_white.png" alt="">
+                  </button>
               </div>
           </div>
           <div class="edit-contact-header-logo">
@@ -116,19 +123,22 @@ function renderEditContactHTML(id, name, contactColor) {
               </div>
               <form action="" onsubmit="saveEditedContact(${safeContactId}); return false" class="add-contact-input-group">
                   <div class="input-frame">
-                      <input id="contactName" type="text" placeholder="Name" autofocus required>
+                      <label class="sr-only" for="contactName">Name</label>
+                      <input id="contactName" type="text" placeholder="Name" autocomplete="name" autofocus required>
                       <img src="./assets/img/icon-person.png" alt="">
                   </div>
                   <div class="input-frame">
-                      <input id="contactMail" type="email" placeholder="Email" autofocus required>
+                      <label class="sr-only" for="contactMail">Email</label>
+                      <input id="contactMail" type="email" placeholder="Email" autocomplete="email" autofocus required>
                       <img src="./assets/img/icon-mail.png" alt="">
                   </div>
                   <div class="input-frame">
-                      <input id="contactPhone" type="tel" placeholder="Phone" autofocus required>
+                      <label class="sr-only" for="contactPhone">Phone</label>
+                      <input id="contactPhone" type="tel" placeholder="Phone" autocomplete="tel" autofocus required>
                       <img src="./assets/img/icon-call.png" alt="">
                   </div>
                   <div id="addContactButton" class="addContactButton">
-                      <button class="cancelButton" onclick="closeOverlay('editContact')" onmouseover="changeCancelIcon()"
+                      <button type="button" class="cancelButton" onclick="closeOverlay('editContact')" onmouseover="changeCancelIcon()"
                           onmouseout="restoreCancelIcon()">Cancel
                           <img id="cancelIcon" src="./assets/img/icon-cancel.png" alt="">
                       </button>
@@ -200,9 +210,9 @@ function generateContactDetailsHTML(name, email, phone, id, color) {
       <div class="contact-Details">
         <div class="contact-details-header-and-button">
           <div class="contact-details-header-responsive">Contact Information</div>
-          <div class="contact-details-back-button" onclick="openContactDetails(${safeContactId})">
+          <button type="button" class="contact-details-back-button" onclick="openContactDetails(${safeContactId})" aria-label="Back to contact list">
             <img src="./assets/img/icon-arrow_left.png">
-          </div>
+          </button>
         </div>
         <div class="contact-details-header" id="contactDetailsHeader">
           <div class="contact-details-badge-group">
@@ -234,9 +244,9 @@ function generateContactDetailsHTML(name, email, phone, id, color) {
             <div class="contact-phone-container-phone">${safePhone}</div>
           </div>
         </div>
-        <div class="openEditDeleteResponsive" id="openEditDeleteResponsive" onclick="openEditDelete(); doNotClose(event)">
+        <button type="button" class="openEditDeleteResponsive" id="openEditDeleteResponsive" onclick="openEditDelete(); doNotClose(event)" aria-label="Open contact actions menu">
           <img src="./assets/img/Menu Contact options.png" alt="">
-        </div>
+        </button>
         <div class="editDelete d-none" id="editDelete" onclick="doNotClose(event)">
           <div class="editDiv" onclick="editContact(${safeContactId})">
             <img src="./assets/img/icon-edit.png" alt="">

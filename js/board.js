@@ -567,6 +567,7 @@ function renderTaskImages(task) {
     const btn = document.createElement('button');
     btn.textContent = 'X'; 
     btn.className = 'delete-edit-thumbnail';
+    btn.setAttribute('aria-label', 'Delete attachment');
     btn.addEventListener('click', e => { 
       e.stopPropagation(); 
       task.images.splice(index, 1); 
