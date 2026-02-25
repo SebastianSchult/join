@@ -16,7 +16,7 @@
   justify-content: space-between;
   color: var(--clr-text);
   background-color: var(--clr-main);
-  padding: 20px;
+  padding: var(--ui-content-gap-lg);
   .header-logo {
     width: 46px;
     height: 56px;
@@ -30,7 +30,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: var(--ui-content-gap-lg);
 }
 
 .header-kanban-writing {
@@ -47,8 +47,8 @@
   font-size: 18px;
   font-weight: 700;
   border: 2.5px solid var(--clr-main);
-  padding: 10px;
-  gap: 10px;
+  padding: var(--ui-space-sm);
+  gap: var(--ui-space-sm);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -63,7 +63,7 @@
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  padding: 10px;
+  padding: var(--ui-space-sm);
   border-radius: 20px 0 20px 20px;
   position: absolute;
   top: 80px;
@@ -77,8 +77,8 @@
     font-weight: 400;
     color: var(--clr-text-menu);
     width: Fixed 152px;
-    padding: 8px 16px;
-    gap: 8px;
+    padding: var(--ui-space-xs) var(--ui-space-md);
+    gap: var(--ui-space-xs);
   }
 }
 
@@ -91,7 +91,7 @@
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  padding: 10px;
+  padding: var(--ui-space-sm);
   border-radius: 20px 0 20px 20px;
   position: absolute;
   top: 80px;
@@ -105,8 +105,8 @@
     font-weight: 400;
     color: var(--clr-main);
     width: Fixed 152px;
-    padding: 8px 16px;
-    gap: 8px;
+    padding: var(--ui-space-xs) var(--ui-space-md);
+    gap: var(--ui-space-xs);
   }
 }
 

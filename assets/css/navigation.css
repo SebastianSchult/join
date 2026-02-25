@@ -39,7 +39,7 @@
 .nav-buttons-box {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--ui-space-sm);
 }
 
 .nav-btn {
@@ -48,9 +48,9 @@
   align-items: center;
   height: 40px;
   width: 186px;
-  padding: 8px 30px 8px 30px;
+  padding: var(--ui-space-xs) 30px;
   border-radius: 8px;
-  gap: 8px;
+  gap: var(--ui-space-xs);
   color: var(--clr-text-menu);
   cursor: pointer;
 
@@ -70,11 +70,11 @@
 .privatePolicyAndLegalNoticeLinksNav {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--ui-content-gap-md);
   margin-bottom: 42px;
 
   div {
-    padding: 8px;
+    padding: var(--ui-space-xs);
     border-radius: 8px;
   }
 
@@ -84,7 +84,7 @@
     font-family: "Open Sans", sans-serif;
     font-size: 16px;
     font-weight: 400;
-    padding: 8px;
+    padding: var(--ui-space-xs);
     border-radius: 8px;
   }
 }
@@ -105,7 +105,7 @@
 
 .privacyNav-clicked,
 .legalNav-clicked {
-  padding: 8px;
+  padding: var(--ui-space-xs);
   border-radius: 8px;
   color: white;
   background-color: var(--clr-main);
@@ -115,7 +115,7 @@
 
 @media (max-width: 950px) {
   .navigation-content {
-    padding-inline: 8px;
+    padding-inline: var(--ui-space-xs);
   }
 }
 
@@ -143,7 +143,7 @@
     padding: 0;
     display: flex;
     flex-direction: row;
-    gap: 15px;
+    gap: var(--ui-content-gap-md);
     border: none;
     justify-content: center;
   }
@@ -191,13 +191,13 @@
 @media (max-width: 560px) {
   h1 {
     font-size: 30px;
-    margin-bottom: 24px;
+    margin-bottom: var(--ui-space-lg);
   }
 
   navigation-container {
     .navigation-content {
       justify-content: center;
-      padding: 8px 0;
+      padding: var(--ui-space-xs) 0;
     }
   }
 
@@ -214,7 +214,7 @@
   }
 
   .nav-btn {
-    padding: 8px 10px 8px 10px;
+    padding: var(--ui-space-xs) var(--ui-space-sm);
     font-size: 14px;
 
     img {

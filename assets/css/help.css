@@ -1,5 +1,5 @@
 .help-page {
-  margin: 0 88px;
+  margin: 0 var(--ui-page-inline);
 }
 
 .help-page-header {
@@ -24,7 +24,7 @@ h2 {
   font-size: 33px;
   font-weight: 700;
   line-height: 39.6px;
-  margin: 24px 0;
+  margin: var(--ui-space-lg) 0;
 }
 
 h3 {
@@ -44,7 +44,7 @@ h4 {
   justify-content: center;
   align-items: start;
   gap: 35px;
-  margin: 16px 0;
+  margin: var(--ui-space-md) 0;
 }
 
 .joinSpanBlue {
@@ -75,11 +75,11 @@ h2 {
 
 @media screen and (max-width: 500px) {
   .help-page {
-    margin: 0 46px;
+    margin: 0 var(--ui-page-inline-mobile);
   }
 
   h2 {
-    margin: 16px 0 60px 0;
+    margin: var(--ui-space-md) 0 60px 0;
   }
 }
 

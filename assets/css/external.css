@@ -9,14 +9,14 @@
 }
 
 .privatePolicyAndLegalNoticeLinksNav {
-  margin-bottom: 16px;
+  margin-bottom: var(--ui-space-md);
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 801px) {
   .main {
     height: auto;
     overflow-x: hidden;
-    margin-left: 24px;
+    margin-left: var(--ui-space-lg);
   }
 
   #navigation-container {

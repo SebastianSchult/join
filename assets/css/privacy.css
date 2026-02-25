@@ -1,11 +1,11 @@
 .privacy-wrapper {
-  margin: 76px 88px;
+  margin: 76px var(--ui-page-inline);
 }
 
 h1 {
   font-size: 61px;
   font-weight: 700;
-  margin-bottom: 48px;
+  margin-bottom: var(--ui-space-3xl);
   margin-left: -12px;
 }
 
@@ -13,8 +13,8 @@ h2 {
   font-size: 33px;
   font-weight: 700;
   color: var(--clr-text-medium-blue);
-  margin-top: 24px;
-  margin-bottom: 10px;
+  margin-top: var(--ui-space-lg);
+  margin-bottom: var(--ui-space-sm);
   margin-left: -8px;
 }
 
@@ -22,8 +22,8 @@ h3 {
   font-size: 19px;
   font-weight: 700;
   color: var(--clr-text-medium-blue);
-  margin-top: 10px;
-  margin-bottom: 8px;
+  margin-top: var(--ui-space-sm);
+  margin-bottom: var(--ui-space-xs);
 }
 
 strong,
@@ -34,7 +34,7 @@ h4 {
 }
 
 p {
-  margin-bottom: 8px;
+  margin-bottom: var(--ui-space-xs);
 }
 
 .h1PrivacyBox {
@@ -51,21 +51,21 @@ p {
 
 @media (max-width: 900px) {
   .privacy-wrapper {
-    margin: 36px 40px;
+    margin: 36px var(--ui-page-inline-mobile);
   }
 
   h1 {
     font-size: 48px;
     font-weight: 700;
-    margin-bottom: 48px;
+    margin-bottom: var(--ui-space-3xl);
   }
 
   h2 {
     font-size: 21px;
     font-weight: 700;
     color: var(--clr-text-medium-blue);
-    margin-top: 24px;
-    margin-bottom: 10px;
+    margin-top: var(--ui-space-lg);
+    margin-bottom: var(--ui-space-sm);
   }
 
   h3 {
@@ -85,7 +85,7 @@ p {
 
 @media (max-width: 801px) {
   .privacy-wrapper {
-    margin: 36px 40px;
+    margin: 36px var(--ui-page-inline-mobile);
   }
 }
 

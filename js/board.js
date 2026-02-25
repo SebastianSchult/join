@@ -473,10 +473,14 @@ function displayEmptyTask(taskId, categoryId){
     // let cardHeight = "min-height: 100%";
     let cardWidth = "min-width: "+  document.getElementById(taskId).clientWidth + "px";
     let cardStyle = cardHeight + "; " + cardWidth;
+    const boardColumnsMaxWidth =
+      typeof getResponsiveBreakpointPx === "function"
+        ? getResponsiveBreakpointPx("--ui-bp-board-columns-max", 1400)
+        : 1400;
 
     let newDiv = document.createElement('div');
     newDiv.classList.add('emptyCard');
-    if(window.innerWidth < 1370){
+    if(window.innerWidth <= boardColumnsMaxWidth){
         newDiv.classList.add('vertical')
     }
 

@@ -1,0 +1,27 @@
+:root {
+  /* Responsive breakpoints */
+  --ui-bp-mobile-max: 801px;
+  --ui-bp-navigation-tablet-max: 950px;
+  --ui-bp-phone-max: 560px;
+  --ui-bp-content-narrow-max: 500px;
+  --ui-bp-board-columns-max: 1400px;
+
+  /* Spacing scale */
+  --ui-space-0: 0;
+  --ui-space-xxs: 4px;
+  --ui-space-xs: 8px;
+  --ui-space-sm: 10px;
+  --ui-space-md: 16px;
+  --ui-space-lg: 24px;
+  --ui-space-xl: 32px;
+  --ui-space-2xl: 40px;
+  --ui-space-3xl: 48px;
+  --ui-space-4xl: 64px;
+
+  /* Layout rhythm */
+  --ui-page-inline: 88px;
+  --ui-page-inline-mobile: 40px;
+  --ui-page-inline-phone: 24px;
+  --ui-content-gap-md: 15px;
+  --ui-content-gap-lg: 20px;
+}

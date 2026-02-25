@@ -6,6 +6,11 @@ const COOKIEBOT_SCRIPT_ID = "Cookiebot";
 const COOKIEBOT_UC_URL = "https://consent.cookiebot.com/uc.js";
 const COOKIEBOT_CONFIG_RETRY_DELAY_MS = 100;
 const COOKIEBOT_CONFIG_MAX_RETRIES = 30;
+const UI_BREAKPOINT_VARIABLES = Object.freeze({
+	mobileMax: "--ui-bp-mobile-max",
+	navigationTabletMax: "--ui-bp-navigation-tablet-max",
+	boardColumnsMax: "--ui-bp-board-columns-max",
+});
 
 initializeLegacyRuntimeFallbacks();
 initializeCookiebot();
@@ -534,7 +539,7 @@ async function includeHTML() {
 
 /**
  * Adds an event listener to the window's resize event. When the window is resized,
- * it checks if the window's inner width is less than or equal to 802. If it is,
+ * it checks if the viewport width is at or below the configured mobile breakpoint.
  * it sets the isSmallerThan802 variable to true. Otherwise, it sets it to false.
  * If the value of isSmallerThan802 has changed since the last resize event,
  * it updates isSmallerThan802Old with the new value and calls the runFunctionsOnBreakpoint function.
@@ -600,11 +605,41 @@ function renderStandardNavigation(){
  * @return {void} This function does not return anything.
  */
 function setIsSmallerThan802(){
-	if (window.innerWidth <= 801) {
+	if (isViewportAtMost(UI_BREAKPOINT_VARIABLES.mobileMax, 801)) {
 		isSmallerThan802 = true;
 	} else {
 		isSmallerThan802 = false;
 	}
+}
+
+
+/**
+ * Reads a CSS breakpoint token and returns its pixel value.
+ *
+ * @param {string} cssVariableName - CSS custom property name, e.g. "--ui-bp-mobile-max".
+ * @param {number} fallbackPx - Fallback breakpoint value in px.
+ * @returns {number} Parsed breakpoint in px.
+ */
+function getResponsiveBreakpointPx(cssVariableName, fallbackPx) {
+	const rootStyles = getComputedStyle(document.documentElement);
+	const rawValue = rootStyles.getPropertyValue(cssVariableName).trim();
+	const parsedValue = Number.parseFloat(rawValue);
+	if (!Number.isFinite(parsedValue)) {
+		return fallbackPx;
+	}
+	return parsedValue;
+}
+
+
+/**
+ * Checks if current viewport width is at or below a breakpoint token.
+ *
+ * @param {string} cssVariableName - CSS custom property name with px value.
+ * @param {number} fallbackPx - Fallback breakpoint value in px.
+ * @returns {boolean} True if viewport width <= breakpoint.
+ */
+function isViewportAtMost(cssVariableName, fallbackPx) {
+	return window.innerWidth <= getResponsiveBreakpointPx(cssVariableName, fallbackPx);
 }
 
 
@@ -695,7 +730,7 @@ function openSmallMenu() {
 	let smallMenu = getDiv("smallMenu");
 	let smallMenuMobile = getDiv("smallMenuMobile");
 
-	if (screenWidth <= 801) {
+	if (screenWidth <= getResponsiveBreakpointPx(UI_BREAKPOINT_VARIABLES.mobileMax, 801)) {
 		smallMenu.classList.remove("d-none");
 		smallMenuMobile.classList.toggle("d-none");
 	} else {
