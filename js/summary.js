@@ -1,6 +1,7 @@
 let loggedUser;
 let globalCapitalizedName;
 let dayTime;
+let mobileGreetingTimeoutId = null;
 
 
 /**
@@ -192,21 +193,27 @@ function buttonEventListener() {
  * Displays a mobile greeting overlay if the window width is less than 801 pixels.
  */
 function greetUserMobile() {
-
     if (window.innerWidth < 951 && document.referrer.includes('index')) {
-        let greetingContainer = document.getElementById('greetingContainer');
-        let subMainSummary = document.getElementById('subMainSummary');
-        let bitGreeting = document.getElementById('h1GreetingUser');
+        const { greetingContainer, subMainSummary, bitGreeting, main } = getSummaryGreetingElements();
+        if (!greetingContainer || !subMainSummary || !main) {
+            return;
+        }
 
         greetingContainer.style.display = 'flex';
-        document.getElementById('main').classList.add("hide-scroll");
-        bitGreeting.style.display = "none";
+        greetingContainer.classList.remove('d-none');
+        main.classList.add('hide-scroll');
+        if (bitGreeting) {
+            bitGreeting.style.display = 'none';
+        }
         subMainSummary.style.overflow = 'hidden';
         subMainSummary.classList.remove('sub-main-summary');
         subMainSummary.classList.add('d-none');
 
         mobileGreeting();
-        setTimeout(hideMobileGreeting, 2500);
+        if (mobileGreetingTimeoutId) {
+            clearTimeout(mobileGreetingTimeoutId);
+        }
+        mobileGreetingTimeoutId = setTimeout(hideMobileGreeting, 2500);
     }
 }
 
@@ -215,11 +222,27 @@ function greetUserMobile() {
  * Hides the mobile greeting by setting the display style of the 'greetingContainer' element to 'none'and adding 'sub-main-summary' class to 'subMainSummary' element and removing 'd-none' class.
  */
 function hideMobileGreeting() {
-    document.getElementById('greetingContainer').style.display = 'none';
-    document.getElementById('main').classList.remove("hide-scroll");
+    const { greetingContainer, subMainSummary, main } = getSummaryGreetingElements();
+    if (!greetingContainer || !subMainSummary || !main) {
+        return;
+    }
+
+    greetingContainer.style.display = 'none';
+    greetingContainer.classList.add('d-none');
+    main.classList.remove('hide-scroll');
     subMainSummary.classList.add('sub-main-summary');
     subMainSummary.classList.remove('d-none');
-    subMainSummary.style.overflow = 'none';
+    subMainSummary.style.overflow = '';
+    mobileGreetingTimeoutId = null;
+}
+
+function getSummaryGreetingElements() {
+    return {
+        greetingContainer: document.getElementById('greetingContainer'),
+        subMainSummary: document.getElementById('subMainSummary'),
+        bitGreeting: document.getElementById('h1GreetingUser'),
+        main: document.getElementById('main'),
+    };
 }
 
 
@@ -227,16 +250,21 @@ function hideMobileGreeting() {
  * Sets the mobile greeting based on the current state of the application.
  */
 function mobileGreeting() {
-    let mobileGreeting = document.getElementById('mobileGreeting');
-    mobileGreeting.innerHTML = '';
-    mobileGreeting.innerHTML = `${dayTime}`;
+    const mobileGreeting = document.getElementById('mobileGreeting');
+    const mobileGreetingUsername = document.getElementById('mobileGreetingUsername');
+    if (!mobileGreeting || !mobileGreetingUsername) {
+        return;
+    }
 
     if (loggedUser) {
-        dayTime += ",";
-        document.getElementById('mobileGreetingUsername').innerHTML = globalCapitalizedName;
+        mobileGreeting.innerHTML = `${dayTime},`;
+        mobileGreeting.classList.remove('mobile-guest-greeting');
+        mobileGreeting.style.fontWeight = '';
+        mobileGreetingUsername.innerHTML = globalCapitalizedName;
     } else {
+        mobileGreeting.innerHTML = `${dayTime}`;
         mobileGreeting.classList.add('mobile-guest-greeting');
         mobileGreeting.style.fontWeight = 'bold';
+        mobileGreetingUsername.innerHTML = '';
     }
 }
-
