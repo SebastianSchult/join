@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="./assets/css/ui-tokens.css">
+    <link rel="stylesheet" href="./assets/css/accessibility.css">
     <link rel="stylesheet" href="assets/css/header.css" />
     <link rel="stylesheet" href="assets/css/navigation.css" />
     <link rel="stylesheet" href="assets/css/privacy.css">
@@ -25,7 +26,9 @@
 <body data-init="privacyInit">
     <div id="bodyContent" class="bodyContent">
         <div class="header-content">
-            <img class="header-logo" src="./assets/img/logo-small_white.png" alt="join-logo" data-action="switch-page" data-url="index.html"/>
+            <a class="header-logo-link" href="./index.html" aria-label="Go to login page">
+                <img class="header-logo" src="./assets/img/logo-small_white.png" alt="join-logo">
+            </a>
             <div class="header-inner-right">
                 <span class="header-kanban-writing">Kanban Project Management Tool</span>
             </div>
@@ -39,7 +42,9 @@
                 <div class="privacy-wrapper">
                     <div class="h1PrivacyBox">
                         <h1>Privacy Policy</h1>
-                        <img src="./assets/img/icon-arrow_left.png" alt="going-back arrow" data-action="go-back">
+                        <button type="button" class="h1PrivacyBackButton" data-action="go-back" aria-label="Go back">
+                            <img src="./assets/img/icon-arrow_left.png" alt="">
+                        </button>
                     </div>
                     <p>Last updated: April 20, 2024</p>
                     <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure

@@ -61,6 +61,12 @@ jobs:
           set -euo pipefail
           npm run lint:js
 
+      - name: Guardrail check for semantic accessibility baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run a11y:audit
+
   accessibility-baseline:
     runs-on: ubuntu-latest
 

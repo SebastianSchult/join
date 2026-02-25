@@ -15,3 +15,16 @@ button.arrowLeft {
   background: transparent;
   padding: 0;
 }
+
+:where(
+    a,
+    button,
+    input,
+    textarea,
+    select,
+    [role="button"],
+    [tabindex]:not([tabindex="-1"])
+  ):focus-visible {
+  outline: 3px solid #29abe2;
+  outline-offset: 2px;
+}

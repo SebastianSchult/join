@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="./assets/css/ui-tokens.css">
+    <link rel="stylesheet" href="./assets/css/accessibility.css">
     <link rel="stylesheet" href="assets/css/header.css" />
     <link rel="stylesheet" href="assets/css/navigation.css" />
     <link rel="stylesheet" href="assets/css/legalNotice.css">
@@ -28,7 +29,9 @@
 <body data-init="privacyInit">
     <div id="bodyContent" class="bodyContent">
         <div class="header-content">
-            <img class="header-logo" src="./assets/img/logo-small_white.png" alt="join-logo" data-action="switch-page" data-url="summary.html"/>
+            <a class="header-logo-link" href="./summary.html" aria-label="Go to summary page">
+                <img class="header-logo" src="./assets/img/logo-small_white.png" alt="join-logo">
+            </a>
             <div class="header-inner-right">
                 <span class="header-kanban-writing">Kanban Project Management Tool</span>
             </div>
@@ -39,16 +42,18 @@
                 <div class="legal_notice-wrapper">
                     <div class="h1LegalNoticeBox">
                         <h1>Legal Notice</h1>
-                        <img src="./assets/img/icon-arrow_left.png" alt="going-back arrow" data-action="go-back">
+                        <button type="button" class="h1LegalNoticeBackButton" data-action="go-back" aria-label="Go back">
+                            <img src="./assets/img/icon-arrow_left.png" alt="">
+                        </button>
                     </div>
                     <div>
                         <div class="imprint1">
                             <h2>Imprint</h2>
-                            <div>
+                            <ul>
                                 <li>Sebastian Schult</li>
                                 <li>Spanger Straße 9</li>
                                 <li>27476 Cuxhaven</li>
-                            </div>
+                            </ul>
                             <div>
                                 <h3>Exploring the Board</h3>
                                 <div>
@@ -121,7 +126,6 @@
                                 interactions with other users of <span class="blue">Join</span>.</p>
                         </div>
                         <div>
-                            >
                             <h3>Disclaimer of warranties and limitation of liability</h3>
 
                             <p class="end-of-page"><span class=" blue">Join</span> is provided "as is" without

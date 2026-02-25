@@ -9,8 +9,16 @@
   height: 200px;
 }
 
-img {
+.help-page-back-button {
+  border: none;
+  background: transparent;
+  padding: 0;
   cursor: pointer;
+}
+
+.help-page-back-button img {
+  display: block;
+  width: 40px;
 }
 
 h1 {
@@ -76,6 +84,10 @@ h2 {
 @media screen and (max-width: 500px) {
   .help-page {
     margin: 0 var(--ui-page-inline-mobile);
+  }
+
+  .help-page-back-button img {
+    width: 32px;
   }
 
   h2 {

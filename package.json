@@ -8,7 +8,8 @@
     "lint:ui-tokens": "node scripts/check_ui_tokens_alignment.cjs",
     "lint": "npm run lint:templates && npm run lint:inline-events && npm run lint:ui-tokens && npm run lint:js",
     "a11y:ci": "lhci autorun --config=./lighthouserc.cjs",
-    "a11y:report": "node scripts/summarize_lighthouse_accessibility.cjs"
+    "a11y:report": "node scripts/summarize_lighthouse_accessibility.cjs",
+    "a11y:audit": "node scripts/check_accessibility_baseline.cjs"
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
