@@ -170,11 +170,6 @@ function collectTopLevelDeclarations(source) {
     /\bclass\s+([A-Za-z_$][\w$]*)\s*/g,
     declarations
   );
-  collectRegexDeclarations(
-    source,
-    /\b(?:window|globalThis)\.([A-Za-z_$][\w$]*)\s*=/g,
-    declarations
-  );
 
   return declarations;
 }
