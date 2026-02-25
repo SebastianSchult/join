@@ -1,3 +1,5 @@
+"use strict";
+
 let users = [];
 let contacts = [];
 let currentContactId = null;
@@ -58,9 +60,9 @@ function sortContactsByName(contacts) {
  */
 function getContactsOutOfUsers() {
   const sourceUsers = Array.isArray(users) ? users : [];
-  temp_contacts = [];
+  const tempContacts = [];
   sourceUsers.forEach((user) => {
-    temp_contacts.push({
+    tempContacts.push({
       contactColor: user.contactColor,
       id: user.id,
       mail: user.mail,
@@ -69,7 +71,7 @@ function getContactsOutOfUsers() {
     });
   });
   users = [];
-  contacts = sortContactsByName(temp_contacts);
+  contacts = sortContactsByName(tempContacts);
 }
 
 
@@ -336,7 +338,7 @@ function highlightSelectedContact(id) {
  */
 function applyHighlight() {
   let allContactCards = document.getElementsByClassName("contact-card");
-  for (card of allContactCards)
+  for (const card of allContactCards)
     if (card.classList.contains("highlighted")) {
       highlightContactCard(card);
     } else {

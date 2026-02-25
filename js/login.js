@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Initializes the login process by including HTML, setting default inputs, and starting an animation.
  */
