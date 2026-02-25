@@ -244,15 +244,15 @@ function generateContactDetailsHTML(name, email, phone, id, color) {
             <div class="contact-phone-container-phone">${safePhone}</div>
           </div>
         </div>
-        <button type="button" class="openEditDeleteResponsive" id="openEditDeleteResponsive" data-action="open-edit-delete" data-stop-propagation="true" aria-label="Open contact actions menu">
+        <button type="button" class="openEditDeleteResponsive" id="openEditDeleteResponsive" data-action="open-edit-delete" data-stop-propagation="true" aria-label="Open contact actions menu" aria-haspopup="menu" aria-controls="editDelete" aria-expanded="false">
           <img src="./assets/img/Menu Contact options.png" alt="">
         </button>
-        <div class="editDelete d-none" id="editDelete" data-stop-propagation="true">
-          <button type="button" class="editDiv" data-action="edit-contact" data-contact-id="${safeContactId}">
+        <div class="editDelete d-none" id="editDelete" role="menu" aria-label="Contact actions" data-stop-propagation="true">
+          <button type="button" class="editDiv" data-action="edit-contact" data-contact-id="${safeContactId}" role="menuitem">
             <img src="./assets/img/icon-edit.png" alt="">
             <span>Edit</span>
             </button>
-          <button type="button" class="deleteDiv" data-action="remove-contact" data-contact-id="${safeContactId}">
+          <button type="button" class="deleteDiv" data-action="remove-contact" data-contact-id="${safeContactId}" role="menuitem">
               <img src="./assets/img/icon-delete.png" alt="">
               <span>Delete</span>
             </button>

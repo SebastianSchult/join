@@ -48,6 +48,8 @@ async function saveContact() {
 }
 
 let contactOverlayOpener = null;
+let contactsKeyboardAccessibilityRegistered = false;
+let editDeleteMenuOpener = null;
 
 
 /**
@@ -287,6 +289,8 @@ function renderAddContacts() {
   setAttributes(newDiv, {
     class: "add-contact",
     "data-stop-propagation": "true",
+    role: "dialog",
+    "aria-modal": "true",
   });
   document.getElementById("addContactContainer").appendChild(newDiv);
 }
@@ -303,6 +307,8 @@ function renderEditContact() {
   newDiv.id = "editContact";
   setAttributes(newDiv, {
     class: "edit-contact",
+    role: "dialog",
+    "aria-modal": "true",
   });
   document.getElementById("contactMainEdit").appendChild(newDiv);
 }
@@ -324,8 +330,22 @@ function showAddContactContainer() {
  *
  */
 function openEditDelete() {
-  document.getElementById("openEditDeleteResponsive").classList.add("d-none");
-  document.getElementById("editDelete").classList.remove("d-none");
+  const openButton = document.getElementById("openEditDeleteResponsive");
+  const editDeleteMenu = document.getElementById("editDelete");
+  if (!openButton || !editDeleteMenu) {
+    return;
+  }
+
+  registerContactsKeyboardAccessibility();
+  editDeleteMenuOpener = openButton;
+
+  openButton.classList.add("d-none");
+  openButton.setAttribute("aria-expanded", "true");
+  editDeleteMenu.classList.remove("d-none");
+  editDeleteMenu.setAttribute("tabindex", "-1");
+
+  const firstMenuButton = editDeleteMenu.querySelector("button");
+  focusElementIfPossible(firstMenuButton || editDeleteMenu);
 }
 
 /**
@@ -334,11 +354,91 @@ function openEditDelete() {
  * @param {} - No parameters
  * @return {} - No return value
  */
-function closeEditDelete() {
-  document
-    .getElementById("openEditDeleteResponsive")
-    .classList.remove("d-none");
-  document.getElementById("editDelete").classList.add("d-none");
+function closeEditDelete(options = {}) {
+  const { restoreFocus = true } = options;
+  const openButton = document.getElementById("openEditDeleteResponsive");
+  const editDeleteMenu = document.getElementById("editDelete");
+
+  if (openButton) {
+    openButton.classList.remove("d-none");
+    openButton.setAttribute("aria-expanded", "false");
+  }
+  if (editDeleteMenu) {
+    editDeleteMenu.classList.add("d-none");
+  }
+
+  if (restoreFocus) {
+    focusElementIfPossible(editDeleteMenuOpener || openButton);
+  }
+  editDeleteMenuOpener = null;
+}
+
+
+/**
+ * Registers keyboard handling for the mobile contact action menu.
+ *
+ * @returns {void}
+ */
+function registerContactsKeyboardAccessibility() {
+  if (contactsKeyboardAccessibilityRegistered) {
+    return;
+  }
+
+  document.addEventListener("keydown", handleContactsKeyboardAccessibility, true);
+  contactsKeyboardAccessibilityRegistered = true;
+}
+
+
+/**
+ * Handles keyboard behavior for the responsive contact action menu.
+ *
+ * @param {KeyboardEvent} event - Browser keyboard event.
+ * @returns {void}
+ */
+function handleContactsKeyboardAccessibility(event) {
+  const editDeleteMenu = document.getElementById("editDelete");
+  if (
+    !editDeleteMenu ||
+    editDeleteMenu.classList.contains("d-none") ||
+    event.defaultPrevented
+  ) {
+    return;
+  }
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    event.stopPropagation();
+    closeEditDelete({ restoreFocus: true });
+    return;
+  }
+
+  if (event.key !== "Tab") {
+    return;
+  }
+
+  const focusableControls = getFocusableElements(editDeleteMenu);
+  if (focusableControls.length === 0) {
+    event.preventDefault();
+    focusElementIfPossible(editDeleteMenu);
+    return;
+  }
+
+  const first = focusableControls[0];
+  const last = focusableControls[focusableControls.length - 1];
+  const activeElement = document.activeElement;
+
+  if (event.shiftKey) {
+    if (activeElement === first || !editDeleteMenu.contains(activeElement)) {
+      event.preventDefault();
+      focusElementIfPossible(last);
+    }
+    return;
+  }
+
+  if (activeElement === last || !editDeleteMenu.contains(activeElement)) {
+    event.preventDefault();
+    focusElementIfPossible(first);
+  }
 }
 
 
@@ -349,6 +449,7 @@ function closeEditDelete() {
  * @returns {void}
  */
 function editContact(id) {
+  closeEditDelete({ restoreFocus: false });
   const contactIndex = contacts.findIndex((contact) => contact.id === id);
   if (contactIndex !== -1) {
     const contact = contacts[contactIndex];
@@ -490,6 +591,7 @@ async function deleteContact(id) {
  * @return {void} This function does not return anything.
  */
 async function removeContact(id) {
+  closeEditDelete({ restoreFocus: false });
   await deleteContact(id);
 }
 

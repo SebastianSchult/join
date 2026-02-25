@@ -202,6 +202,7 @@ function openDropdown(arrowContainerId, contentContainerId){
     const opener = arrowContainer ? arrowContainer.closest('button') : null;
     if (opener) {
         opener.setAttribute('aria-expanded', 'true');
+        opener.setAttribute('aria-controls', contentContainerId);
     }
 
     activeDropdownState = {
@@ -316,13 +317,62 @@ function registerAddTaskKeyboardAccessibility(){
  * @returns {void}
  */
 function handleAddTaskKeyboardAccessibility(event){
-    if (event.defaultPrevented || event.key !== 'Escape') {
+    if (event.defaultPrevented) {
         return;
     }
 
-    if (closeOpenDropdowns({ restoreFocus: true })) {
+    if (!activeDropdownState || !activeDropdownState.contentContainerId) {
+        return;
+    }
+
+    const dropdownContainer = document.getElementById(activeDropdownState.contentContainerId);
+    if (!dropdownContainer || !dropdownContainer.classList.contains('dropdown-opened')) {
+        activeDropdownState = null;
+        return;
+    }
+
+    if (event.key === 'Escape') {
+        if (closeDropdown(activeDropdownState.contentContainerId, { restoreFocus: true })) {
+            setCloseDropdownContainer();
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        return;
+    }
+
+    if (event.key !== 'Tab') {
+        return;
+    }
+
+    const focusableControls =
+        typeof getFocusableElements === 'function'
+            ? getFocusableElements(dropdownContainer)
+            : Array.from(
+                  dropdownContainer.querySelectorAll(
+                      "button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex='-1'])"
+                  )
+              );
+    if (focusableControls.length === 0) {
         event.preventDefault();
-        event.stopPropagation();
+        focusElementIfPossible(dropdownContainer);
+        return;
+    }
+
+    const first = focusableControls[0];
+    const last = focusableControls[focusableControls.length - 1];
+    const activeElement = document.activeElement;
+
+    if (event.shiftKey) {
+        if (activeElement === first || !dropdownContainer.contains(activeElement)) {
+            event.preventDefault();
+            focusElementIfPossible(last);
+        }
+        return;
+    }
+
+    if (activeElement === last || !dropdownContainer.contains(activeElement)) {
+        event.preventDefault();
+        focusElementIfPossible(first);
     }
 }
 
