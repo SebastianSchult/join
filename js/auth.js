@@ -80,6 +80,15 @@ function doesEmailExist(usersList, emailToCheck, options = {}) {
     });
 }
 
+function checkMailExist(mailToCheck, usersList) {
+    const sourceUsers = Array.isArray(usersList)
+        ? usersList
+        : typeof users !== "undefined" && Array.isArray(users)
+            ? users
+            : [];
+    return doesEmailExist(sourceUsers, mailToCheck);
+}
+
 async function derivePasswordHash(password, saltHex, iterations) {
     if (typeof password !== "string" || password.length === 0) {
         throw new Error("Password must be a non-empty string.");
