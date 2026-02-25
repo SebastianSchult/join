@@ -1,5 +1,16 @@
 dev.nix
 
+# OS artifacts
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor/IDE artifacts
+.idea/
+*.swp
+*.swo
+*~
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -12,6 +23,7 @@ dev.nix
 
 # Built Visual Studio Code Extensions
 *.vsix
+.vscode-test/
 
 # Node dependencies (local lint tooling)
 node_modules/
