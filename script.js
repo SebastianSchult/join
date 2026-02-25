@@ -1,7 +1,6 @@
 "use strict";
 
-let isSmallerThan802 = false;
-let isSmallerThan802Old = false;
+let isMobileViewport = false;
 const COOKIEBOT_SCRIPT_ID = "Cookiebot";
 const COOKIEBOT_UC_URL = "https://consent.cookiebot.com/uc.js";
 const COOKIEBOT_CONFIG_RETRY_DELAY_MS = 100;
@@ -540,26 +539,32 @@ async function includeHTML() {
 		}
 	}
 	showInitials();
-	setIsSmallerThan802()
-	addResizeEventListener();
-	runFunctionsOnBreakpoint();
+	initializeResponsiveNavigation();
 }
 
 
 /**
- * Adds an event listener to the window's resize event. When the window is resized,
- * it checks if the viewport width is at or below the configured mobile breakpoint.
- * it sets the isSmallerThan802 variable to true. Otherwise, it sets it to false.
- * If the value of isSmallerThan802 has changed since the last resize event,
- * it updates isSmallerThan802Old with the new value and calls the runFunctionsOnBreakpoint function.
+ * Initializes responsive navigation state and breakpoint listener.
  *
- * @return {void} This function does not return anything.
+ * @returns {void}
  */
-function addResizeEventListener(){
+function initializeResponsiveNavigation() {
+	isMobileViewport = isUiBreakpointAtMost("mobileMax");
+	runFunctionsOnBreakpoint();
+	addResizeEventListener();
+}
+
+
+/**
+ * Registers resize listener that rerenders navigation only when breakpoint state changes.
+ *
+ * @returns {void}
+ */
+function addResizeEventListener() {
 	window.addEventListener('resize', () => {
-		setIsSmallerThan802();
-		if (isSmallerThan802 !== isSmallerThan802Old){
-			isSmallerThan802Old = isSmallerThan802;
+		const nextIsMobileViewport = isUiBreakpointAtMost("mobileMax");
+		if (nextIsMobileViewport !== isMobileViewport) {
+			isMobileViewport = nextIsMobileViewport;
 			runFunctionsOnBreakpoint();
 		}
 	});
@@ -570,7 +575,7 @@ function addResizeEventListener(){
  * Runs specific functions based on the current breakpoint.
  */
 function runFunctionsOnBreakpoint() {
-	if(isSmallerThan802){
+	if (isMobileViewport) {
 		renderMobileNavigation()
 		setActiveNavButton();
 	}
@@ -605,16 +610,6 @@ function renderStandardNavigation(){
 	container.innerHTML = renderNavigationHTML();
 	mobileContainer.innerHTML = "";
 
-}
-
-
-/**
- * Sets the value of the isSmallerThan802 variable based on the window's inner width.
- *
- * @return {void} This function does not return anything.
- */
-function setIsSmallerThan802(){
-	isSmallerThan802 = isUiBreakpointAtMost("mobileMax");
 }
 
 
@@ -805,13 +800,13 @@ function setActiveNavButton() {
 		activeNavLink.classList.remove("active");
 	}
 
-	navLinks.forEach((link) => {
-		if (location.pathname.includes(link)) {
-			document.getElementById(link).classList.add("active");
-			if (isSmallerThan802) document.getElementById(link).querySelector("img").src = `./assets/img/icon-${link}-marked.png`;
-			else document.getElementById(link).querySelector("img").src = `./assets/img/icon-${link}.png`;
-		}
-	});
+		navLinks.forEach((link) => {
+			if (location.pathname.includes(link)) {
+				document.getElementById(link).classList.add("active");
+				if (isMobileViewport) document.getElementById(link).querySelector("img").src = `./assets/img/icon-${link}-marked.png`;
+				else document.getElementById(link).querySelector("img").src = `./assets/img/icon-${link}.png`;
+			}
+		});
 }
 
 

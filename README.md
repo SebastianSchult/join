@@ -43,3 +43,4 @@ npm run a11y:report
 - Accessibility checks: [ACCESSIBILITY_CHECKS.md](./ACCESSIBILITY_CHECKS.md)
 - UI tokens and breakpoints: [UI_TOKENS.md](./UI_TOKENS.md)
 - Secure rendering / XSS rules: [SECURITY_RENDERING.md](./SECURITY_RENDERING.md)
+- Refactor baseline and roadmap: [REFACTOR_RESEARCH.md](./REFACTOR_RESEARCH.md)
