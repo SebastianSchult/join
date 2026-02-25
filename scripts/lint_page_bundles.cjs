@@ -176,23 +176,6 @@ function collectTopLevelDeclarations(source) {
     declarations
   );
 
-  const declarationListPattern = /\b(?:const|let|var)\s+([^;]+)/g;
-  let listMatch;
-  while ((listMatch = declarationListPattern.exec(source)) !== null) {
-    const declarationChunk = listMatch[1];
-    const baseIndex = listMatch.index;
-    const names = parseVariableDeclarationNames(declarationChunk);
-
-    for (const name of names) {
-      const localIndex = declarationChunk.indexOf(name);
-      const absoluteIndex = localIndex >= 0 ? baseIndex + localIndex : baseIndex;
-      declarations.push({
-        name,
-        line: getLineNumber(source, absoluteIndex),
-      });
-    }
-  }
-
   return declarations;
 }
 
@@ -204,25 +187,6 @@ function collectRegexDeclarations(source, pattern, target) {
       line: getLineNumber(source, match.index),
     });
   }
-}
-
-function parseVariableDeclarationNames(declarationChunk) {
-  const names = [];
-  const entries = declarationChunk.split(",");
-
-  for (const entry of entries) {
-    const candidate = entry.trim();
-    if (candidate.startsWith("{") || candidate.startsWith("[")) {
-      continue;
-    }
-
-    const nameMatch = candidate.match(/^([A-Za-z_$][\w$]*)\b/);
-    if (nameMatch) {
-      names.push(nameMatch[1]);
-    }
-  }
-
-  return names;
 }
 
 function stripComments(source) {
