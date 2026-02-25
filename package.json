@@ -4,7 +4,8 @@
   "scripts": {
     "lint:js": "node scripts/lint_page_bundles.cjs",
     "lint:templates": "node scripts/check_duplicate_template_attributes.cjs",
-    "lint": "npm run lint:js && npm run lint:templates"
+    "lint": "npm run lint:js && npm run lint:templates",
+    "a11y:ci": "npx --yes @lhci/cli autorun --config=./lighthouserc.cjs"
   },
   "devDependencies": {
     "eslint": "^8.57.1"

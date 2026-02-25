@@ -48,3 +48,29 @@ jobs:
         run: |
           set -euo pipefail
           npm run lint:js
+
+  accessibility-baseline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run Lighthouse accessibility baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run a11y:ci
+
+      - name: Upload Lighthouse artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports-${{ github.run_id }}
+          path: .lighthouseci
+          if-no-files-found: ignore
