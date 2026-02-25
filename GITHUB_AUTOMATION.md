@@ -1,0 +1,124 @@
+# GitHub Automation
+
+This project uses GitHub Actions for issue triage, PR status sync, quality checks, and deployment.
+
+## Workflows
+
+### 1) Issue triage
+
+- File: `.github/workflows/issue-triage.yml`
+- Trigger: `issues` (`opened`, `edited`, `reopened`)
+- What it does:
+  - Ensures standard labels exist (`type:*`, `priority:*`, `area:*`, `status:*`).
+  - Adds labels based on issue title/body.
+  - Optionally adds issue to a GitHub Project.
+
+Required for project add:
+
+- Repository variable: `GH_PROJECT_URL`
+- Repository secret: `PROJECT_TOKEN`
+
+### 2) PR issue status sync
+
+- File: `.github/workflows/pr-issue-status.yml`
+- Trigger: `pull_request` (`opened`, `reopened`, `ready_for_review`, `synchronize`, `closed`)
+- What it does:
+  - Resolves linked issue numbers (closing refs, branch prefix like `123-...`, PR body `#123`).
+  - Moves issue status in project:
+    - PR open/reopen/sync/ready: `Review`
+    - PR merged: `Done`
+  - Syncs issue labels (`status: review`, `status: done`).
+
+Required:
+
+- Repository variable: `GH_PROJECT_URL`
+- Repository secret: `PROJECT_TOKEN`
+
+### 3) PR tests
+
+- File: `.github/workflows/pr-tests.yml`
+- Trigger: `push`, `pull_request`
+- Jobs:
+  - `js-guardrails`
+    - JS syntax checks
+    - template duplicate-attribute guardrail
+    - inline event guardrail
+    - UI token alignment guardrail
+    - page-bundle lint guardrail
+    - semantic accessibility baseline guardrail (`npm run a11y:audit`)
+  - `accessibility-baseline`
+    - Lighthouse accessibility baseline via `treosh/lighthouse-ci-action`
+    - uploads `.lighthouseci` artifacts
+
+### 4) Deploy on main
+
+- File: `.github/workflows/deploy-on-main.yml`
+- Trigger: `push` on `main`
+- Modes:
+  - SSH + rsync
+  - FTPS primary with FTP fallback
+- Also generates `js/config.js` at deploy-time from repository secrets.
+
+## Setup checklist
+
+Path:
+
+- `Settings` -> `Secrets and variables` -> `Actions`
+
+### Variables
+
+- `GH_PROJECT_URL`
+  - Example: `https://github.com/users/<USER>/projects/<NUMBER>`
+
+### Secrets (project automation)
+
+- `PROJECT_TOKEN`
+  - Personal access token with project/repository access needed for project item updates.
+
+### Secrets (deploy - choose one mode)
+
+SSH mode:
+
+- `DEPLOY_SSH_HOST`
+- `DEPLOY_SSH_USER`
+- `DEPLOY_SSH_KEY`
+- `DEPLOY_PATH`
+- optional: `DEPLOY_SSH_PORT`, `DEPLOY_POST_COMMAND`
+
+FTP mode:
+
+- `DEPLOY_FTP_SERVER`
+- `DEPLOY_FTP_USER`
+- `DEPLOY_FTP_PASSWORD`
+- `DEPLOY_FTP_DIR`
+- optional: `DEPLOY_FTP_PORT`
+
+### Secrets (runtime config generation in deploy)
+
+- `JOIN_APP_STORAGE_TOKEN` (required)
+- `JOIN_APP_BASE_URL` (required)
+- `JOIN_APP_FIREBASE_TASKS_ID` (required)
+- `JOIN_APP_FIREBASE_USERS_ID` (required)
+- `JOIN_APP_COOKIEBOT_ID` (required)
+- `JOIN_APP_STORAGE_URL` (optional, default provided)
+- `JOIN_APP_COOKIEBOT_BLOCKING_MODE` (optional, default `auto`)
+
+## Branch and PR convention
+
+- Branch name starts with issue number: `<issue>-short-description`
+  - Example: `45-p1accessibility-accessibility-baseline-audit-and-critical-wcag-fixes`
+- Include `Closes #<issue>` in PR description.
+- Open PR from feature branch to `main`.
+
+This keeps issue linking deterministic for `pr-issue-status.yml`.
+
+## Troubleshooting
+
+- Project updates not happening:
+  - Verify `GH_PROJECT_URL` format and project access for `PROJECT_TOKEN`.
+  - Ensure project has a `Status` single-select field.
+- Deployment fails:
+  - Check which mode was selected in workflow logs (`ssh`, `ftp`, `none`).
+  - Re-validate server/credentials/path secrets.
+- Runtime config generation fails:
+  - Missing required `JOIN_APP_*` secrets are shown in logs.

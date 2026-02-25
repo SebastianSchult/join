@@ -56,10 +56,12 @@ Required:
 - `JOIN_APP_BASE_URL`
 - `JOIN_APP_FIREBASE_TASKS_ID`
 - `JOIN_APP_FIREBASE_USERS_ID`
+- `JOIN_APP_COOKIEBOT_ID`
 
 Optional:
 
 - `JOIN_APP_STORAGE_URL` (default: `https://remote-storage.developerakademie.org/item`)
+- `JOIN_APP_COOKIEBOT_BLOCKING_MODE` (default: `auto`)
 
 ## What gets deployed
 
