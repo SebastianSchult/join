@@ -320,15 +320,26 @@ function setPriorityForNewCard(priority){
 function toggleRequiredMessage(requiredInputField){
     let requiredMessageField = document.getElementById(requiredInputField.requiredFieldId);
     let toUnderline = document.getElementById(requiredInputField.idForRedUnderline);
+    let inputField = document.getElementById(requiredInputField.id);
+
+    if (inputField) {
+        inputField.setAttribute('aria-describedby', requiredInputField.requiredFieldId);
+    }
 
     if (getStateOfRequriredField(requiredInputField)){
         requiredInputField.state = true;
         toUnderline.classList.remove('is-invalid');
-        requiredMessageField.innerHTML = "";
+        if (inputField) {
+            inputField.setAttribute('aria-invalid', 'false');
+        }
+        requiredMessageField.textContent = "";
     } else {
         requiredInputField.state = false;
         toUnderline.classList.add('is-invalid');
-        requiredMessageField.innerHTML = "This field is requried";
+        if (inputField) {
+            inputField.setAttribute('aria-invalid', 'true');
+        }
+        requiredMessageField.textContent = "This field is required";
     }
     setCreateBtnState();
 }
