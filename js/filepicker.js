@@ -48,14 +48,12 @@ function setupDragAndDrop() {
     event.preventDefault();
     event.stopPropagation();
     dropArea.classList.add("dragging");
-    console.log("dragover event on addImageBottom");
   }, true);
   
   dropArea.addEventListener("dragleave", (event) => {
     event.preventDefault();
     event.stopPropagation();
     dropArea.classList.remove("dragging");
-    console.log("dragleave event on addImageBottom");
   }, true);
   
   dropArea.addEventListener("drop", (event) => {
@@ -63,7 +61,6 @@ function setupDragAndDrop() {
     event.stopPropagation();
     dropArea.classList.remove("dragging");
     const files = event.dataTransfer.files;
-    console.log("Dropped files:", files);
     if (files.length > 0) {
       handleFiles(files, getCurrentImageContainer());
     }
@@ -224,7 +221,6 @@ function getCurrentImageContainer() {
 function observeContainer() {
   const observer = new MutationObserver(() => {
     if (document.getElementById("subtasksImageContainer")) {
-      console.log("Container wurde geladen!");
       renderAddTaskImages();
       observer.disconnect();
     }
