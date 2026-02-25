@@ -24,4 +24,5 @@
   --ui-page-inline-phone: 24px;
   --ui-content-gap-md: 15px;
   --ui-content-gap-lg: 20px;
+  --ui-touch-target-min: 44px;
 }
