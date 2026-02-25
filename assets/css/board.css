@@ -60,10 +60,10 @@
     width: 100%;
     align-items: end;
     margin: 0;
-    padding-bottom: 20px;
+    padding-bottom: var(--ui-content-gap-lg);
     position: relative;
-    bottom: 20px;
-    right: 20px;
+    bottom: var(--ui-content-gap-lg);
+    right: var(--ui-content-gap-lg);
   }
 
   .clearBtn {
@@ -106,7 +106,7 @@
 }
 
 .boardTopContainer {
-  padding: 10px;
+  padding: var(--ui-space-sm);
   display: flex;
   gap: 35px;
 
@@ -147,7 +147,7 @@
   width: 100%;
   justify-content: space-between;
   padding: 8px 16px 8px 16px;
-  gap: 16px;
+  gap: var(--ui-space-md);
   height: 100%;
 
   input {
@@ -168,7 +168,7 @@
 .editCardImagesContainer {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 10px;
+  margin-top: var(--ui-space-sm);
 }
 
 .editThumbnailWrapper {
@@ -225,9 +225,9 @@ button:focus {
   display: grid;
   width: 100%;
   flex-direction: column;
-  padding: 10px;
+  padding: var(--ui-space-sm);
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  gap: var(--ui-space-lg);
   overflow: scroll;
   height: 100%;
 }
@@ -256,7 +256,7 @@ button:focus {
 
 .categoryTasks {
   display: flex;
-  gap: 16px;
+  gap: var(--ui-space-md);
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -283,8 +283,8 @@ button:focus {
   justify-content: space-between;
   width: 100%;
   border-radius: 24px;
-  gap: 24px;
-  padding: 16px;
+  gap: var(--ui-space-lg);
+  padding: var(--ui-space-md);
   box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   width: 252px;
@@ -375,7 +375,7 @@ button:focus {
 .cardBottomContainer {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--ui-space-lg);
 }
 
 .assignedToAndPriority {
@@ -386,7 +386,7 @@ button:focus {
 .cardTopContainer {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--ui-space-lg);
 }
 
 .cardPriority {
@@ -399,7 +399,7 @@ button:focus {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--ui-space-md);
   align-items: center;
 }
 
@@ -547,7 +547,7 @@ progress {
 .openCardInnerContainer {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--ui-space-lg);
   overflow-y: auto;
   padding-right: 10px;
 }
@@ -598,7 +598,7 @@ progress {
 .openCardAssignedToContact {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--ui-space-md);
   text-transform: capitalize;
   padding: 7px 16px;
   font-size: 1.188rem;
@@ -621,7 +621,7 @@ progress {
   display: flex;
   align-items: center;
   padding: 6px 16px;
-  gap: 16px;
+  gap: var(--ui-space-md);
   font-size: 1rem;
   text-transform: capitalize; /* has to be??  */
 }
@@ -732,7 +732,7 @@ progress {
 
   .openCardContainer[editing] .addTaskBodyRight {
     position: static !important;
-    padding: 16px;
+    padding: var(--ui-space-md);
   }
 
   .addTaskBtn {
@@ -754,7 +754,7 @@ progress {
 
   .category {
     display: flex;
-    gap: 16px;
+    gap: var(--ui-space-md);
     width: 100%;
   }
 
@@ -819,7 +819,7 @@ progress {
   .addTaskHoverContainer {
     position: fixed;
     top: 20px;
-    right: 20px;
+    right: var(--ui-content-gap-lg);
     left: 20px;
     height: 95%;
     border-radius: 30px;
@@ -835,7 +835,7 @@ progress {
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 10px;
+      padding: var(--ui-space-sm);
       height: 80%;
     }
 
@@ -886,7 +886,7 @@ progress {
 
     .addTaskPriorityButtonContainer {
       justify-content: center;
-      gap: 16px;
+      gap: var(--ui-space-md);
     }
 
     .addTaskPriorityButton {
@@ -954,7 +954,7 @@ progress {
     padding: 5px;
     .boardEditTaskHeader,
     .addTaskBodyRight {
-      padding: 10px;
+      padding: var(--ui-space-sm);
       bottom: 10px;
     }
   }

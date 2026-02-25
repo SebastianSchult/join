@@ -199,8 +199,8 @@ function buttonEventListener() {
  */
 function greetUserMobile() {
     const mobileGreetingMaxWidth =
-        typeof getResponsiveBreakpointPx === 'function'
-            ? getResponsiveBreakpointPx('--ui-bp-navigation-tablet-max', 950)
+        typeof getUiBreakpointValue === 'function'
+            ? getUiBreakpointValue('navigationTabletMax')
             : 950;
 
     if (window.innerWidth <= mobileGreetingMaxWidth && document.referrer.includes('index')) {
