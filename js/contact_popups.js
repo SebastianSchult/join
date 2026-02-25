@@ -14,7 +14,6 @@ async function saveContact() {
         mail: contactMail.value,
         phone: contactPhone.value,
         contactColor: generateRandomColor(),
-        password: getFirstNameForDefaultPassword(contactName.value),
       });
 
       await firebaseUpdateItem(users, FIREBASE_USERS_ID);
