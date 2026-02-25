@@ -93,20 +93,6 @@ function getNextId(contactsArray) {
 
 
 /**
- * Finds the maximum id in the contactsArray and returns the next id.
- */
-function getNextId(contactsArray) {
-  let maxId = 0;
-  contactsArray.forEach((contact) => {
-    if (contact.id > maxId) {
-      maxId = contact.id;
-    }
-  });
-  return maxId + 1;
-}
-
-
-/**
  * Initializes the contacts by including the HTML and loading the contacts.
  *
  * @return {void} This function does not return anything.
