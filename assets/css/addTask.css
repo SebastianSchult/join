@@ -667,7 +667,7 @@ select {
   flex-direction: row;
   justify-content: space-between;
   font-size: 1rem;
-  cursor: pointer;
+  cursor: default;
   padding: var(--padding-0616);
   border-radius: 10px;
 
@@ -678,6 +678,23 @@ select {
   &:hover .subtaskCheckboxes {
     visibility: visible;
   }
+}
+
+.subtaskTextButton {
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.subtaskTextButton:focus-visible {
+  outline: 2px solid var(--clr-contact-marked);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 .subTaskOutputDiv.editing {

@@ -19,10 +19,10 @@ function generateContactsContainerHTML() {
   </button>
   <div class="contacts-container-outer">
     <div class="contacts-container" id="contacts-container"> 
-            <div id="button-add-contact-card" class="button-add-contact" data-action="add-contact-card" data-stop-propagation="true">
-                <div class="add-new-contact">Add new contact</div>
+            <button type="button" id="button-add-contact-card" class="button-add-contact" data-action="add-contact-card" data-stop-propagation="true">
+                <span class="add-new-contact">Add new contact</span>
                 <img src="./assets/img/icon-person_add.png" alt="icon-person_add.png">
-            </div>
+            </button>
         <div class="contact-list" id="contactList">
         </div>
     </div>
@@ -177,13 +177,13 @@ function generateContactCardHTML(
     const safeShorterMail = escapeHtml(shorterMail);
 
     return /*html*/ `
-      <div class="contact-card" id="contact-card-${safeContactId}" data-action="open-contact-details" data-contact-id="${safeContactId}">
+      <button type="button" class="contact-card" id="contact-card-${safeContactId}" data-action="open-contact-details" data-contact-id="${safeContactId}">
         <div class="profile-badge-group" style="background-color: ${safeProfileColor}">${safeInitials}</div>
         <div>
           <span class="contact-card-name">${safeFormattedName}</span><br>
-          <a class="contact-card-email">${safeShorterMail}</a>
+          <span class="contact-card-email">${safeShorterMail}</span>
         </div>
-      </div>
+      </button>
     `;
   }
 
@@ -223,12 +223,12 @@ function generateContactDetailsHTML(name, email, phone, id, color) {
           <div class="contact-details-name-group">
             <div class="contact-details-name">${safeContactName}</div>
             <div class="contact-details-icons">
-              <div class="icon-edit" data-action="edit-contact" data-contact-id="${safeContactId}">
+              <button type="button" class="icon-edit" data-action="edit-contact" data-contact-id="${safeContactId}">
                 <img src="./assets/img/icon-edit.png" alt="">Edit
-              </div>
-              <div class="icon-delete" data-action="remove-contact" data-contact-id="${safeContactId}">
+              </button>
+              <button type="button" class="icon-delete" data-action="remove-contact" data-contact-id="${safeContactId}">
                 <img src="./assets/img/icon-delete.png" alt="">Delete
-              </div>
+              </button>
             </div>
           </div>
         </div>
@@ -248,14 +248,14 @@ function generateContactDetailsHTML(name, email, phone, id, color) {
           <img src="./assets/img/Menu Contact options.png" alt="">
         </button>
         <div class="editDelete d-none" id="editDelete" data-stop-propagation="true">
-          <div class="editDiv" data-action="edit-contact" data-contact-id="${safeContactId}">
+          <button type="button" class="editDiv" data-action="edit-contact" data-contact-id="${safeContactId}">
             <img src="./assets/img/icon-edit.png" alt="">
             <span>Edit</span>
-            </div>
-          <div class="deleteDiv" data-action="remove-contact" data-contact-id="${safeContactId}">
+            </button>
+          <button type="button" class="deleteDiv" data-action="remove-contact" data-contact-id="${safeContactId}">
               <img src="./assets/img/icon-delete.png" alt="">
               <span>Delete</span>
-            </div>
+            </button>
         </div>
       </div>
     `;

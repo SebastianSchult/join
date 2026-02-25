@@ -562,8 +562,10 @@ function renderSubtaskHTML(outputContainer, subtask) {
   const safeSubtaskText = escapeHtml(subtask && subtask.subtaskText);
 
   outputContainer.innerHTML += /*html*/ `
-        <div class="subTaskOutputDiv" id="subtask${safeSubtaskId}" data-dblclick-action="edit-subtask" data-subtask-id="${safeSubtaskId}">
-        <div class="subtaskText">${safeSubtaskText}</div>
+        <div class="subTaskOutputDiv" id="subtask${safeSubtaskId}">
+        <button type="button" class="subtaskTextButton" data-action="edit-subtask" data-subtask-id="${safeSubtaskId}">
+          <span class="subtaskText">${safeSubtaskText}</span>
+        </button>
             <div class="subtaskCheckboxes">
                 <button type="button" class="subtaskImgDiv pointer" id="subtaskImgEdit" data-action="edit-subtask" data-subtask-id="${safeSubtaskId}" aria-label="Edit subtask"></button>
                 <div class="vLine"></div>
