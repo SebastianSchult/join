@@ -13,6 +13,14 @@ async function addTaskInit(){
     checkValidity();
 }
 
+const DROPDOWN_ARROW_BY_CONTENT_ID = {
+    'dropdown-content-assignedTo': 'custom-arrow-assignedTo',
+    'dropdown-content-category': 'custom-arrow-category',
+};
+
+let addTaskKeyboardAccessibilityRegistered = false;
+let activeDropdownState = null;
+
 
 /**
  * Renders the HTML for adding a task.
@@ -23,6 +31,8 @@ function renderAddTaskHTML() {
     container.innerHTML = '';
     container.innerHTML += renderAddTaskMainContentHTML();
     document.getElementById('addTaskBodyRight').innerHTML = renderAddTaskFooterHTML();
+    registerAddTaskKeyboardAccessibility();
+    initializeDropdownAccessibilityState();
     setTodayDateAsMin();
     setPriority('medium');
     renderContactsToDropdown();
@@ -150,16 +160,187 @@ function getButtonColor(priority) {
  * Toggles the visibility of the dropdown content and updates the arrow image based on its current direction.
  */
 function renderArrow(arrowContainer, contentContainer){
-    let customArrow = document.getElementById(arrowContainer)
-    let arrowImg = customArrow.childNodes[1];
-    arrowImg.dataset.direction == "down"
-    ? arrowImg.dataset.direction = "up"
-    : arrowImg.dataset.direction = "down"
-    arrowImg.src = `./assets/img/icon-arrow_dropdown_${arrowImg.dataset.direction}.png`
-    document.getElementById(contentContainer).classList.toggle('d-none')
-    document.getElementById(contentContainer).classList.toggle('dropdown-opened')
+    registerAddTaskKeyboardAccessibility();
+    const dropdownContainer = document.getElementById(contentContainer);
+    if (!dropdownContainer) {
+        return;
+    }
+    const shouldOpen = !dropdownContainer.classList.contains('dropdown-opened');
+
+    closeOpenDropdowns({ restoreFocus: false });
+
+    if (shouldOpen) {
+        openDropdown(arrowContainer, contentContainer);
+    }
+    setCloseDropdownContainer();
+}
+
+
+/**
+ * Opens a dropdown and stores opener metadata for focus restoration.
+ *
+ * @param {string} arrowContainerId - Arrow container id.
+ * @param {string} contentContainerId - Dropdown content id.
+ * @returns {void}
+ */
+function openDropdown(arrowContainerId, contentContainerId){
+    const dropdownContainer = document.getElementById(contentContainerId);
+    if (!dropdownContainer) {
+        return;
+    }
+
+    const arrowContainer = document.getElementById(arrowContainerId);
+    const arrowImg = arrowContainer ? arrowContainer.querySelector('img[data-direction]') : null;
+    if (arrowImg) {
+        arrowImg.dataset.direction = 'up';
+        arrowImg.src = `./assets/img/icon-arrow_dropdown_${arrowImg.dataset.direction}.png`;
+    }
+
+    dropdownContainer.classList.remove('d-none');
+    dropdownContainer.classList.add('dropdown-opened');
+
+    const opener = arrowContainer ? arrowContainer.closest('button') : null;
+    if (opener) {
+        opener.setAttribute('aria-expanded', 'true');
+    }
+
+    activeDropdownState = {
+        contentContainerId,
+        opener,
+    };
+
+    focusFirstDropdownControl(dropdownContainer);
+}
+
+
+/**
+ * Closes a specific dropdown by its content id.
+ *
+ * @param {string} contentContainerId - Dropdown content id.
+ * @param {{restoreFocus?: boolean}} [options={}] - Close behavior options.
+ * @returns {boolean} True when a dropdown was closed.
+ */
+function closeDropdown(contentContainerId, options = {}){
+    const dropdownContainer = document.getElementById(contentContainerId);
+    if (!dropdownContainer || !dropdownContainer.classList.contains('dropdown-opened')) {
+        return false;
+    }
+
+    const { restoreFocus = false } = options;
+    const arrowContainerId = DROPDOWN_ARROW_BY_CONTENT_ID[contentContainerId];
+    const arrowContainer = arrowContainerId ? document.getElementById(arrowContainerId) : null;
+    const arrowImg = arrowContainer ? arrowContainer.querySelector('img[data-direction]') : null;
+    if (arrowImg) {
+        arrowImg.dataset.direction = 'down';
+        arrowImg.src = `./assets/img/icon-arrow_dropdown_${arrowImg.dataset.direction}.png`;
+    }
+
+    dropdownContainer.classList.add('d-none');
+    dropdownContainer.classList.remove('dropdown-opened');
+
+    const openerFromState =
+        activeDropdownState &&
+        activeDropdownState.contentContainerId === contentContainerId
+            ? activeDropdownState.opener
+            : null;
+    const opener = openerFromState || (arrowContainer ? arrowContainer.closest('button') : null);
+    if (opener) {
+        opener.setAttribute('aria-expanded', 'false');
+    }
+    if (restoreFocus) {
+        focusElementIfPossible(opener);
+    }
+
+    if (activeDropdownState && activeDropdownState.contentContainerId === contentContainerId) {
+        activeDropdownState = null;
+    }
+
+    return true;
+}
+
+
+/**
+ * Closes all currently open dropdowns.
+ *
+ * @param {{restoreFocus?: boolean}} [options={}] - Close behavior options.
+ * @returns {boolean} True when at least one dropdown was closed.
+ */
+function closeOpenDropdowns(options = {}){
+    const { restoreFocus = false } = options;
+    const openedDropdowns = Array.from(document.getElementsByClassName('dropdown-opened'));
+    if (openedDropdowns.length === 0) {
+        return false;
+    }
+
+    openedDropdowns.forEach((dropdownContainer, index) => {
+        const isLast = index === openedDropdowns.length - 1;
+        closeDropdown(dropdownContainer.id, { restoreFocus: restoreFocus && isLast });
+    });
 
     setCloseDropdownContainer();
+    return true;
+}
+
+
+/**
+ * Sets base ARIA state for dropdown trigger buttons.
+ *
+ * @returns {void}
+ */
+function initializeDropdownAccessibilityState(){
+    document.querySelectorAll('.addTask-dropdown-contact, .addTask-dropdown-category').forEach(triggerButton => {
+        triggerButton.setAttribute('aria-expanded', 'false');
+        triggerButton.setAttribute('aria-haspopup', 'listbox');
+    });
+}
+
+
+/**
+ * Registers keyboard handling for dropdown Escape-close behavior.
+ *
+ * @returns {void}
+ */
+function registerAddTaskKeyboardAccessibility(){
+    if (addTaskKeyboardAccessibilityRegistered) {
+        return;
+    }
+    document.addEventListener('keydown', handleAddTaskKeyboardAccessibility);
+    addTaskKeyboardAccessibilityRegistered = true;
+}
+
+
+/**
+ * Handles Escape key presses for dropdown close flows.
+ *
+ * @param {KeyboardEvent} event - Keyboard event.
+ * @returns {void}
+ */
+function handleAddTaskKeyboardAccessibility(event){
+    if (event.defaultPrevented || event.key !== 'Escape') {
+        return;
+    }
+
+    if (closeOpenDropdowns({ restoreFocus: true })) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+}
+
+
+/**
+ * Focuses the first focusable control inside a dropdown panel.
+ *
+ * @param {HTMLElement} dropdownContainer - Open dropdown container.
+ * @returns {void}
+ */
+function focusFirstDropdownControl(dropdownContainer){
+    if (!dropdownContainer) {
+        return;
+    }
+    const firstControl = dropdownContainer.querySelector(
+        "button, a[href], input:not([disabled]), [tabindex]:not([tabindex='-1'])"
+    );
+    focusElementIfPossible(firstControl);
 }
 
 
@@ -173,6 +354,9 @@ function renderArrow(arrowContainer, contentContainer){
 function setCloseDropdownContainer(){
     let openendDropdowns = document.getElementsByClassName('dropdown-opened');
     let container = getContainerToSetOnclick();
+    if (!container) {
+        return;
+    }
 
     if (!openendDropdowns.length == 0){
         for (let i=0; i<openendDropdowns.length; i++){
@@ -290,10 +474,10 @@ function renderAssignedContactsContainer(){
  * @return {void} 
  */
 function chooseCategory(chosenCategory){
-    let dropdownContentContainer = document.getElementById('dropdown-content-category')
     let categoryContainer = document.getElementById('dropdown-category-title');
     categoryContainer.innerHTML = chosenCategory;
-    dropdownContentContainer.classList.add('d-none');
+    closeDropdown('dropdown-content-category', { restoreFocus: true });
+    setCloseDropdownContainer();
     newTask['type'] = chosenCategory;
 }
 

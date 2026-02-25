@@ -47,6 +47,8 @@ async function saveContact() {
   }
 }
 
+let contactOverlayOpener = null;
+
 
 /**
  * Returns contact form element references from the current DOM.
@@ -209,11 +211,17 @@ function resetContactForm(formElements = getContactFormElements()) {
  * @returns {void}
  */
 function addContactCard() {
+  contactOverlayOpener = document.activeElement;
   if (!document.getElementById("addContact")) {
     renderAddContacts();
   }
   document.getElementById("addContact").innerHTML = renderAddContactsHTML();
   addOverlay("closeOverlay('addContact')");
+  activateFocusLayer("addContact", {
+    opener: contactOverlayOpener,
+    initialFocus: "#contactName",
+    onEscape: () => closeOverlay("addContact"),
+  });
 }
 
 
@@ -243,6 +251,7 @@ function addOverlay(functionToAdd) {
  * @return {void}
  */
 function closeOverlay(id) {
+  deactivateFocusLayer({ restoreFocus: true });
   const container = document.getElementById(id);
   if (!container) {
     return;
@@ -408,6 +417,7 @@ async function saveEditedContact(id) {
  * @return {void} This function does not return a value.
  */
 function editContactCard(contact) {
+  contactOverlayOpener = document.activeElement;
   if (!document.getElementById("editContact")) {
     renderEditContact();
   }
@@ -417,6 +427,11 @@ function editContactCard(contact) {
     contact.contactColor
   );
   addOverlay("closeOverlay('editContact')");
+  activateFocusLayer("editContact", {
+    opener: contactOverlayOpener,
+    initialFocus: "#contactName",
+    onEscape: () => closeOverlay("editContact"),
+  });
 }
 
 
