@@ -13,5 +13,8 @@ dev.nix
 # Built Visual Studio Code Extensions
 *.vsix
 
+# Node dependencies (local lint tooling)
+node_modules/
+
 # Local runtime config (contains secrets; never commit)
 js/config.js

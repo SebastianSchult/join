@@ -21,6 +21,19 @@ cp js/config.example.js js/config.js
 
 3. Start the app as usual.
 
+## Local lint checks
+
+Run these commands before pushing a branch:
+
+```bash
+npm install
+npm run lint
+```
+
+What this checks:
+- `lint:js`: ESLint on page-based script bundles (`no-undef`, `no-redeclare`)
+- `lint:templates`: duplicate inline HTML attributes inside template/rendering JS
+
 ## Security note
 
 - `js/config.js` is gitignored and must never be committed.

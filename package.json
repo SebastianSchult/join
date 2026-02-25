@@ -1,0 +1,12 @@
+{
+  "name": "join",
+  "private": true,
+  "scripts": {
+    "lint:js": "node scripts/lint_page_bundles.cjs",
+    "lint:templates": "node scripts/check_duplicate_template_attributes.cjs",
+    "lint": "npm run lint:js && npm run lint:templates"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
+  }
+}
