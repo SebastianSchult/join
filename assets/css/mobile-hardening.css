@@ -1,0 +1,167 @@
+@media (max-width: 801px) {
+  body,
+  .bodyContent,
+  .main-wrapper,
+  .main,
+  .board-Container,
+  .contact-main,
+  .main-summary,
+  .sub-main-summary {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  .boardTopContainer {
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: var(--ui-space-md);
+  }
+
+  .searchTaskContainer,
+  .searchTaskInner {
+    width: 100%;
+    min-height: var(--ui-touch-target-min);
+  }
+
+  .searchTaskInner {
+    align-items: center;
+  }
+
+  .searchTaskInner input {
+    min-width: 0;
+  }
+
+  .category,
+  .category-container {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .categoryTasks {
+    max-width: 100%;
+  }
+
+  .searchImg,
+  .addTaskButton,
+  .boardAddTaskCloseHoverContainer,
+  .openCardDeleteContainer,
+  .openCardEditContainer,
+  .addTaskDueDateImage,
+  .subtaskImgDiv,
+  .icon-action-button,
+  .contact-details-back-button {
+    min-width: var(--ui-touch-target-min);
+    min-height: var(--ui-touch-target-min);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .openEditDeleteResponsive,
+  .add-contact-button,
+  .button-add-contact,
+  .cancelButton,
+  .createButton,
+  .icon-edit,
+  .icon-delete,
+  .editDiv,
+  .deleteDiv {
+    min-height: var(--ui-touch-target-min);
+  }
+
+  .addTaskBody,
+  .addTaskBodyLeft {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .addTaskBodyTop,
+  .addTaskBodyBottom {
+    width: min(100%, 440px);
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .addTaskBtn,
+  .createBtn,
+  .clearBtn,
+  .addTaskPriorityButton,
+  .addTask-dropdown-contact,
+  .addTask-dropdown-category,
+  .subtaskBottom,
+  .uploadImageButton {
+    min-height: var(--ui-touch-target-min);
+  }
+
+  .addTaskPriorityButtonContainer {
+    flex-wrap: wrap;
+    gap: var(--ui-space-sm);
+  }
+
+  .addTaskPriorityButton {
+    flex: 1 1 120px;
+  }
+
+  .button-add-contact-card,
+  .contact-list-letter,
+  .parting-line-container,
+  .parting-line {
+    width: 100%;
+    max-width: 22rem;
+  }
+
+  .contacts-container {
+    padding-inline: var(--ui-space-md);
+  }
+
+  .contact-card {
+    min-height: var(--ui-touch-target-min);
+    align-items: center;
+  }
+
+  .add-contact,
+  .edit-contact {
+    width: 100%;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+    margin-right: 0;
+  }
+
+  .summary-box {
+    gap: var(--ui-space-xl);
+    padding: var(--ui-space-md);
+  }
+}
+
+@media (max-width: 560px) {
+  .openCardContainer,
+  .openCardContainer[editing] {
+    width: calc(100vw - (var(--ui-space-md) * 2));
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  .addTaskHoverContainer {
+    left: var(--ui-space-sm);
+    right: var(--ui-space-sm);
+    width: auto;
+    max-width: calc(100vw - (var(--ui-space-sm) * 2));
+  }
+
+  .contact-list {
+    padding-inline: var(--ui-space-sm);
+  }
+
+  .button-container {
+    width: 100%;
+    justify-items: center;
+    padding-inline: var(--ui-space-sm);
+  }
+
+  .urgent,
+  #toDoButton {
+    width: min(100%, 396px);
+  }
+}

@@ -44,6 +44,7 @@ Shared spacing tokens:
 - `--ui-space-2xl: 40px`
 - `--ui-space-3xl: 48px`
 - `--ui-space-4xl: 64px`
+- `--ui-touch-target-min: 44px`
 
 Layout helpers:
 
@@ -58,3 +59,4 @@ Layout helpers:
 1. Add/change token values in `assets/css/ui-tokens.css` first.
 2. In JS, always read breakpoints via `getResponsiveBreakpointPx(...)`.
 3. In CSS, avoid introducing new ad-hoc spacing values when an existing token fits.
+4. For mobile controls, keep interactive targets at or above `--ui-touch-target-min`.
