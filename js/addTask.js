@@ -215,8 +215,11 @@ function renderContactsToDropdown(){
     let content = document.getElementById('dropdown-content-assignedTo');
     content.innerHTML = '';
     contacts.forEach(contact => {
-        content.innerHTML += /*html*/`<div class="dropdownOption" id="assignedToContact${contact.id}" marked=false onclick="assignContactToTask(${contact.id})">
-            <div class="dropdownContactBadgeAndName">${renderAssignedToButtonsHTML(contact)} ${contact.name}</div> <img src="./assets/img/icon-check_button_unchecked.png" alt="">
+        const safeContactId = toSafeInteger(contact && contact.id);
+        const safeContactName = escapeHtml(contact && contact.name);
+
+        content.innerHTML += /*html*/`<div class="dropdownOption" id="assignedToContact${safeContactId}" marked=false onclick="assignContactToTask(${safeContactId})">
+            <div class="dropdownContactBadgeAndName">${renderAssignedToButtonsHTML(contact)} ${safeContactName}</div> <img src="./assets/img/icon-check_button_unchecked.png" alt="">
             </div>`
     })
 }
@@ -399,7 +402,6 @@ function deactivateButton(id){
         btn.removeAttribute("onclick");
     }
 }
-
 
 
 

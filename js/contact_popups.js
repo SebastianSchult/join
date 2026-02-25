@@ -47,13 +47,16 @@ async function saveContact() {
 function displaySuccessMessage(message) {
   const overlay = document.createElement("div");
   overlay.className = "contact-succ-created-overlay";
-  overlay.innerHTML = `
-      <div class="contact-succesfully-created-wrapper">
-        <div class="contact-succesfully-created">
-          ${message}
-        </div>
-      </div>
-    `;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "contact-succesfully-created-wrapper";
+
+  const messageContainer = document.createElement("div");
+  messageContainer.className = "contact-succesfully-created";
+  messageContainer.textContent = message == null ? "" : String(message);
+
+  wrapper.appendChild(messageContainer);
+  overlay.appendChild(wrapper);
   document.body.appendChild(overlay);
 
   setTimeout(() => {

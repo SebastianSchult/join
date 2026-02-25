@@ -90,6 +90,10 @@ function renderAddContactsHTML() {
  * @return {string} The HTML code for the edit contact form.
  */
 function renderEditContactHTML(id, name, contactColor) {
+    const safeContactId = toSafeInteger(id);
+    const safeContactColor = sanitizeCssColor(contactColor);
+    const safeInitials = escapeHtml(getInitials(name || ""));
+
     return /*html*/ `
           <div class="edit-contact-header">
               <div class="edit-contact-header-close">
@@ -105,14 +109,12 @@ function renderEditContactHTML(id, name, contactColor) {
           <div class="edit-contact-bottom">
               <div class="profile-badge-group-add-contact">
                   <div class="profile-badge-add-contact"> 
-                  <div class="contact-details-badge" style="background-color: ${contactColor}">
-              <div class="contact-details-badge-initials">${getInitials(
-                name
-              )}</div>
+                  <div class="contact-details-badge" style="background-color: ${safeContactColor}">
+              <div class="contact-details-badge-initials">${safeInitials}</div>
             </div>
                   </div>
               </div>
-              <form action="" onsubmit="saveEditedContact(${id}); return false" class="add-contact-input-group">
+              <form action="" onsubmit="saveEditedContact(${safeContactId}); return false" class="add-contact-input-group">
                   <div class="input-frame">
                       <input id="contactName" type="text" placeholder="Name" autofocus required>
                       <img src="./assets/img/icon-person.png" alt="">
@@ -126,12 +128,12 @@ function renderEditContactHTML(id, name, contactColor) {
                       <img src="./assets/img/icon-call.png" alt="">
                   </div>
                   <div id="addContactButton" class="addContactButton">
-                      <button class="cancelButton" onclick="closeOverlay('editContact')" onmouseover="changeCancelIcon()" onclick="doNotClose(event)"
+                      <button class="cancelButton" onclick="closeOverlay('editContact')" onmouseover="changeCancelIcon()"
                           onmouseout="restoreCancelIcon()">Cancel
-                          <img id="cancelIcon" onclick="closeOverlay('editContact')" src="./assets/img/icon-cancel.png" alt="">
+                          <img id="cancelIcon" src="./assets/img/icon-cancel.png" alt="">
                       </button>
-                      <button class="createButton" onclick="doNotClose(event)">Save
-                          <img id="createIcon" onclick="saveEditedContact(${id})" src="./assets/img/icon-check.png" alt="">
+                      <button class="createButton" type="submit">Save
+                          <img id="createIcon" src="./assets/img/icon-check.png" alt="">
                       </button>
                   </div>
               </form>
@@ -158,14 +160,18 @@ function generateContactCardHTML(
     email,
     shorterMail
   ) {
-    let formattedName = getNameWithCapitalizedFirstLetter(name);
+    const safeContactId = toSafeInteger(contactId);
+    const safeProfileColor = sanitizeCssColor(profileColor);
+    const safeInitials = escapeHtml(initials);
+    const safeFormattedName = escapeHtml(getNameWithCapitalizedFirstLetter(name));
+    const safeShorterMail = escapeHtml(shorterMail);
 
     return /*html*/ `
-      <div class="contact-card" id="contact-card-${contactId}" onclick="openContactDetails(${contactId})">
-        <div class="profile-badge-group" style="background-color: ${profileColor}">${initials}</div>
+      <div class="contact-card" id="contact-card-${safeContactId}" onclick="openContactDetails(${safeContactId})">
+        <div class="profile-badge-group" style="background-color: ${safeProfileColor}">${safeInitials}</div>
         <div>
-          <span class="contact-card-name">${formattedName}</span><br>
-          <a class="contact-card-email">${shorterMail}</a>
+          <span class="contact-card-name">${safeFormattedName}</span><br>
+          <a class="contact-card-email">${safeShorterMail}</a>
         </div>
       </div>
     `;
@@ -182,29 +188,35 @@ function generateContactCardHTML(
  * @returns {string} The HTML code for displaying contact details.
  */
 function generateContactDetailsHTML(name, email, phone, id, color) {
+    const safeContactId = toSafeInteger(id);
+    const safeContactName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safePhone = escapeHtml(phone);
+    const safeColor = sanitizeCssColor(color);
+    const safeInitials = escapeHtml(getInitials(name || ""));
+    const safeMailtoHref = sanitizeMailtoHref(email);
+
     return /*html*/ `
       <div class="contact-Details">
         <div class="contact-details-header-and-button">
           <div class="contact-details-header-responsive">Contact Information</div>
-          <div class="contact-details-back-button" onclick="openContactDetails(${id})">
+          <div class="contact-details-back-button" onclick="openContactDetails(${safeContactId})">
             <img src="./assets/img/icon-arrow_left.png">
           </div>
         </div>
         <div class="contact-details-header" id="contactDetailsHeader">
           <div class="contact-details-badge-group">
-            <div class="contact-details-badge" style="background-color: ${color}">
-              <div class="contact-details-badge-initials">${getInitials(
-                name
-              )}</div>
+            <div class="contact-details-badge" style="background-color: ${safeColor}">
+              <div class="contact-details-badge-initials">${safeInitials}</div>
             </div>
           </div>
           <div class="contact-details-name-group">
-            <div class="contact-details-name">${name}</div>
+            <div class="contact-details-name">${safeContactName}</div>
             <div class="contact-details-icons">
-              <div class="icon-edit" onclick="editContact(${id})">
+              <div class="icon-edit" onclick="editContact(${safeContactId})">
                 <img src="./assets/img/icon-edit.png" alt="">Edit
               </div>
-              <div class="icon-delete" onclick="removeContact(${id})">
+              <div class="icon-delete" onclick="removeContact(${safeContactId})">
                 <img src="./assets/img/icon-delete.png" alt="">Delete
               </div>
             </div>
@@ -214,23 +226,23 @@ function generateContactDetailsHTML(name, email, phone, id, color) {
         <div class="contact-information">Contact Information</div>
           <div class="contact-email-container" id="contactEmailContainer">
             <div class="contact-information-mail-header" >Email</div>
-            <a class="contact-information-mail" href="mailto:${email}">${email}</a>
+            <a class="contact-information-mail" href="${safeMailtoHref}">${safeEmail}</a>
           </div>
         <div>
           <div class="contact-phone-container">
             <div class="contact-phone-container-header">Phone</div>
-            <div class="contact-phone-container-phone">${phone}</div>
+            <div class="contact-phone-container-phone">${safePhone}</div>
           </div>
         </div>
         <div class="openEditDeleteResponsive" id="openEditDeleteResponsive" onclick="openEditDelete(); doNotClose(event)">
           <img src="./assets/img/Menu Contact options.png" alt="">
         </div>
         <div class="editDelete d-none" id="editDelete" onclick="doNotClose(event)">
-          <div class="editDiv" onclick="editContact(${id})">
+          <div class="editDiv" onclick="editContact(${safeContactId})">
             <img src="./assets/img/icon-edit.png" alt="">
             <span>Edit</span>
             </div>
-          <div class="deleteDiv" onclick="removeContact(${id})">
+          <div class="deleteDiv" onclick="removeContact(${safeContactId})">
               <img src="./assets/img/icon-delete.png" alt="">
               <span>Delete</span>
             </div>
