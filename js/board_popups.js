@@ -10,7 +10,9 @@ function openCard(taskId){
         setAttributes(newDiv, {
             'id': 'openCardContainer',
             'class': 'openCardContainer',
-            'data-stop-propagation': 'true'
+            'data-stop-propagation': 'true',
+            'role': 'dialog',
+            'aria-modal': 'true',
         });
         document.body.appendChild(newDiv);
     }
@@ -95,7 +97,13 @@ function renderContactsToOpenCard(task) {
  */
 function renderBoardAddTaskOverlay(){
     let newDiv = document.createElement('div');
-    setAttributes(newDiv, {'id': 'addTaskHoverContainer', 'class': 'addTaskHoverContainer', 'data-stop-propagation': 'true'});
+    setAttributes(newDiv, {
+        'id': 'addTaskHoverContainer',
+        'class': 'addTaskHoverContainer',
+        'data-stop-propagation': 'true',
+        'role': 'dialog',
+        'aria-modal': 'true',
+    });
     document.body.appendChild(newDiv);
 
     let container = document.getElementById('addTaskHoverContainer');
@@ -153,12 +161,18 @@ function showAddTaskContainer(category='category-0') {
  */
 function hideAddTaskContainer(){
     if(!document.getElementById('addTaskHoverContainer')){
+        if (typeof closeOpenDropdowns === "function") {
+            closeOpenDropdowns({ restoreFocus: false });
+        }
         deactivateFocusLayer({ restoreFocus: true });
         toggleBoardOverlay('disable');
         return;
     }
     if(document.getElementById('addTaskHoverContainer')){
         let container = document.getElementById('addTaskHoverContainer');
+        if (typeof closeOpenDropdowns === "function") {
+            closeOpenDropdowns({ restoreFocus: false });
+        }
         deactivateFocusLayer({ restoreFocus: true });
         container.classList.remove('showBoard');
         container.classList.add('hideBoard');
