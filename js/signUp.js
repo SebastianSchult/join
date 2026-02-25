@@ -30,7 +30,14 @@ async function addNewUser() {
         return;
     }
     
-    users = await firebaseGetItem(FIREBASE_USERS_ID);
+    const loadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
+        context: 'users',
+        errorMessage: 'Could not load users. Please try again.',
+    });
+    if (loadResult.error) {
+        return;
+    }
+    users = loadResult.data;
     getInputValues();
     if (!checkPasswordsEqual()) {
         showUserMessage('Passwords do not match!');

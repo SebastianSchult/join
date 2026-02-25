@@ -98,6 +98,87 @@ async function firebaseGetItem(path = "_") {
     return response.json();
 }
 
+function normalizeFirebaseArrayPayload(payload) {
+    if (Array.isArray(payload)) {
+        return payload.filter((item) => item !== null && item !== undefined);
+    }
+
+    if (payload && typeof payload === "object") {
+        return Object.values(payload).filter(
+            (item) => item !== null && item !== undefined
+        );
+    }
+
+    return [];
+}
+
+function showGlobalUserMessage(message) {
+    if (!message) {
+        return;
+    }
+
+    if (typeof window.showUserMessage === "function") {
+        try {
+            window.showUserMessage(message);
+            return;
+        } catch (error) {
+            console.error("showUserMessage failed:", error);
+        }
+    }
+
+    const toastId = "joinGlobalMessageToast";
+    const existingToast = document.getElementById(toastId);
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    const toast = document.createElement("div");
+    toast.id = toastId;
+    toast.setAttribute("role", "alert");
+    toast.textContent = message;
+    toast.style.position = "fixed";
+    toast.style.bottom = "24px";
+    toast.style.left = "50%";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.backgroundColor = "#2a3647";
+    toast.style.color = "#fff";
+    toast.style.padding = "12px 18px";
+    toast.style.borderRadius = "10px";
+    toast.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.25)";
+    toast.style.zIndex = "9999";
+    toast.style.fontSize = "14px";
+    document.body.appendChild(toast);
+
+    window.setTimeout(() => {
+        toast.remove();
+    }, 3200);
+}
+
+async function firebaseGetArraySafe(path = "_", options = {}) {
+    const {
+        context = "data",
+        errorMessage = `Could not load ${context}. Please try again.`,
+        showErrorMessage = true,
+    } = options;
+
+    try {
+        const payload = await firebaseGetItem(path);
+        return {
+            data: normalizeFirebaseArrayPayload(payload),
+            error: null,
+        };
+    } catch (error) {
+        console.error(`Failed to load ${context}:`, error);
+        if (showErrorMessage) {
+            showGlobalUserMessage(errorMessage);
+        }
+        return {
+            data: [],
+            error,
+        };
+    }
+}
+
 /**
  *
  * @param {string} key - the key the values are stored in
