@@ -2,6 +2,13 @@
  * Saves a contact by pushing it to the contacts array and storing it in local storage.
  */
 async function saveContact() {
+  const formElements = getContactFormElements();
+  if (!hasCompleteContactForm(formElements)) {
+    showGlobalUserMessage("Contact form is not available. Please reopen it.");
+    return;
+  }
+
+  const { nameInput, mailInput, phoneInput, createButton } = formElements;
   const loadResult = await getContactsFromRemoteStorage({
     errorMessage: "Could not load contacts. Contact was not created.",
   });
@@ -9,35 +16,85 @@ async function saveContact() {
     return;
   }
 
-  const enteredMail = document.getElementById("contactMail").value;
+  const enteredMail = mailInput.value;
   if (contactEmailExists(enteredMail)) {
     showGlobalUserMessage("A contact with this email already exists.");
     return;
   }
 
   try {
-    createBtn.disabled = true;
+    createButton.disabled = true;
     const sourceUsers = Array.isArray(users) ? users : [];
     const newId = generateCollisionSafeId(sourceUsers);
     const newContact = {
       id: newId,
-      name: contactName.value,
+      name: nameInput.value,
       mail: normalizeEmailForContactFlow(enteredMail),
-      phone: contactPhone.value,
+      phone: phoneInput.value,
       contactColor: generateRandomColor(),
     };
 
     await firebaseSetEntity(newContact, FIREBASE_USERS_ID);
     sourceUsers.push(newContact);
-    resetContactForm();
+    resetContactForm(formElements);
     closeOverlay("addContact");
     displaySuccessMessage("Contact successfully created");
     applyContactsMutationResult(sourceUsers, newContact.id);
   } catch (error) {
     console.error("Error saving contact:", error);
     showGlobalUserMessage("Could not save contact. Please try again.");
-    createBtn.disabled = false;
+    createButton.disabled = false;
   }
+}
+
+
+/**
+ * Returns contact form element references from the current DOM.
+ *
+ * @returns {{nameInput: HTMLInputElement|null, mailInput: HTMLInputElement|null, phoneInput: HTMLInputElement|null, createButton: HTMLButtonElement|null}}
+ */
+function getContactFormElements() {
+  return {
+    nameInput: document.getElementById("contactName"),
+    mailInput: document.getElementById("contactMail"),
+    phoneInput: document.getElementById("contactPhone"),
+    createButton: document.getElementById("createBtn"),
+  };
+}
+
+
+/**
+ * Checks if all required contact form elements exist.
+ *
+ * @param {Object} formElements - Object returned by getContactFormElements.
+ * @returns {boolean} True when all required elements are present.
+ */
+function hasCompleteContactForm(formElements) {
+  return Boolean(
+    formElements &&
+      formElements.nameInput &&
+      formElements.mailInput &&
+      formElements.phoneInput &&
+      formElements.createButton
+  );
+}
+
+
+/**
+ * Writes values into currently visible contact form fields.
+ *
+ * @param {{name: string, mail: string, phone: string}} values - Form values to apply.
+ * @returns {void}
+ */
+function setContactFormValues(values) {
+  const formElements = getContactFormElements();
+  if (!formElements.nameInput || !formElements.mailInput || !formElements.phoneInput) {
+    return;
+  }
+
+  formElements.nameInput.value = values.name;
+  formElements.mailInput.value = values.mail;
+  formElements.phoneInput.value = values.phone;
 }
 
 
@@ -129,11 +186,19 @@ function displaySuccessMessage(message) {
  * @param {void}
  * @return {void}
  */
-function resetContactForm() {
-  contactName.value = "";
-  contactMail.value = "";
-  contactPhone.value = "";
-  createBtn.disabled = false;
+function resetContactForm(formElements = getContactFormElements()) {
+  if (formElements.nameInput) {
+    formElements.nameInput.value = "";
+  }
+  if (formElements.mailInput) {
+    formElements.mailInput.value = "";
+  }
+  if (formElements.phoneInput) {
+    formElements.phoneInput.value = "";
+  }
+  if (formElements.createButton) {
+    formElements.createButton.disabled = false;
+  }
 }
 
 
@@ -164,8 +229,6 @@ function addContactCard() {
 function addOverlay(functionToAdd) {
   const overlay = document.createElement("div");
   overlay.classList.add("overlay");
-
-  const bodyContent = document.getElementById("bodyContent");
   overlay.setAttribute("onclick", functionToAdd);
 
   document.body.appendChild(overlay);
@@ -181,10 +244,18 @@ function addOverlay(functionToAdd) {
  */
 function closeOverlay(id) {
   const container = document.getElementById(id);
+  if (!container) {
+    return;
+  }
+
   container.classList.add("move-out-right");
+  const addContactContainerElement = document.getElementById("addContactContainer");
   setTimeout(() => {
-    addContactContainer.classList.remove("move-out-right");
+    if (addContactContainerElement) {
+      addContactContainerElement.classList.remove("move-out-right");
+    }
   }, 125);
+
   const overlay = document.querySelector(".overlay");
   if (overlay) overlay.remove();
 
@@ -275,9 +346,11 @@ function editContact(id) {
     contact.name = getNameWithCapitalizedFirstLetter(contact.name);
 
     editContactCard(contact);
-    document.getElementById("contactName").value = contact.name;
-    document.getElementById("contactMail").value = contact.mail;
-    document.getElementById("contactPhone").value = contact.phone;
+    setContactFormValues({
+      name: contact.name,
+      mail: contact.mail,
+      phone: contact.phone,
+    });
 
     currentContactId = id; // Setze die aktuelle Kontakt-ID
   }
@@ -305,13 +378,21 @@ async function saveEditedContact(id) {
   const userIndex = sourceUsers.findIndex((contact) => contact.id === id);
 
   if (userIndex !== -1) {
+    const formElements = getContactFormElements();
+    if (
+      !formElements.nameInput ||
+      !formElements.mailInput ||
+      !formElements.phoneInput
+    ) {
+      showGlobalUserMessage("Contact form is not available. Please reopen it.");
+      return;
+    }
+
     const user = sourceUsers[userIndex];
 
-    user.name = document.getElementById("contactName").value;
-    user.mail = normalizeEmailForContactFlow(
-      document.getElementById("contactMail").value
-    );
-    user.phone = document.getElementById("contactPhone").value;
+    user.name = formElements.nameInput.value;
+    user.mail = normalizeEmailForContactFlow(formElements.mailInput.value);
+    user.phone = formElements.phoneInput.value;
 
     await firebaseSetEntity(user, FIREBASE_USERS_ID);
     closeOverlay("editContact");
