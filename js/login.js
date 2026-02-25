@@ -1,3 +1,16 @@
+/* global
+checkIfUserIsRemembered,
+firebaseGetArraySafe,
+FIREBASE_USERS_ID,
+migrateLegacyPlaintextPasswords,
+firebaseUpdateItem,
+normalizeAuthEmail,
+getCurrentUser,
+switchPage,
+verifyPasswordCredentials,
+setCurrentUser,
+showGlobalUserMessage
+*/
 "use strict";
 
 /**
