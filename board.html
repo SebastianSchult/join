@@ -34,7 +34,7 @@
     <title>Join - AddTask</title>
 </head>
 
-<body onload="boardInit()">
+<body data-init="boardInit">
     <div id="bodyContent" class="bodyContent">
         <header w3-include-html="./assets/templates/header.html" id="header" class="header">
         </header>
@@ -45,12 +45,12 @@
                 <div class="board-Container">
                     <div class="boardTopContainer">
                         <div class="searchTaskContainer">
-                            <div class="searchTaskInner"><input id="findTask" placeholder="Find Task" type="text" onkeyup="searchTask()">
-                                <button type="button" class="searchImg" onclick="searchTask()" aria-label="Search tasks"></button>
+                            <div class="searchTaskInner"><input id="findTask" placeholder="Find Task" type="text" data-keyup-action="search-task">
+                                <button type="button" class="searchImg" data-action="search-task" aria-label="Search tasks"></button>
                             </div>
                         </div>
                         <div class="boardAddTaskButtonContainer">
-                            <button type="button" class="createBtn addTaskBtn addTaskBtnBoard btnBoard" onclick="doNotClose(event); showAddTaskContainer()">
+                            <button type="button" class="createBtn addTaskBtn addTaskBtnBoard btnBoard" data-action="open-add-task-container" data-category="category-0" data-stop-propagation="true">
                                 <span class="addTaskBtnText">Add Task</span>
                                 <span class="addTaskBtnImg "></span>
                             </button>
@@ -58,35 +58,35 @@
 
                     </div>
                     <div class="category-container">
-                        <div class="category" ondrop="moveTo('category-0')"
-                            ondragover="allowDrop(event)">
+                        <div class="category" data-drop-action="move-to" data-category="category-0"
+                            data-dragover-action="allow-drop">
                             <div class="categoryTitle">
                                 <h2>To Do</h2>
-                                <button type="button" class="addTaskButton" onclick="showAddTaskContainer('category-0')" aria-label="Add task to To Do"></button>
+                                <button type="button" class="addTaskButton" data-action="open-add-task-container" data-category="category-0" aria-label="Add task to To Do"></button>
                             </div>
                             <div id="category-0" class="categoryTasks">
                             </div>
                         </div>
-                        <div class="category" ondrop="moveTo('category-1')" ondragover="allowDrop(event)">
+                        <div class="category" data-drop-action="move-to" data-category="category-1" data-dragover-action="allow-drop">
                             <div class=" categoryTitle">
                             <h2>In progress</h2>
-                            <button type="button" class="addTaskButton" onclick="showAddTaskContainer('category-1')" aria-label="Add task to In progress"></button>
+                            <button type="button" class="addTaskButton" data-action="open-add-task-container" data-category="category-1" aria-label="Add task to In progress"></button>
                         </div>
                         <div id="category-1" class="categoryTasks">
                         </div>
                     </div>
-                    <div class="category" ondrop="moveTo('category-2')" ondragover="allowDrop(event)">
+                    <div class="category" data-drop-action="move-to" data-category="category-2" data-dragover-action="allow-drop">
                             <div class=" categoryTitle">
                         <h2>Await feedback</h2>
-                        <button type="button" class="addTaskButton" onclick="showAddTaskContainer('category-2')" aria-label="Add task to Await feedback"></button>
+                        <button type="button" class="addTaskButton" data-action="open-add-task-container" data-category="category-2" aria-label="Add task to Await feedback"></button>
                     </div>
                     <div id="category-2" class="categoryTasks">
                     </div>
                 </div>
-                <div class="category" ondrop="moveTo('category-3')" ondragover="allowDrop(event)">
+                <div class="category" data-drop-action="move-to" data-category="category-3" data-dragover-action="allow-drop">
                     <div class="categoryTitle">
                         <h2>Done</h2>
-                        <button type="button" class="addTaskButton" onclick="showAddTaskContainer('category-3')" aria-label="Add task to Done"></button>
+                        <button type="button" class="addTaskButton" data-action="open-add-task-container" data-category="category-3" aria-label="Add task to Done"></button>
                     </div>
                     <div id="category-3" class="categoryTasks">
                     </div>

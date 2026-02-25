@@ -101,7 +101,7 @@ function subtaskAddOrCancel(option) {
         }
     }
     subtaskBottom.innerHTML = renderSubtaskDefaultHTML();
-    subtaskBottom.setAttribute('onclick', 'renderSubtaskInputField()');
+    subtaskBottom.dataset.action = 'render-subtask-input-field';
 }
 
 
@@ -345,15 +345,13 @@ function focusFirstDropdownControl(dropdownContainer){
 
 
 /**
- * Sets the onclick event handler for the container element based on the open dropdowns.
- * If there are open dropdowns, the onclick event handler is set to render the arrow based on the dropdown id.
- * If there are no open dropdowns, the onclick event handler is removed from the container element.
+ * Sets delegated close behavior for outside container based on the open dropdowns.
  *
  * @return {void}
  */
 function setCloseDropdownContainer(){
     let openendDropdowns = document.getElementsByClassName('dropdown-opened');
-    let container = getContainerToSetOnclick();
+    let container = getContainerToSetDropdownCloseAction();
     if (!container) {
         return;
     }
@@ -361,25 +359,31 @@ function setCloseDropdownContainer(){
     if (!openendDropdowns.length == 0){
         for (let i=0; i<openendDropdowns.length; i++){
             if (openendDropdowns[i].id == 'dropdown-content-assignedTo'){
-                container.setAttribute('onclick', 'renderArrow("custom-arrow-assignedTo", "dropdown-content-assignedTo")');
+                container.dataset.action = 'toggle-addtask-dropdown';
+                container.dataset.arrowContainer = 'custom-arrow-assignedTo';
+                container.dataset.contentContainer = 'dropdown-content-assignedTo';
             }
             if (openendDropdowns[i].id == 'dropdown-content-category'){
-                container.setAttribute('onclick', 'renderArrow("custom-arrow-category", "dropdown-content-category")');
+                container.dataset.action = 'toggle-addtask-dropdown';
+                container.dataset.arrowContainer = 'custom-arrow-category';
+                container.dataset.contentContainer = 'dropdown-content-category';
             }
         }
     }
     else{
-        container.removeAttribute('onclick')
+        delete container.dataset.action;
+        delete container.dataset.arrowContainer;
+        delete container.dataset.contentContainer;
     }
 }
 
 
 /**
- * Returns the container element to set the onclick attribute on based on the current page location.
+ * Returns the container element to set delegated dropdown-close action on.
  *
- * @return {HTMLElement} The container element to set the onclick attribute on. Returns the 'bodyContent' element if the current page location includes 'addTask', the 'openCardContainer' element if it exists, or the 'addTaskHoverContainer' element if it exists.
+ * @return {HTMLElement} Container used for outside-click dropdown close behavior.
  */
-function getContainerToSetOnclick(){
+function getContainerToSetDropdownCloseAction(){
     if (window.location.href.includes('addTask')){
         return document.getElementById('bodyContent')
     } else {
@@ -402,7 +406,7 @@ function renderContactsToDropdown(){
         const safeContactId = toSafeInteger(contact && contact.id);
         const safeContactName = escapeHtml(contact && contact.name);
 
-        content.innerHTML += /*html*/`<button type="button" class="dropdownOption" id="assignedToContact${safeContactId}" marked=false onclick="assignContactToTask(${safeContactId})">
+        content.innerHTML += /*html*/`<button type="button" class="dropdownOption" id="assignedToContact${safeContactId}" marked=false data-action="assign-contact-to-task" data-contact-id="${safeContactId}">
             <span class="dropdownContactBadgeAndName">${renderAssignedToButtonsHTML(contact)} ${safeContactName}</span> <img src="./assets/img/icon-check_button_unchecked.png" alt="">
             </button>`
     })
@@ -552,7 +556,7 @@ function getStateOfRequriredField(requiredInputField){
  */
 function setCreateBtnState() {
 	if (requiredInputFields.every((r) => r.state == true)) {
-        activateButton('createBtn', 'createTask()');
+        activateButton('createBtn', 'create-task');
 	} else {
         deactivateButton('createBtn');
 	}
@@ -560,12 +564,12 @@ function setCreateBtnState() {
 
 
 /**
- * Activates a button by removing the "disabled" class and setting the "onclick" attribute.
+ * Activates a button by removing the disabled state and wiring its delegated click action.
  *
  * @param {string} id - The ID of the button element.
- * @param {string} onClickFunctionName - The name of the function to be called when the button is clicked.
+ * @param {string} actionName - The data-action value handled by delegated events.
  */
-function activateButton(id, onClickFunctionName){
+function activateButton(id, actionName){
     if(document.getElementById(id)){
         let btn = document.getElementById(id);
         btn.classList.remove("disabled");
@@ -573,13 +577,15 @@ function activateButton(id, onClickFunctionName){
             btn.disabled = false;
             btn.setAttribute("aria-disabled", "false");
         }
-        btn.setAttribute("onclick", onClickFunctionName);
+        if (actionName) {
+            btn.dataset.action = actionName;
+        }
     }
 }
 
 
 /**
- * Deactivates a button by adding the "disabled" class and removing the "onclick" attribute.
+ * Deactivates a button by adding the disabled state and removing delegated action wiring.
  *
  * @param {string} id - The ID of the button element.
  */
@@ -591,6 +597,6 @@ function deactivateButton(id){
             btn.disabled = true;
             btn.setAttribute("aria-disabled", "true");
         }
-        btn.removeAttribute("onclick");
+        delete btn.dataset.action;
     }
 }

@@ -22,7 +22,7 @@
     <title>Join - Login</title>
 </head>
 
-<body onload="loginInit()">
+<body data-init="loginInit">
     <div id="bodyContent" class="bodyContent">
         <main id="main" class="main hide-scroll signup-active">
             <div id="loginMainContainer" class="loginMainContainer">
@@ -34,7 +34,7 @@
                     </div>
                     <div class="signUpField">
                         <span>Not a join user yet?</span>
-                        <button type="button" class="loginButtons signUpButton" onclick="gotoSignUp()">Sign up</button>
+                        <button type="button" class="loginButtons signUpButton" data-action="goto-signup">Sign up</button>
                     </div>
                 </header>
                 <div class=" login-page">
@@ -43,7 +43,7 @@
                             <h1 class="loginH1">Log in</h1>
                             <div class="horizontalH1Underline"></div>
                         </div>
-                        <form id="loginForm" onsubmit="loginUser(); return false;">
+                        <form id="loginForm" data-submit-action="login-user">
                             <div class="innerLoginBox">
                                 <div class="loginInputField">
                                     <label class="sr-only" for="loginEmailInput">Email</label>
@@ -57,7 +57,7 @@
                                     <div class="mailIcon"><img src="./assets/img/icon-lock.png" alt="lock">
                                     </div>
                                 </div>
-                                <button type="button" id="loginCheckbox" class="checkboxBox" onclick="toggleRememberMeCheckbox()"
+                                <button type="button" id="loginCheckbox" class="checkboxBox" data-action="toggle-remember-me"
                                     aria-label="Toggle remember me">
                                     <img id="loginCheckboxImg" src="./assets/img/icon-check_button_unchecked.png"
                                         alt="checkbox image">
@@ -67,12 +67,12 @@
                         </form>
                         <div class="loginButtonsBox">
                             <button class="loginButtons loginButtonUser" form="loginForm">Login</button>
-                            <button type="button" class="loginButtons loginButtonGuest" onclick="loginAsGuest()">Guest Login</button>
+                            <button type="button" class="loginButtons loginButtonGuest" data-action="login-guest">Guest Login</button>
                         </div>
                     </div>
                     <div class="signUpField-mobile d-none">
                         <span>Not a join user?</span>
-                        <button type="button" class="loginButtons signUpButton signUpButton-mobile" onclick="gotoSignUp()">Sign
+                        <button type="button" class="loginButtons signUpButton signUpButton-mobile" data-action="goto-signup">Sign
                             up</button>
                     </div>
                 </div>
