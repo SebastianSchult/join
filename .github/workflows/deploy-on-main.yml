@@ -70,6 +70,8 @@ jobs:
           JOIN_APP_BASE_URL: ${{ secrets.JOIN_APP_BASE_URL }}
           JOIN_APP_FIREBASE_TASKS_ID: ${{ secrets.JOIN_APP_FIREBASE_TASKS_ID }}
           JOIN_APP_FIREBASE_USERS_ID: ${{ secrets.JOIN_APP_FIREBASE_USERS_ID }}
+          JOIN_APP_COOKIEBOT_ID: ${{ secrets.JOIN_APP_COOKIEBOT_ID }}
+          JOIN_APP_COOKIEBOT_BLOCKING_MODE: ${{ secrets.JOIN_APP_COOKIEBOT_BLOCKING_MODE }}
         run: |
           set -euo pipefail
           node <<'NODE'
@@ -83,6 +85,9 @@ jobs:
             BASE_URL: process.env.JOIN_APP_BASE_URL || "",
             FIREBASE_TASKS_ID: process.env.JOIN_APP_FIREBASE_TASKS_ID || "",
             FIREBASE_USERS_ID: process.env.JOIN_APP_FIREBASE_USERS_ID || "",
+            COOKIEBOT_ID: process.env.JOIN_APP_COOKIEBOT_ID || "",
+            COOKIEBOT_BLOCKING_MODE:
+              process.env.JOIN_APP_COOKIEBOT_BLOCKING_MODE || "auto",
           };
 
           const requiredKeys = [
@@ -90,6 +95,7 @@ jobs:
             "BASE_URL",
             "FIREBASE_TASKS_ID",
             "FIREBASE_USERS_ID",
+            "COOKIEBOT_ID",
           ];
 
           const missing = requiredKeys.filter(
