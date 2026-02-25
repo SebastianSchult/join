@@ -195,10 +195,15 @@ function buttonEventListener() {
 
 
 /**
- * Displays a mobile greeting overlay if the window width is less than 801 pixels.
+ * Displays a mobile greeting overlay on tablet/mobile breakpoints.
  */
 function greetUserMobile() {
-    if (window.innerWidth < 951 && document.referrer.includes('index')) {
+    const mobileGreetingMaxWidth =
+        typeof getResponsiveBreakpointPx === 'function'
+            ? getResponsiveBreakpointPx('--ui-bp-navigation-tablet-max', 950)
+            : 950;
+
+    if (window.innerWidth <= mobileGreetingMaxWidth && document.referrer.includes('index')) {
         const { greetingContainer, subMainSummary, bitGreeting, main } = getSummaryGreetingElements();
         if (!greetingContainer || !subMainSummary || !main) {
             return;

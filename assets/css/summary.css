@@ -647,7 +647,7 @@ button {
 }
 
 /*////////////////////////////////////////////////////////////////////max 800px*/
-@media (max-width: 800px) {
+@media (max-width: 801px) {
   .daytimeGreeting {
     display: none;
   }

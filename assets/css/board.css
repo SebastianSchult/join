@@ -781,7 +781,7 @@ progress {
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 801px) {
   .boardAddTaskButtonContainer {
     display: none;
   }
