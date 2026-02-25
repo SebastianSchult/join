@@ -287,7 +287,12 @@ function renderEditContainer(){
     container.innerHTML = createEditHeader();
     container.innerHTML += renderAddTaskMainContentHTML();
     container.innerHTML += createEditFooter(newTask);
-    addFilepickerListener();
+    if (typeof initializeFilepickerUI === "function") {
+        initializeFilepickerUI();
+    } else {
+        addFilepickerListener();
+        setupDragAndDrop();
+    }
 }
 
 

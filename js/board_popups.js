@@ -98,7 +98,12 @@ function showAddTaskContainer(category='category-0') {
     newTask.category = category;
     if (!document.getElementById('addTaskHoverContainer')) {
         renderBoardAddTaskOverlay();
-        addFilepickerListener();
+        if (typeof initializeFilepickerUI === "function") {
+            initializeFilepickerUI();
+        } else {
+            addFilepickerListener();
+            setupDragAndDrop();
+        }
     }
     let container = document.getElementById('addTaskHoverContainer');
     container.classList.add('showBoard');
@@ -197,4 +202,3 @@ function createSuccessMessageContainer(){
 
     document.body.appendChild(div);
 }
-

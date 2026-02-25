@@ -27,6 +27,9 @@ function renderAddTaskHTML() {
     setPriority('medium');
     renderContactsToDropdown();
     renderSubtasks();
+    if (typeof initializeFilepickerUI === "function") {
+        initializeFilepickerUI();
+    }
   }
 
 
@@ -396,7 +399,6 @@ function deactivateButton(id){
         btn.removeAttribute("onclick");
     }
 }
-
 
 
 

@@ -1,13 +1,22 @@
 let allImages = [];
+let dropAreaObserver = null;
+let imageContainerObserver = null;
+let globalDragAndDropListenersBound = false;
 
 document.addEventListener("DOMContentLoaded", () => {
-  addFilepickerListener();
-  setupDragAndDrop(); 
-  renderAddTaskImages(); 
-  observeContainer(); 
+  initializeFilepickerUI();
 });
 
-setTimeout(addFilepickerListener, 1000);
+setTimeout(() => {
+  initializeFilepickerUI();
+}, 1000);
+
+function initializeFilepickerUI() {
+  addFilepickerListener();
+  setupDragAndDrop();
+  renderAddTaskImages();
+  observeContainer();
+}
 
 function openFilepicker() {
   const filepicker = document.getElementById("filepicker");
@@ -21,6 +30,9 @@ function openFilepicker() {
 function addFilepickerListener() {
   const filepicker = document.getElementById("filepicker");
   if (!filepicker) return;
+  if (filepicker.dataset.listenerAttached === "true") return;
+
+  filepicker.dataset.listenerAttached = "true";
   
   filepicker.addEventListener("change", async () => {
     const files = filepicker.files;
@@ -34,15 +46,15 @@ function addFilepickerListener() {
 function setupDragAndDrop() {
   const dropArea = document.getElementById("addImageBottom");
   if (!dropArea) {
-    console.error("Drop-Bereich 'addImageBottom' nicht gefunden!");
-    return;
+    observeDropArea();
+    return false;
   }
-  document.addEventListener("dragover", (event) => {
-    event.preventDefault();
-  });
-  document.addEventListener("drop", (event) => {
-    event.preventDefault();
-  });
+  if (dropArea.dataset.dragDropAttached === "true") {
+    return true;
+  }
+
+  dropArea.dataset.dragDropAttached = "true";
+  bindGlobalDragAndDropListeners();
   
   dropArea.addEventListener("dragover", (event) => {
     event.preventDefault();
@@ -65,6 +77,42 @@ function setupDragAndDrop() {
       handleFiles(files, getCurrentImageContainer());
     }
   }, true);
+
+  return true;
+}
+
+function bindGlobalDragAndDropListeners() {
+  if (globalDragAndDropListenersBound) {
+    return;
+  }
+
+  document.addEventListener("dragover", preventDefaultDragBehavior);
+  document.addEventListener("drop", preventDefaultDragBehavior);
+  globalDragAndDropListenersBound = true;
+}
+
+function preventDefaultDragBehavior(event) {
+  event.preventDefault();
+}
+
+function observeDropArea() {
+  if (dropAreaObserver || !document.body) {
+    return;
+  }
+
+  dropAreaObserver = new MutationObserver(() => {
+    if (!document.getElementById("addImageBottom")) {
+      return;
+    }
+
+    setupDragAndDrop();
+    addFilepickerListener();
+
+    dropAreaObserver.disconnect();
+    dropAreaObserver = null;
+  });
+
+  dropAreaObserver.observe(document.body, { childList: true, subtree: true });
 }
 
 function handleFiles(files, container) {
@@ -219,11 +267,25 @@ function getCurrentImageContainer() {
 }
 
 function observeContainer() {
-  const observer = new MutationObserver(() => {
+  if (document.getElementById("subtasksImageContainer")) {
+    addFilepickerListener();
+    setupDragAndDrop();
+    return;
+  }
+
+  if (imageContainerObserver || !document.body) {
+    return;
+  }
+
+  imageContainerObserver = new MutationObserver(() => {
     if (document.getElementById("subtasksImageContainer")) {
+      imageContainerObserver.disconnect();
+      imageContainerObserver = null;
       renderAddTaskImages();
-      observer.disconnect();
+      addFilepickerListener();
+      setupDragAndDrop();
     }
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+
+  imageContainerObserver.observe(document.body, { childList: true, subtree: true });
 }
