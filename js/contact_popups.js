@@ -10,7 +10,7 @@ async function saveContact() {
   }
 
   const enteredMail = document.getElementById("contactMail").value;
-  if (doesEmailExist(users, enteredMail)) {
+  if (contactEmailExists(enteredMail)) {
     showGlobalUserMessage("A contact with this email already exists.");
     return;
   }
@@ -21,7 +21,7 @@ async function saveContact() {
     users.push({
       id: newId,
       name: contactName.value,
-      mail: normalizeAuthEmail(enteredMail),
+      mail: normalizeEmailForContactFlow(enteredMail),
       phone: contactPhone.value,
       contactColor: generateRandomColor(),
     });
@@ -38,6 +38,54 @@ async function saveContact() {
     showGlobalUserMessage("Could not save contact. Please try again.");
     createBtn.disabled = false;
   }
+}
+
+
+/**
+ * Normalizes email values even if auth helpers are temporarily stale in cache.
+ *
+ * @param {unknown} emailValue - Raw email input.
+ * @returns {string} Normalized lowercase email.
+ */
+function normalizeEmailForContactFlow(emailValue) {
+  if (typeof normalizeAuthEmail === "function") {
+    return normalizeAuthEmail(emailValue);
+  }
+  if (typeof emailValue !== "string") {
+    return "";
+  }
+  return emailValue.trim().toLowerCase();
+}
+
+
+/**
+ * Resolves duplicate-email checks with backward compatibility for older script versions.
+ *
+ * @param {string} emailValue - Email to check.
+ * @returns {boolean} True when email already exists.
+ */
+function contactEmailExists(emailValue) {
+  const sourceUsers = Array.isArray(users) ? users : [];
+
+  if (typeof doesEmailExist === "function") {
+    return doesEmailExist(sourceUsers, emailValue);
+  }
+
+  if (typeof checkMailExist === "function") {
+    return checkMailExist(emailValue, sourceUsers);
+  }
+
+  const normalized = normalizeEmailForContactFlow(emailValue);
+  if (normalized === "") {
+    return false;
+  }
+
+  return sourceUsers.some((user) => {
+    if (!user || typeof user !== "object") {
+      return false;
+    }
+    return normalizeEmailForContactFlow(user.mail) === normalized;
+  });
 }
 
 
