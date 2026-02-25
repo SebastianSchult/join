@@ -8,12 +8,14 @@ let currentContactId = null;
  *
  * @return {Promise<Array>} A promise that resolves to an array of contacts.
  */
-async function getContactsFromRemoteStorage() {
-  try {
-    users = await firebaseGetItem(FIREBASE_USERS_ID);
-  } catch (error) {
-    console.error("Loading error:", error);
-  }
+async function getContactsFromRemoteStorage(options = {}) {
+  const loadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
+    context: "contacts",
+    errorMessage: "Could not load contacts. Please try again.",
+    ...options,
+  });
+  users = loadResult.data;
+  return loadResult;
 }
 
 
@@ -55,8 +57,9 @@ function sortContactsByName(contacts) {
  * @return {Array} An array of contacts sorted by name.
  */
 function getContactsOutOfUsers() {
+  const sourceUsers = Array.isArray(users) ? users : [];
   temp_contacts = [];
-  users.forEach((user) => {
+  sourceUsers.forEach((user) => {
     temp_contacts.push({
       contactColor: user.contactColor,
       id: user.id,

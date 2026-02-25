@@ -9,8 +9,11 @@ let mobileGreetingTimeoutId = null;
  */
 async function summaryInit() {
     includeHTML();
-    // await getContactsFromRemoteStorage();
-    await firebaseGetItem(FIREBASE_USERS_ID);
+    const usersLoadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
+        context: 'contacts',
+        errorMessage: 'Could not load contacts for summary.',
+    });
+    users = usersLoadResult.data;
     getContactsOutOfUsers();
     await loadTasksFromRemoteStorage();
     getLoggedUser();

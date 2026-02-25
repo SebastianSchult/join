@@ -2,7 +2,13 @@
  * Saves a contact by pushing it to the contacts array and storing it in local storage.
  */
 async function saveContact() {
-  await getContactsFromRemoteStorage();
+  const loadResult = await getContactsFromRemoteStorage({
+    errorMessage: "Could not load contacts. Contact was not created.",
+  });
+  if (loadResult.error) {
+    return;
+  }
+
   if (checkMailExist(document.getElementById("contactMail").value)) {
   } else {
     try {
@@ -21,11 +27,13 @@ async function saveContact() {
       users = [];
       resetContactForm();
       closeOverlay("addContact");
+      displaySuccessMessage("Contact successfully created");
+      loadContacts();
     } catch (error) {
       console.error("Error saving contact:", error);
+      showGlobalUserMessage("Could not save contact. Please try again.");
+      createBtn.disabled = false;
     }
-    displaySuccessMessage("Contact successfully created");
-    loadContacts();
   }
 }
 
@@ -231,7 +239,15 @@ function editContact(id) {
  * @return {undefined} This function does not return a value.
  */
 async function saveEditedContact(id) {
-  let users = await firebaseGetItem(FIREBASE_USERS_ID);
+  const loadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
+    context: "contacts",
+    errorMessage: "Could not load contacts for editing. Please try again.",
+  });
+  if (loadResult.error) {
+    return;
+  }
+
+  let users = loadResult.data;
   const userIndex = users.findIndex((contact) => contact.id === id);
 
   if (userIndex !== -1) {
@@ -296,7 +312,15 @@ function deleteContactFromLocalStorage(contactId) {
  * @return {Promise<void>} A promise that resolves when the contact is successfully deleted.
  */
 async function deleteContact(id) {
-  let users = await firebaseGetItem(FIREBASE_USERS_ID);
+  const loadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
+    context: "contacts",
+    errorMessage: "Could not load contacts for deleting. Please try again.",
+  });
+  if (loadResult.error) {
+    return;
+  }
+
+  let users = loadResult.data;
   const userIndex = users.findIndex((user) => user.id === id);
   if (userIndex !== -1) {
     users.splice(userIndex, 1);

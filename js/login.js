@@ -50,7 +50,15 @@ function checkIfUserWasPreviouslyRegistered() {
  * @return {Promise<void>} A promise that resolves when users are loaded and migrated if needed.
  */
 async function loadUsers() {
-    users = await firebaseGetItem(FIREBASE_USERS_ID);
+    const loadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
+        context: "users",
+        showErrorMessage: false,
+    });
+    users = loadResult.data;
+
+    if (loadResult.error) {
+        throw loadResult.error;
+    }
 
     if (!Array.isArray(users)) {
         users = [];
@@ -348,4 +356,3 @@ function checkIfFormIsValid() {
     return false;
   }
 }
-

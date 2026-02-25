@@ -327,7 +327,10 @@ function renderEditCardAssignedContacts(){
  */
 async function saveEditedTask(taskId) {
     console.log("saveEditedTask: Speichern gestartet für Task:", taskId);
-    await loadTasksFromRemoteStorage();
+    const loadResult = await loadTasksFromRemoteStorage();
+    if (loadResult.error) {
+        return;
+    }
     collectInformationsForNewCard();
 
     let taskToSaveIndex = findTaskIndex(taskId);

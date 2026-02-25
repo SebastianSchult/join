@@ -129,7 +129,10 @@ function clearFormular(){
  * @return {Promise<void>} A Promise that resolves once the task is created.
  */
 async function createTask(){
-    await loadTasksFromRemoteStorage();
+    const loadResult = await loadTasksFromRemoteStorage();
+    if (loadResult.error) {
+        return;
+    }
     collectInformationsForNewCard();
     newTask.images = allImages.map(image => image.base64);
     tasks.push(newTask);
@@ -176,11 +179,16 @@ async function saveTasksToRemoteStorage(){
 *
 */
 async function loadTasksFromRemoteStorage(){
-   tasks = await firebaseGetItem(FIREBASE_TASKS_ID);
+   const loadResult = await firebaseGetArraySafe(FIREBASE_TASKS_ID, {
+      context: 'tasks',
+      errorMessage: 'Could not load tasks. Please try again.',
+   });
+   tasks = loadResult.data;
    tasks.forEach(task => {
        if(!task.hasOwnProperty('subtasks')) task.subtasks = []; 
        if(!task.hasOwnProperty('assignedTo')) task.assignedTo = [];
    })
+   return loadResult;
 }
 
 
