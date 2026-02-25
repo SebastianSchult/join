@@ -61,19 +61,22 @@ function renderAddContactsHTML() {
               <form data-submit-action="save-contact" class="add-contact-input-group">
                   <div class="input-frame">
                       <label class="sr-only" for="contactName">Name</label>
-                      <input id="contactName" type="text" placeholder="Name" autocomplete="name" autofocus required>
+                      <input id="contactName" type="text" placeholder="Name" autocomplete="name" aria-describedby="contactNameError" aria-invalid="false" autofocus required>
                       <img src="./assets/img/icon-person.png" alt="">
                   </div>
+                  <span id="contactNameError" class="contact-error-message" role="alert" aria-live="polite"></span>
                   <div class="input-frame">
                       <label class="sr-only" for="contactMail">Email</label>
-                      <input id="contactMail" type="email" placeholder="Email" autocomplete="email" autofocus required>
+                      <input id="contactMail" type="email" placeholder="Email" autocomplete="email" aria-describedby="contactMailError" aria-invalid="false" autofocus required>
                       <img src="./assets/img/icon-mail.png" alt="">
                   </div>
+                  <span id="contactMailError" class="contact-error-message" role="alert" aria-live="polite"></span>
                   <div class="input-frame">
                       <label class="sr-only" for="contactPhone">Phone</label>
-                      <input id="contactPhone" pattern="[0-9]*" type="tel" placeholder="Phone" autocomplete="tel" autofocus required>
+                      <input id="contactPhone" pattern="[0-9]*" type="tel" placeholder="Phone" autocomplete="tel" aria-describedby="contactPhoneError" aria-invalid="false" autofocus required>
                       <img src="./assets/img/icon-call.png" alt="">
                   </div>
+                  <span id="contactPhoneError" class="contact-error-message" role="alert" aria-live="polite"></span>
                   <div id="addContactButton" class="addContactButton">
                       <button type="button" class="cancelButton" data-action="close-overlay" data-overlay-id="addContact" data-hover-action="change-cancel-icon"
                           data-leave-action="restore-cancel-icon">Cancel
@@ -124,19 +127,22 @@ function renderEditContactHTML(id, name, contactColor) {
               <form action="" data-submit-action="save-edited-contact" data-contact-id="${safeContactId}" class="add-contact-input-group">
                   <div class="input-frame">
                       <label class="sr-only" for="contactName">Name</label>
-                      <input id="contactName" type="text" placeholder="Name" autocomplete="name" autofocus required>
+                      <input id="contactName" type="text" placeholder="Name" autocomplete="name" aria-describedby="contactNameError" aria-invalid="false" autofocus required>
                       <img src="./assets/img/icon-person.png" alt="">
                   </div>
+                  <span id="contactNameError" class="contact-error-message" role="alert" aria-live="polite"></span>
                   <div class="input-frame">
                       <label class="sr-only" for="contactMail">Email</label>
-                      <input id="contactMail" type="email" placeholder="Email" autocomplete="email" autofocus required>
+                      <input id="contactMail" type="email" placeholder="Email" autocomplete="email" aria-describedby="contactMailError" aria-invalid="false" autofocus required>
                       <img src="./assets/img/icon-mail.png" alt="">
                   </div>
+                  <span id="contactMailError" class="contact-error-message" role="alert" aria-live="polite"></span>
                   <div class="input-frame">
                       <label class="sr-only" for="contactPhone">Phone</label>
-                      <input id="contactPhone" type="tel" placeholder="Phone" autocomplete="tel" autofocus required>
+                      <input id="contactPhone" type="tel" placeholder="Phone" autocomplete="tel" aria-describedby="contactPhoneError" aria-invalid="false" autofocus required>
                       <img src="./assets/img/icon-call.png" alt="">
                   </div>
+                  <span id="contactPhoneError" class="contact-error-message" role="alert" aria-live="polite"></span>
                   <div id="addContactButton" class="addContactButton">
                       <button type="button" class="cancelButton" data-action="close-overlay" data-overlay-id="editContact" data-hover-action="change-cancel-icon"
                           data-leave-action="restore-cancel-icon">Cancel

@@ -1,10 +1,13 @@
 <div class="header-content header-mobile">
-  <img class="header-logo" src="./assets/img/logo-small_white.png" alt="join-logo"
-    data-action="switch-page" data-url="summary.html" />
+  <a class="header-logo-link" href="./summary.html" data-action="switch-page" data-url="summary.html" data-prevent-default="true" aria-label="Go to summary page">
+    <img class="header-logo" src="./assets/img/logo-small_white.png" alt="">
+  </a>
   <div class="header-inner-right">
     <span class="header-kanban-writing">Kanban Project Management Tool</span>
-    <img id="helpIcon" class="helpIcon" src="./assets/img/icon-help.png" alt="help" data-action="open-help" />
-    <button id="userInitials" class="header-initials-button" data-action="open-small-menu">
+    <button type="button" id="helpIcon" class="helpIconButton" data-action="open-help" aria-label="Open help page">
+      <img class="helpIcon" src="./assets/img/icon-help.png" alt="">
+    </button>
+    <button type="button" id="userInitials" class="header-initials-button" data-action="open-small-menu" aria-label="Open user menu">
     </button>
   </div>
   <div id="smallMenu" class="small-menu d-none">

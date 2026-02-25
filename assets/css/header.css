@@ -17,11 +17,17 @@
   color: var(--clr-text);
   background-color: var(--clr-main);
   padding: var(--ui-content-gap-lg);
+  .header-logo-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+  }
   .header-logo {
     width: 46px;
     height: 56px;
     margin-left: 39px;
-    cursor: pointer;
   }
 }
 
@@ -110,8 +116,18 @@
   }
 }
 
-.helpIcon {
+.helpIconButton {
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  padding: 0;
+}
+
+.helpIcon {
+  display: block;
 }
 
 @media (max-width: 801px) {
@@ -134,7 +150,7 @@
   .header-kanban-writing {
     display: none;
   }
-  .helpIcon {
+  .helpIconButton {
     display: none;
   }
 

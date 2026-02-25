@@ -7,6 +7,10 @@ async function saveContact() {
     showGlobalUserMessage("Contact form is not available. Please reopen it.");
     return;
   }
+  clearContactFieldErrors(formElements);
+  if (!validateContactFormFields(formElements)) {
+    return;
+  }
 
   const { nameInput, mailInput, phoneInput, createButton } = formElements;
   const loadResult = await getContactsFromRemoteStorage({
@@ -18,6 +22,7 @@ async function saveContact() {
 
   const enteredMail = mailInput.value;
   if (contactEmailExists(enteredMail)) {
+    setContactFieldError(mailInput, "A contact with this email already exists.");
     showGlobalUserMessage("A contact with this email already exists.");
     return;
   }
@@ -28,9 +33,9 @@ async function saveContact() {
     const newId = generateCollisionSafeId(sourceUsers);
     const newContact = {
       id: newId,
-      name: nameInput.value,
+      name: nameInput.value.trim(),
       mail: normalizeEmailForContactFlow(enteredMail),
-      phone: phoneInput.value,
+      phone: phoneInput.value.trim(),
       contactColor: generateRandomColor(),
     };
 
@@ -50,6 +55,11 @@ async function saveContact() {
 let contactOverlayOpener = null;
 let contactsKeyboardAccessibilityRegistered = false;
 let editDeleteMenuOpener = null;
+const CONTACT_REQUIRED_FIELD_ERRORS = Object.freeze({
+  contactName: "Please enter a name.",
+  contactMail: "Please enter an email address.",
+  contactPhone: "Please enter a phone number.",
+});
 
 
 /**
@@ -64,6 +74,124 @@ function getContactFormElements() {
     phoneInput: document.getElementById("contactPhone"),
     createButton: document.getElementById("createBtn"),
   };
+}
+
+
+/**
+ * Resolves the error output element for a contact form field.
+ *
+ * @param {HTMLInputElement|null} inputElement - Contact form input field.
+ * @returns {HTMLElement|null} Matching error container.
+ */
+function getContactFieldErrorElement(inputElement) {
+  if (!inputElement) {
+    return null;
+  }
+
+  const describedBy = inputElement.getAttribute("aria-describedby") || "";
+  const describedByIds = describedBy
+    .split(" ")
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const errorIdFromA11y = describedByIds.find((id) => id.endsWith("Error"));
+  if (errorIdFromA11y) {
+    return document.getElementById(errorIdFromA11y);
+  }
+
+  if (!inputElement.id) {
+    return null;
+  }
+  return document.getElementById(`${inputElement.id}Error`);
+}
+
+
+/**
+ * Marks one contact input as invalid and announces the error text.
+ *
+ * @param {HTMLInputElement|null} inputElement - Input to mark.
+ * @param {string} message - Accessible error message.
+ * @returns {void}
+ */
+function setContactFieldError(inputElement, message) {
+  if (!inputElement) {
+    return;
+  }
+
+  inputElement.setAttribute("aria-invalid", "true");
+  const errorElement = getContactFieldErrorElement(inputElement);
+  if (errorElement) {
+    errorElement.textContent = message;
+  }
+}
+
+
+/**
+ * Clears one contact input error state.
+ *
+ * @param {HTMLInputElement|null} inputElement - Input to clear.
+ * @returns {void}
+ */
+function clearContactFieldError(inputElement) {
+  if (!inputElement) {
+    return;
+  }
+
+  inputElement.setAttribute("aria-invalid", "false");
+  const errorElement = getContactFieldErrorElement(inputElement);
+  if (errorElement) {
+    errorElement.textContent = "";
+  }
+}
+
+
+/**
+ * Clears all current contact form field errors.
+ *
+ * @param {{nameInput: HTMLInputElement|null, mailInput: HTMLInputElement|null, phoneInput: HTMLInputElement|null}} formElements - Current form refs.
+ * @returns {void}
+ */
+function clearContactFieldErrors(formElements) {
+  clearContactFieldError(formElements?.nameInput || null);
+  clearContactFieldError(formElements?.mailInput || null);
+  clearContactFieldError(formElements?.phoneInput || null);
+}
+
+
+/**
+ * Validates required and format-sensitive contact fields.
+ *
+ * @param {{nameInput: HTMLInputElement|null, mailInput: HTMLInputElement|null, phoneInput: HTMLInputElement|null}} formElements - Current form refs.
+ * @returns {boolean} True when all fields are valid.
+ */
+function validateContactFormFields(formElements) {
+  const { nameInput, mailInput, phoneInput } = formElements;
+  let isValid = true;
+
+  if (!nameInput || nameInput.value.trim() === "") {
+    setContactFieldError(nameInput, CONTACT_REQUIRED_FIELD_ERRORS.contactName);
+    isValid = false;
+  } else {
+    clearContactFieldError(nameInput);
+  }
+
+  if (!mailInput || mailInput.value.trim() === "") {
+    setContactFieldError(mailInput, CONTACT_REQUIRED_FIELD_ERRORS.contactMail);
+    isValid = false;
+  } else if (!mailInput.checkValidity()) {
+    setContactFieldError(mailInput, "Please enter a valid email address.");
+    isValid = false;
+  } else {
+    clearContactFieldError(mailInput);
+  }
+
+  if (!phoneInput || phoneInput.value.trim() === "") {
+    setContactFieldError(phoneInput, CONTACT_REQUIRED_FIELD_ERRORS.contactPhone);
+    isValid = false;
+  } else {
+    clearContactFieldError(phoneInput);
+  }
+
+  return isValid;
 }
 
 
@@ -191,6 +319,7 @@ function displaySuccessMessage(message) {
  * @return {void}
  */
 function resetContactForm(formElements = getContactFormElements()) {
+  clearContactFieldErrors(formElements);
   if (formElements.nameInput) {
     formElements.nameInput.value = "";
   }
@@ -498,12 +627,34 @@ async function saveEditedContact(id) {
       showGlobalUserMessage("Contact form is not available. Please reopen it.");
       return;
     }
+    clearContactFieldErrors(formElements);
+    if (!validateContactFormFields(formElements)) {
+      return;
+    }
 
     const user = sourceUsers[userIndex];
+    const normalizedMail = normalizeEmailForContactFlow(formElements.mailInput.value);
+    const mailExistsOnAnotherContact =
+      typeof doesEmailExist === "function"
+        ? doesEmailExist(sourceUsers, normalizedMail, { excludeId: id })
+        : sourceUsers.some(
+            (contact) =>
+              contact &&
+              contact.id !== id &&
+              normalizeEmailForContactFlow(contact.mail) === normalizedMail
+          );
+    if (mailExistsOnAnotherContact) {
+      setContactFieldError(
+        formElements.mailInput,
+        "A contact with this email already exists."
+      );
+      showGlobalUserMessage("A contact with this email already exists.");
+      return;
+    }
 
-    user.name = formElements.nameInput.value;
-    user.mail = normalizeEmailForContactFlow(formElements.mailInput.value);
-    user.phone = formElements.phoneInput.value;
+    user.name = formElements.nameInput.value.trim();
+    user.mail = normalizedMail;
+    user.phone = formElements.phoneInput.value.trim();
 
     await firebaseSetEntity(user, FIREBASE_USERS_ID);
     closeOverlay("editContact");
