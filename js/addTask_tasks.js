@@ -31,6 +31,9 @@ let newTask =
         'images': []
 };
 
+let pendingTaskUpserts = new Set();
+let pendingTaskDeletes = new Set();
+
 
 /**
  * Adds a new subtask to the list of tasks.
@@ -136,6 +139,7 @@ async function createTask(){
     collectInformationsForNewCard();
     newTask.images = allImages.map(image => image.base64);
     tasks.push(newTask);
+    queueTaskUpsert(newTask.id);
     await saveTasksToRemoteStorage();
     showSuccessMessage();
     resetNewTask();
@@ -169,8 +173,33 @@ function resetNewTask(){
 */
 async function saveTasksToRemoteStorage(){
   deactivateButton('createBtn');
-  await firebaseUpdateItem(tasks, FIREBASE_TASKS_ID);
-  activateButton('createBtn', 'createTask()');
+
+  const upsertIds = Array.from(pendingTaskUpserts);
+  const deleteIds = Array.from(pendingTaskDeletes);
+
+  if (upsertIds.length === 0 && deleteIds.length === 0) {
+      activateButton('createBtn', 'createTask()');
+      return;
+  }
+
+  try {
+      const patchPayload = buildTaskPatchPayload(upsertIds);
+      if (Object.keys(patchPayload).length > 0) {
+          await firebasePatchCollection(patchPayload, FIREBASE_TASKS_ID);
+      }
+
+      for (let i = 0; i < deleteIds.length; i++) {
+          await firebaseDeleteEntity(deleteIds[i], FIREBASE_TASKS_ID);
+      }
+
+      pendingTaskUpserts.clear();
+      pendingTaskDeletes.clear();
+  } catch (error) {
+      console.error('Failed to persist task changes:', error);
+      showGlobalUserMessage('Could not save task changes. Please try again.');
+  } finally {
+      activateButton('createBtn', 'createTask()');
+  }
 }
 
 
@@ -231,8 +260,45 @@ function pushContactToTempAssignedContacts(id){
  * @return {number} The new task ID.
  */
 function getNewTaskId(){
-    let freeId = findFreeId(tasks);
-    return freeId;
+    return generateCollisionSafeId(tasks);
+}
+
+function queueTaskUpsert(taskId){
+    const normalizedId = Number(taskId);
+    if (!Number.isSafeInteger(normalizedId)) {
+        return;
+    }
+    pendingTaskDeletes.delete(normalizedId);
+    pendingTaskUpserts.add(normalizedId);
+}
+
+function queueTaskDelete(taskId){
+    const normalizedId = Number(taskId);
+    if (!Number.isSafeInteger(normalizedId)) {
+        return;
+    }
+    pendingTaskUpserts.delete(normalizedId);
+    pendingTaskDeletes.add(normalizedId);
+}
+
+function buildTaskPatchPayload(taskIds){
+    const payload = {};
+    taskIds.forEach((id) => {
+        const task = getTaskById(id);
+        if (task) {
+            payload[id] = task;
+        }
+    });
+    return payload;
+}
+
+function getTaskById(taskId){
+    for (let i = 0; i < tasks.length; i++) {
+        if (Number(tasks[i].id) === Number(taskId)) {
+            return tasks[i];
+        }
+    }
+    return null;
 }
 
 

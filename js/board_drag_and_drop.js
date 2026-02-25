@@ -58,6 +58,7 @@ function allowDrop(event){
 function moveTo(category){
     let task = getTaskOutOfId(currentDraggedElement);
     task['category'] = category;
+    queueTaskUpsert(task.id);
     renderCategories(tasks);
     saveTasksToRemoteStorage();
 }
