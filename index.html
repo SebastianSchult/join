@@ -33,7 +33,7 @@
                     </div>
                     <div class="signUpField">
                         <span>Not a join user yet?</span>
-                        <button class="loginButtons signUpButton" onclick="gotoSignUp()">Sign up</button>
+                        <button type="button" class="loginButtons signUpButton" onclick="gotoSignUp()">Sign up</button>
                     </div>
                 </header>
                 <div class=" login-page">
@@ -54,31 +54,32 @@
                                     <div class="mailIcon"><img src="./assets/img/icon-lock.png" alt="lock">
                                     </div>
                                 </div>
-                                <div id="loginCheckbox" class="checkboxBox" onclick="toggleRememberMeCheckbox()">
+                                <button type="button" id="loginCheckbox" class="checkboxBox" onclick="toggleRememberMeCheckbox()"
+                                    aria-label="Toggle remember me">
                                     <img id="loginCheckboxImg" src="./assets/img/icon-check_button_unchecked.png"
                                         alt="checkbox image">
-                                    <div for="rememberMe" class="custom-checkbox">Remember me</div>
-                                </div>
+                                    <span class="custom-checkbox">Remember me</span>
+                                </button>
                             </div>
                         </form>
                         <div class="loginButtonsBox">
                             <button class="loginButtons loginButtonUser" form="loginForm">Login</button>
-                            <button class="loginButtons loginButtonGuest" onclick="loginAsGuest()">Guest Login</button>
+                            <button type="button" class="loginButtons loginButtonGuest" onclick="loginAsGuest()">Guest Login</button>
                         </div>
                     </div>
                     <div class="signUpField-mobile d-none">
                         <span>Not a join user?</span>
-                        <button class="loginButtons signUpButton signUpButton-mobile" onclick="gotoSignUp()">Sign
+                        <button type="button" class="loginButtons signUpButton signUpButton-mobile" onclick="gotoSignUp()">Sign
                             up</button>
                     </div>
                 </div>
                 <div class="loginFooter">
-                    <div class="privacyPolicy" onclick="switchPageNewTab('privacy_external.html');" target="_blank">
+                    <a class="privacyPolicy" href="./privacy_external.html" target="_blank" rel="noopener noreferrer">
                         <span>Privacy policy</span>
-                    </div>
-                    <div class="legalNotice" onclick="switchPageNewTab('legal_notice_external.html');" target="_blank">
+                    </a>
+                    <a class="legalNotice" href="./legal_notice_external.html" target="_blank" rel="noopener noreferrer">
                         <span>Legal notice</span>
-                    </div>
+                    </a>
                 </div>
             </div>
         </main>

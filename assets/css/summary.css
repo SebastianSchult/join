@@ -43,7 +43,7 @@
   grid-row: 2 / 3;
 }
 
-div.square-button.toDo {
+.square-button.toDo {
   background-color: var(--clr-summary-square-button-focus);
 }
 
@@ -251,6 +251,8 @@ button {
   cursor: pointer;
   border: unset;
   transition: all 0.125s ease-in-out;
+  text-decoration: none;
+  color: inherit;
 }
 
 .inner-square-button {
@@ -273,6 +275,7 @@ button {
   cursor: pointer;
   transition: all 0.125s ease-in-out;
   color: #fff;
+  text-decoration: none;
 }
 
 .urgent {
