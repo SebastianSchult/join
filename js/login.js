@@ -83,6 +83,86 @@ function findUserByEmail(email) {
 }
 
 /**
+ * Reads login form controls used for accessibility state updates.
+ *
+ * @returns {{emailInput: HTMLInputElement|null, passwordInput: HTMLInputElement|null, emailError: HTMLElement|null, passwordError: HTMLElement|null, formError: HTMLElement|null}}
+ */
+function getLoginA11yElements() {
+    return {
+        emailInput: document.getElementById("loginEmailInput"),
+        passwordInput: document.getElementById("loginPasswordInput"),
+        emailError: document.getElementById("loginEmailError"),
+        passwordError: document.getElementById("loginPasswordError"),
+        formError: document.getElementById("loginFormError"),
+    };
+}
+
+/**
+ * Applies field-level error text and aria-invalid state.
+ *
+ * @param {HTMLInputElement|null} inputElement - Field to mark invalid.
+ * @param {HTMLElement|null} errorElement - Related error output element.
+ * @param {string} message - Error message shown to assistive technologies.
+ * @returns {void}
+ */
+function setLoginFieldError(inputElement, errorElement, message) {
+    if (inputElement) {
+        inputElement.setAttribute("aria-invalid", "true");
+    }
+    if (errorElement) {
+        errorElement.textContent = message;
+    }
+}
+
+/**
+ * Clears all login field and form error states.
+ *
+ * @returns {void}
+ */
+function clearLoginValidationState() {
+    const { emailInput, passwordInput, emailError, passwordError, formError } =
+        getLoginA11yElements();
+
+    if (emailInput) {
+        emailInput.setAttribute("aria-invalid", "false");
+    }
+    if (passwordInput) {
+        passwordInput.setAttribute("aria-invalid", "false");
+    }
+    if (emailError) {
+        emailError.textContent = "";
+    }
+    if (passwordError) {
+        passwordError.textContent = "";
+    }
+    if (formError) {
+        formError.textContent = "";
+    }
+}
+
+/**
+ * Announces invalid credentials and maps the message to login fields.
+ *
+ * @returns {void}
+ */
+function showLoginCredentialsError() {
+    const {
+        emailInput,
+        passwordInput,
+        emailError,
+        passwordError,
+        formError,
+    } = getLoginA11yElements();
+    const message = "Invalid email or password. Please try again.";
+
+    setLoginFieldError(emailInput, emailError, message);
+    setLoginFieldError(passwordInput, passwordError, message);
+    if (formError) {
+        formError.textContent = message;
+    }
+}
+
+/**
  * Shows the overlay if the user is not logged in.
  */
 function showOverlay() {
@@ -130,6 +210,7 @@ function hideOverlay() {
 async function loginUser() {
     const email = document.getElementById('loginEmailInput').value;
     const password = document.getElementById('loginPasswordInput').value;
+    clearLoginValidationState();
 
     try {
         await loadUsers();
@@ -144,11 +225,16 @@ async function loginUser() {
             setRememberMe(user.name); // localStorage
             switchPage('summary.html');
         } else {
+            showLoginCredentialsError();
             showGlobalUserMessage('Invalid email or password. Please try again.');
         }
     } catch (error) {
         users = [];
         console.error('Login failed:', error);
+        const { formError } = getLoginA11yElements();
+        if (formError) {
+            formError.textContent = 'Login failed. Please try again.';
+        }
         showGlobalUserMessage('Login failed. Please try again.');
     }
 

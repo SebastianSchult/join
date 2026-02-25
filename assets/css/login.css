@@ -108,6 +108,19 @@
   gap: 34px;
 }
 
+.loginInputField input[aria-invalid="true"] {
+  color: #2a3647;
+  box-shadow: inset 0 -2px 0 #ff8190;
+}
+
+.login-error-message {
+  width: 100%;
+  min-height: 18px;
+  font-size: 14px;
+  color: #ff8190;
+  line-height: 1.3;
+}
+
 #loginEmailInput,
 #loginPasswordInput {
   border: none;
