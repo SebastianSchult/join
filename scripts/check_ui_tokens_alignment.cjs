@@ -46,7 +46,7 @@ for (const check of cssChecks) {
   ensureFileContainsBreakpoint(absolutePath, check.kind, tokenValues[check.token], check.token);
 }
 
-assertScriptBreakpointFallbacks(tokenValues);
+assertBreakpointFallbacks(tokenValues);
 assertJsBreakpointUsage();
 assertTokenizedSpacingUsage();
 
@@ -99,14 +99,16 @@ function ensureFileContainsBreakpoint(filePath, kind, value, tokenKey) {
   }
 }
 
-function assertScriptBreakpointFallbacks(tokenValues) {
-  const scriptPath = path.resolve(process.cwd(), "script.js");
-  if (!fs.existsSync(scriptPath)) {
-    violations.push("Missing script.js for breakpoint fallback checks.");
+function assertBreakpointFallbacks(tokenValues) {
+  const responsivePath = path.resolve(process.cwd(), "js/responsive-navigation.js");
+  if (!fs.existsSync(responsivePath)) {
+    violations.push(
+      "Missing js/responsive-navigation.js for breakpoint fallback checks."
+    );
     return;
   }
 
-  const source = fs.readFileSync(scriptPath, "utf8");
+  const source = fs.readFileSync(responsivePath, "utf8");
   for (const [key, value] of Object.entries({
     mobileMax: tokenValues.mobileMax,
     navigationTabletMax: tokenValues.navigationTabletMax,
@@ -120,7 +122,7 @@ function assertScriptBreakpointFallbacks(tokenValues) {
     const regex = new RegExp(`\\b${key}\\s*:\\s*${value}\\b`);
     if (!regex.test(source)) {
       violations.push(
-        `script.js fallback '${key}' must match token value ${value}px.`
+        `js/responsive-navigation.js fallback '${key}' must match token value ${value}px.`
       );
     }
   }
