@@ -1,6 +1,7 @@
 name: PR Tests
 
 on:
+  push:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
 
@@ -23,8 +24,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          files=$(find js -type f -name "*.js" -print)
+          files=$(find js -type f -name "*.js" -print | sort)
           for f in $files script.js; do
+            echo "Checking syntax: $f"
             node --check "$f"
           done
 

@@ -326,7 +326,6 @@ function renderEditCardAssignedContacts(){
  * @param {number} taskId - The ID of the task to be saved.
  */
 async function saveEditedTask(taskId) {
-    console.log("saveEditedTask: Speichern gestartet für Task:", taskId);
     const loadResult = await loadTasksFromRemoteStorage();
     if (loadResult.error) {
         return;
