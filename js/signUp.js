@@ -42,7 +42,7 @@ async function addNewUser() {
     getInputValues();
     if (!checkPasswordsEqual()) {
         showUserMessage('Passwords do not match!');
-    } else if (checkMailExist(newMail)) {
+    } else if (doesEmailExist(users, newMail)) {
         showUserMessage('The mail already exists!');
     } else {
         try {
@@ -60,16 +60,6 @@ async function addNewUser() {
             showUserMessage('Sign up failed. Please try again.');
         }
     }
-}
-
-function checkMailExist(mailToCheck) {
-    const normalizedMail = normalizeAuthEmail(mailToCheck);
-    for (let i = 0; i < users.length; i++) {
-        if (normalizeAuthEmail(users[i].mail) === normalizedMail) {
-            return true;
-        }
-    }
-    return false;
 }
 
 function testMailinputWithRegex(){

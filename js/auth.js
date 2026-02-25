@@ -54,6 +54,32 @@ function normalizeAuthEmail(email) {
     return email.trim().toLowerCase();
 }
 
+function doesEmailExist(usersList, emailToCheck, options = {}) {
+    if (!Array.isArray(usersList)) {
+        return false;
+    }
+
+    const normalizedMail = normalizeAuthEmail(emailToCheck);
+    if (normalizedMail === "") {
+        return false;
+    }
+
+    const hasExcludeId = Object.prototype.hasOwnProperty.call(options, "excludeId");
+    const excludeId = hasExcludeId ? options.excludeId : null;
+
+    return usersList.some((user) => {
+        if (!user || typeof user !== "object") {
+            return false;
+        }
+
+        if (hasExcludeId && user.id === excludeId) {
+            return false;
+        }
+
+        return normalizeAuthEmail(user.mail) === normalizedMail;
+    });
+}
+
 async function derivePasswordHash(password, saltHex, iterations) {
     if (typeof password !== "string" || password.length === 0) {
         throw new Error("Password must be a non-empty string.");

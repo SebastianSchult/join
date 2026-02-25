@@ -9,31 +9,34 @@ async function saveContact() {
     return;
   }
 
-  if (checkMailExist(document.getElementById("contactMail").value)) {
-  } else {
-    try {
-      createBtn.disabled = true;
-      const newId = getNextId(users);
-      users.push({
-        id: newId,
-        name: contactName.value,
-        mail: contactMail.value,
-        phone: contactPhone.value,
-        contactColor: generateRandomColor(),
-      });
+  const enteredMail = document.getElementById("contactMail").value;
+  if (doesEmailExist(users, enteredMail)) {
+    showGlobalUserMessage("A contact with this email already exists.");
+    return;
+  }
 
-      await firebaseUpdateItem(users, FIREBASE_USERS_ID);
-      getContactsOutOfUsers();
-      users = [];
-      resetContactForm();
-      closeOverlay("addContact");
-      displaySuccessMessage("Contact successfully created");
-      loadContacts();
-    } catch (error) {
-      console.error("Error saving contact:", error);
-      showGlobalUserMessage("Could not save contact. Please try again.");
-      createBtn.disabled = false;
-    }
+  try {
+    createBtn.disabled = true;
+    const newId = getNextId(users);
+    users.push({
+      id: newId,
+      name: contactName.value,
+      mail: normalizeAuthEmail(enteredMail),
+      phone: contactPhone.value,
+      contactColor: generateRandomColor(),
+    });
+
+    await firebaseUpdateItem(users, FIREBASE_USERS_ID);
+    getContactsOutOfUsers();
+    users = [];
+    resetContactForm();
+    closeOverlay("addContact");
+    displaySuccessMessage("Contact successfully created");
+    loadContacts();
+  } catch (error) {
+    console.error("Error saving contact:", error);
+    showGlobalUserMessage("Could not save contact. Please try again.");
+    createBtn.disabled = false;
   }
 }
 
