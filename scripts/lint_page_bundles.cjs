@@ -21,6 +21,12 @@ async function main() {
   const eslint = new ESLint({
     useEslintrc: true,
     ignore: false,
+    overrideConfig: {
+      rules: {
+        "no-undef": "error",
+        "no-redeclare": "error",
+      },
+    },
   });
 
   const lintResults = [];
