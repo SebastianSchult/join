@@ -123,12 +123,17 @@ input[type="password"]:focus {
 }
 
 .checkboxBox {
+  border: none;
+  background: transparent;
   padding-top: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
   width: min-content;
+  font: inherit;
+  color: inherit;
+  text-align: left;
 }
 
 .custom-checkbox {
@@ -137,8 +142,8 @@ input[type="password"]:focus {
   align-items: center;
   white-space: nowrap;
   gap: 8px;
-  width: 24px;
-  height: 24px;
+  width: auto;
+  height: auto;
   font-size: 16px;
   font-weight: 400;
 }

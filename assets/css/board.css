@@ -85,6 +85,9 @@
   display: flex;
   justify-self: right;
   position: relative;
+  border: none;
+  background-color: transparent;
+  padding: 0;
   background-image: url("../img/icon-close.png");
   background-repeat: no-repeat;
   background-position: center;
@@ -124,6 +127,9 @@
 }
 
 .searchImg {
+  border: none;
+  background-color: transparent;
+  padding: 0;
   background-image: url("../img/icon-search.png");
   background-repeat: no-repeat;
   background-position: center;
@@ -284,6 +290,11 @@ button:focus {
   width: 252px;
   min-height: 270px;
   min-width: 252px;
+  border: none;
+  background-color: #fff;
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
 }
 
 .emptyCard {
@@ -301,6 +312,9 @@ button:focus {
 }
 
 .addTaskButton {
+  border: none;
+  background-color: transparent;
+  padding: 0;
   background-image: url("../img/icon-plus_button.png");
   background-repeat: no-repeat;
   cursor: pointer;
@@ -313,8 +327,10 @@ button:focus {
 }
 
 .addTaskBtnImg {
+  display: block;
   background-image: url("../img/icon-plus.png");
   background-position: center;
+  background-repeat: no-repeat;
   width: 15px;
   aspect-ratio: 1;
 }
@@ -628,6 +644,7 @@ progress {
 }
 
 .openCardImgDiv {
+  display: block;
   width: 24px;
   aspect-ratio: 1;
   cursor: pointer;
@@ -669,6 +686,12 @@ progress {
 
 .openCardDeleteContainer,
 .openCardEditContainer {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
 
   &:hover {

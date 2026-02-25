@@ -218,9 +218,9 @@ function renderContactsToDropdown(){
         const safeContactId = toSafeInteger(contact && contact.id);
         const safeContactName = escapeHtml(contact && contact.name);
 
-        content.innerHTML += /*html*/`<div class="dropdownOption" id="assignedToContact${safeContactId}" marked=false onclick="assignContactToTask(${safeContactId})">
-            <div class="dropdownContactBadgeAndName">${renderAssignedToButtonsHTML(contact)} ${safeContactName}</div> <img src="./assets/img/icon-check_button_unchecked.png" alt="">
-            </div>`
+        content.innerHTML += /*html*/`<button type="button" class="dropdownOption" id="assignedToContact${safeContactId}" marked=false onclick="assignContactToTask(${safeContactId})">
+            <span class="dropdownContactBadgeAndName">${renderAssignedToButtonsHTML(contact)} ${safeContactName}</span> <img src="./assets/img/icon-check_button_unchecked.png" alt="">
+            </button>`
     })
 }
 
@@ -385,6 +385,10 @@ function activateButton(id, onClickFunctionName){
     if(document.getElementById(id)){
         let btn = document.getElementById(id);
         btn.classList.remove("disabled");
+        if (btn.tagName === "BUTTON") {
+            btn.disabled = false;
+            btn.setAttribute("aria-disabled", "false");
+        }
         btn.setAttribute("onclick", onClickFunctionName);
     }
 }
@@ -399,9 +403,10 @@ function deactivateButton(id){
     if(document.getElementById(id)){
         let btn = document.getElementById(id);
         btn.classList.add("disabled");
+        if (btn.tagName === "BUTTON") {
+            btn.disabled = true;
+            btn.setAttribute("aria-disabled", "true");
+        }
         btn.removeAttribute("onclick");
     }
 }
-
-
-

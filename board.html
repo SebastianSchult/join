@@ -45,14 +45,14 @@
                     <div class="boardTopContainer">
                         <div class="searchTaskContainer">
                             <div class="searchTaskInner"><input id="findTask" placeholder="Find Task" type="text" onkeyup="searchTask()">
-                                <div class="searchImg" onclick="searchTask()"> </div>
+                                <button type="button" class="searchImg" onclick="searchTask()" aria-label="Search tasks"></button>
                             </div>
                         </div>
-                        <div class="boardAddTaskButtonContainer" onclick="doNotClose(event)">
-                            <div class="createBtn addTaskBtn addTaskBtnBoard btnBoard" onclick="showAddTaskContainer()">
+                        <div class="boardAddTaskButtonContainer">
+                            <button type="button" class="createBtn addTaskBtn addTaskBtnBoard btnBoard" onclick="doNotClose(event); showAddTaskContainer()">
                                 <span class="addTaskBtnText">Add Task</span>
-                                <div class="addTaskBtnImg "></div>
-                            </div>
+                                <span class="addTaskBtnImg "></span>
+                            </button>
                         </div>
 
                     </div>
@@ -61,23 +61,23 @@
                             ondragover="allowDrop(event)">
                             <div class="categoryTitle">
                                 <h2>To Do</h2>
-                                <div class="addTaskButton" onclick="showAddTaskContainer('category-0')"></div>
+                                <button type="button" class="addTaskButton" onclick="showAddTaskContainer('category-0')" aria-label="Add task to To Do"></button>
                             </div>
                             <div id="category-0" class="categoryTasks">
                             </div>
                         </div>
-                        <div class="category" ondrop="moveTo('category-1')" ondragover="allowDrop(event)"">
+                        <div class="category" ondrop="moveTo('category-1')" ondragover="allowDrop(event)">
                             <div class=" categoryTitle">
                             <h2>In progress</h2>
-                            <div class="addTaskButton" onclick="showAddTaskContainer('category-1')"></div>
+                            <button type="button" class="addTaskButton" onclick="showAddTaskContainer('category-1')" aria-label="Add task to In progress"></button>
                         </div>
                         <div id="category-1" class="categoryTasks">
                         </div>
                     </div>
-                    <div class="category" ondrop="moveTo('category-2')" ondragover="allowDrop(event)"">
+                    <div class="category" ondrop="moveTo('category-2')" ondragover="allowDrop(event)">
                             <div class=" categoryTitle">
                         <h2>Await feedback</h2>
-                        <div class="addTaskButton" onclick="showAddTaskContainer('category-2')"></div>
+                        <button type="button" class="addTaskButton" onclick="showAddTaskContainer('category-2')" aria-label="Add task to Await feedback"></button>
                     </div>
                     <div id="category-2" class="categoryTasks">
                     </div>
@@ -85,7 +85,7 @@
                 <div class="category" ondrop="moveTo('category-3')" ondragover="allowDrop(event)">
                     <div class="categoryTitle">
                         <h2>Done</h2>
-                        <div class="addTaskButton" onclick="showAddTaskContainer('category-3')"></div>
+                        <button type="button" class="addTaskButton" onclick="showAddTaskContainer('category-3')" aria-label="Add task to Done"></button>
                     </div>
                     <div id="category-3" class="categoryTasks">
                     </div>
