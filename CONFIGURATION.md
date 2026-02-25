@@ -16,6 +16,8 @@ cp js/config.example.js js/config.js
 - `BASE_URL`
 - `FIREBASE_TASKS_ID`
 - `FIREBASE_USERS_ID`
+- `COOKIEBOT_ID` (from your Cookiebot manager)
+- optional: `COOKIEBOT_BLOCKING_MODE` (default: `auto`)
 
 3. Start the app as usual.
 
@@ -33,6 +35,15 @@ For GitHub Actions deployment, `js/config.js` is generated during deploy from re
 - `JOIN_APP_FIREBASE_TASKS_ID`
 - `JOIN_APP_FIREBASE_USERS_ID`
 - optional: `JOIN_APP_STORAGE_URL`
+- `JOIN_APP_COOKIEBOT_ID`
+- optional: `JOIN_APP_COOKIEBOT_BLOCKING_MODE` (default: `auto`)
+
+## Cookiebot setup
+
+1. Create/get your Cookiebot domain group ID in Cookiebot.
+2. Add it to local `js/config.js` as `COOKIEBOT_ID`.
+3. Add repository secret `JOIN_APP_COOKIEBOT_ID` for deploy.
+4. Deploy to `main` and verify banner appears on first page load.
 
 ## Password handling
 
