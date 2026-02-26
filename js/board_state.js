@@ -115,6 +115,8 @@ async function saveEditedTask(taskId) {
 
     const taskToSaveIndex = findTaskIndex(taskId);
     if (taskToSaveIndex === -1) {
+        await closeCard();
+        showGlobalUserMessage("Could not update this task. Please reload and try again.");
         return;
     }
 
@@ -122,7 +124,7 @@ async function saveEditedTask(taskId) {
     updateTaskImages(taskToSaveIndex);
 
     await saveTasksToRemoteStorage();
-    finalizeEdit();
+    await finalizeEdit();
 }
 
 /**
@@ -132,7 +134,7 @@ async function saveEditedTask(taskId) {
  * @returns {number} Array index or -1.
  */
 function findTaskIndex(taskId) {
-    const index = tasks.findIndex((task) => task.id === taskId);
+    const index = tasks.findIndex((task) => Number(task.id) === Number(taskId));
     if (index === -1) {
         console.error("saveEditedTask: Kein Task gefunden für ID", taskId);
     }
@@ -166,8 +168,8 @@ function updateTaskImages(index) {
 /**
  * Finalizes edit mode and resets staged media.
  */
-function finalizeEdit() {
-    closeCard();
+async function finalizeEdit() {
+    await closeCard();
     showSuccessMessage();
     allImages = [];
 }
