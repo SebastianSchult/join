@@ -35,12 +35,15 @@ function callAddTaskFormDomain(methodName, args = [], fallbackValue) {
 
 function renderAddTaskHTML() {
     const container = document.getElementById("addTaskBody");
-    const footerContainer = document.getElementById("addTaskBodyRight");
-    if (!container || !footerContainer) {
+    if (!container) {
         return;
     }
 
     container.innerHTML = renderAddTaskMainContentHTML();
+    const footerContainer = document.getElementById("addTaskBodyRight");
+    if (!footerContainer) {
+        return;
+    }
     footerContainer.innerHTML = renderAddTaskFooterHTML();
 
     registerAddTaskKeyboardAccessibility();
