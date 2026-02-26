@@ -93,6 +93,7 @@ Every refactor PR should include:
 2. Risk notes (possible regressions and impacted flows/pages).
 3. Validation evidence:
    - `npm run lint`
+   - `npm run lint:jsdoc`
    - `npm run lint:file-size`
    - manual smoke checks for affected user journeys
 4. Backward compatibility notes for mixed deploy/cache states when runtime code is touched.
