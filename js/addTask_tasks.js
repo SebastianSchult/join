@@ -189,7 +189,7 @@ async function saveTasksToRemoteStorage(){
   const deleteIds = Array.from(pendingTaskDeletes);
 
   if (upsertIds.length === 0 && deleteIds.length === 0) {
-      activateButton('createBtn', 'createTask()');
+      activateButton('createBtn', 'create-task');
       return;
   }
 
@@ -209,7 +209,7 @@ async function saveTasksToRemoteStorage(){
       console.error('Failed to persist task changes:', error);
       showGlobalUserMessage('Could not save task changes. Please try again.');
   } finally {
-      activateButton('createBtn', 'createTask()');
+      activateButton('createBtn', 'create-task');
   }
 }
 
