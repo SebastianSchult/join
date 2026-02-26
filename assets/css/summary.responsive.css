@@ -1,0 +1,568 @@
+@media (max-width: 465px) {
+  .button-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    justify-content: center;
+    align-items: center;
+    grid-column-gap: 8px;
+    grid-row-gap: 16px;
+    padding: 13px;
+  }
+
+  .urgent {
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+    width: 280px;
+    height: 150px;
+  }
+
+  .date {
+    font-weight: 700;
+    font-size: 20px;
+    margin-top: 12px;
+  }
+
+  .dateBox span {
+    font-weight: 400;
+    font-size: 16px;
+  }
+
+  .urgentBox {
+    span {
+      font-weight: 400;
+      font-size: 17px;
+    }
+    img {
+      width: 64px;
+      height: 64px;
+    }
+  }
+
+  .square-button {
+    padding: 0;
+    margin: 0;
+    width: 132px;
+    height: 142px;
+    span {
+      font-weight: 400;
+      font-size: 17px;
+      white-space: pre-line;
+    }
+
+    img {
+      width: 64px;
+      height: 64px;
+    }
+  }
+
+  .amount,
+  #amountUrgent {
+    font-size: 26px;
+  }
+
+  .image-and-amount {
+    gap: 8px;
+  }
+
+  .verticalSeparaterLine {
+    height: 106px;
+    border: 2.5px solid #fff;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+  .toDo {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+  }
+
+  .inBoard {
+    background-color: #fff;
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+  }
+
+  .inProgress {
+    grid-column: 2 / 2;
+    grid-row: 3 / 4;
+  }
+
+  .feedback {
+    background-color: #fff;
+    grid-column: 1 / 2;
+    grid-row: 4 / 5;
+  }
+
+  .done {
+    background-color: #fff;
+    grid-column: 2 /2;
+    grid-row: 4 / 5;
+  }
+
+  #toDoButton {
+    background-color: var(--clr-summary-square-button-focus);
+    width: 280px;
+    height: 106px;
+  }
+}
+
+/* / ///////////////////////////////////////////////////////////////////max 600px*/
+@media (min-width: 465px) and (max-width: 600px) {
+  .sub-main-summary {
+    width: -webkit-fill-available;
+  }
+
+  #h1GreetingUser {
+    display: none;
+  }
+
+  .button-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    justify-content: center;
+    align-items: center;
+    grid-column-gap: 21px;
+    grid-row-gap: 21px;
+    height: auto;
+    padding: 7px;
+  }
+
+  .urgent {
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+    width: 396px;
+    height: 150px;
+  }
+
+  .toDo {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+  }
+
+  .inBoard {
+    background-color: #fff;
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+  }
+
+  .inProgress {
+    grid-column: 2 / 2;
+    grid-row: 3 / 4;
+  }
+
+  .feedback {
+    background-color: #fff;
+    grid-column: 1 / 2;
+    grid-row: 4 / 5;
+  }
+
+  .done {
+    background-color: #fff;
+    grid-column: 2 /2;
+    grid-row: 4 / 5;
+  }
+
+  #toDoButton {
+    background-color: var(--clr-summary-square-button-focus);
+    width: 396px;
+    height: 106px;
+
+    /*das ist neu von unten:*/
+    .inner-square-button {
+      gap: 8px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .date {
+    font-weight: 700;
+    font-size: 23px;
+    white-space: nowrap;
+    margin-top: 12px;
+  }
+
+  .dateBox span {
+    font-weight: 400;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  .urgentBox {
+    span {
+      font-weight: 400;
+      font-size: 19px;
+      white-space: nowrap;
+    }
+    img {
+      width: 76px;
+      height: 76px;
+    }
+  }
+
+  .square-button {
+    padding: 0;
+    margin: 0;
+    width: 186px;
+    height: 152px;
+
+    span {
+      font-weight: 400;
+      font-size: 19px;
+    }
+
+    img {
+      width: 76px;
+      height: 76px;
+    }
+  }
+
+  .amount,
+  #amountUrgent {
+    font-size: 40px;
+  }
+
+  .verticalSeparaterLine {
+    height: 106px;
+    border: 2.5px solid #fff;
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+}
+
+/*////////////////////////////////////////////////////////////////////max 800px*/
+@media (max-width: 801px) {
+  .daytimeGreeting {
+    display: none;
+  }
+
+  #h1GreetingUser {
+    display: none;
+  }
+  .h1-box {
+    height: 0;
+    margin-bottom: 0;
+  }
+}
+
+/*////////////////////////////////////////////////////////////////////min 700px*/
+@media (max-width: 949px) {
+  .inner-square-button.toDo {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 949px) {
+  .sub-main-summary {
+    padding: 16px 52px;
+  }
+
+  .summary-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .greetingContainer-and-subMainSummary {
+    /* margin-top: 180px; */
+    overflow: hidden;
+  }
+
+  .h1-box {
+    height: 0;
+    margin: 0;
+    display: none;
+  }
+
+  .button-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    justify-content: center;
+    align-items: center;
+    grid-column-gap: 21px;
+    grid-row-gap: 21px;
+    height: auto;
+  }
+
+  .square-button {
+    padding: 0;
+    margin: 0;
+    height: 152px;
+    width: 252px;
+  }
+
+  .daytimeGreeting {
+    margin-top: 42px;
+  }
+
+  .date {
+    margin-top: 19px;
+    white-space: nowrap;
+  }
+
+  .urgentAndDate span {
+    white-space: nowrap;
+  }
+
+  .amount {
+    font-size: 40px;
+  }
+
+  .inner-square-button img {
+    width: 76px;
+    height: 76px;
+  }
+
+  .inner-square-button span {
+    font-size: 19px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .urgentAndDate {
+    height: 151px;
+    width: auto;
+  }
+
+  .verticalSeparaterLine {
+    height: 126px;
+  }
+
+  .urgent {
+    grid-column: 1 / 3;
+    grid-row: 1 / 1;
+    height: 219px;
+    width: 528px;
+  }
+
+  #toDoButton {
+    width: 528px;
+  }
+
+  .toDo {
+    background-color: var(--clr-summary-square-button-focus);
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+    width: 396px;
+    height: 106px;
+  }
+
+  .inBoard {
+    background-color: #fff;
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+  }
+
+  .inner-square-button.toDoInner {
+    gap: 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .inProgress {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+  }
+
+  .feedback {
+    background-color: #fff;
+    grid-column: 1 / 3;
+    grid-row: 4 / 5;
+  }
+
+  .done {
+    background-color: #fff;
+    grid-column: 2 /3;
+    grid-row: 4 / 5;
+  }
+}
+
+/*/ ///////////////////////////////////////////////////////////////////min    950px*/
+
+@media only screen and (min-width: 950px) and (max-width: 1204px) {
+  .summary-box {
+    margin-top: 0;
+    gap: 20px;
+  }
+
+  .h1-box {
+    gap: 24px;
+    /* margin: 32px 0 54px 48px; */
+  }
+
+  #usernameForGreeting {
+    /* margin: 9.5px 0 2px 0; */
+    font-size: 48px;
+  }
+
+  .userGreeting {
+    font-size: 40px;
+  }
+
+  .button-container {
+    display: grid;
+    grid-template-columns: 204px 204px 204px;
+    grid-template-rows: auto;
+    justify-content: center;
+    align-items: center;
+    grid-column-gap: 24px;
+    grid-row-gap: 24px;
+    padding: 10px 20px;
+  }
+
+  .urgent {
+    grid-column: 1 / 4;
+    grid-row: 1 / 2;
+    width: calc((204px * 3) + (2 * 24px));
+    /* height: 150px; */
+  }
+
+  .toDo {
+    background-color: var(--clr-summary-square-button-focus);
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    background: white;
+    height: 219px;
+    width: 204px;
+  }
+
+  .inBoard {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    height: 219px;
+    width: 204px;
+  }
+
+  .inProgress {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+    height: 219px;
+    width: 204px;
+  }
+
+  .feedback {
+    height: 219px;
+    width: 204px;
+    /* margin-bottom: 24px; */
+  }
+
+  .done {
+    height: 219px;
+    width: 204px;
+    /* margin-bottom: 24px; */
+  }
+}
+
+/*////////////////////////////////////////////////////////////////////min 1204px*/
+/* Medium Devices, Desktops */
+@media only screen and (min-width: 1204px) {
+  .button-container {
+    display: grid;
+    grid-template-columns: 204px 204px 204px 204px;
+    grid-template-rows: auto;
+    justify-content: center;
+    align-items: center;
+    /* gap: 24px; */
+    grid-column-gap: 24px;
+    grid-row-gap: 24px;
+  }
+
+  .urgent {
+    grid-column: 1 / 4;
+    grid-row: 1 / 2;
+    width: calc((204px * 3) + (2 * 24px));
+  }
+
+  .toDo {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    background: white;
+    height: 219px;
+    width: 204px;
+    background-color: var(--clr-summary-square-button-focus);
+  }
+
+  .inBoard {
+    grid-column: 4 / 5;
+    grid-row: 1 / 2;
+
+    height: 219px;
+    width: 204px;
+  }
+
+  .inProgress {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    height: 219px;
+    width: 204px;
+  }
+
+  .feedback {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+    height: 219px;
+    width: 204px;
+  }
+
+  .done {
+    grid-column: 4 / 5;
+    grid-row: 2 / 3;
+    height: 219px;
+    width: 204px;
+  }
+
+  #usernameForGreeting {
+    font-size: 64px;
+  }
+
+  .daytimeGreeting {
+    font-size: 48px;
+  }
+}
+
+.usernameForGreeting {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: fit-content;
+  font-size: 48px;
+}
+
+.userGreeting {
+  font-weight: 400;
+}
+
+.daytimeGreeting {
+  font-size: 64px !important;
+  font-weight: 700;
+  line-height: 76.8px;
+  text-align: left;
+  color: var(--clr-text-good-morning);
+  align-content: center;
+}
+
+/* #usernameForGreeting {
+  max-width: fit-content;
+  color: var(--clr-main);
+  height: 58px;
+  margin: 9.5px 0 9.5px 22px;
+  font-family: Open Sans;
+  font-size: 64px;
+  font-weight: 700;
+} */
+
+.d-none {
+  display: none;
+}
