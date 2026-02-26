@@ -1,15 +1,15 @@
 const JOIN_APP_CONFIG = window.JOIN_APP_CONFIG || {};
 const StorageCompatFallbacks = window.StorageCompatFallbacks || null;
 
-const StorageErrorPolicy = resolveStorageModule(
+const StorageErrorPolicy = resolveStorageFacadeModule(
     "StorageErrorPolicy",
     "createStorageErrorPolicyFallback"
 );
-const StorageTransport = resolveStorageModule(
+const StorageTransport = resolveStorageFacadeModule(
     "StorageTransport",
     "createStorageTransportFallback"
 );
-const StorageFirebaseAdapter = resolveStorageModule(
+const StorageFirebaseAdapter = resolveStorageFacadeModule(
     "StorageFirebaseAdapter",
     "createStorageFirebaseAdapterFallback"
 );
@@ -36,7 +36,7 @@ function getCompatFallbackFactory(factoryName) {
     return undefined;
 }
 
-function resolveStorageModule(moduleName, fallbackFactoryName) {
+function resolveStorageFacadeModule(moduleName, fallbackFactoryName) {
     const moduleRef = window[moduleName];
     if (moduleRef) {
         return moduleRef;
