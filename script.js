@@ -5,6 +5,12 @@ initializeCookiebot();
 initializeUiEventDelegation();
 initializePageOnDomReady();
 
+/**
+ * Executes the page-specific initializer declared via `data-init` on the body.
+ * Waits for DOM readiness when required.
+ *
+ * @returns {void}
+ */
 function initializePageOnDomReady() {
 	const runPageInit = () => {
 		const initFunctionName = document.body?.dataset?.init;
@@ -81,6 +87,12 @@ function openHelp() {
 }
 
 
+/**
+ * Restores a remembered user into the current session when available.
+ * Redirects to summary when the login page is open.
+ *
+ * @returns {void}
+ */
 function checkIfUserIsRemembered() {
 	if (!sessionStorage.getItem('currentUser')) {
 		if (localStorage.getItem('rememberedUser') != null) {

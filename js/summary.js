@@ -246,6 +246,11 @@ function hideMobileGreeting() {
     mobileGreetingTimeoutId = null;
 }
 
+/**
+ * Returns DOM references required by summary greeting overlays.
+ *
+ * @returns {{greetingContainer: HTMLElement|null, subMainSummary: HTMLElement|null, bitGreeting: HTMLElement|null, main: HTMLElement|null}}
+ */
 function getSummaryGreetingElements() {
     return {
         greetingContainer: document.getElementById('greetingContainer'),

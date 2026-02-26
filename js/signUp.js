@@ -5,6 +5,11 @@ let newPassword = '';
 let newPasswordConfirm = '';
 let users = [];
 
+/**
+ * Reads and stores current signup form values in module-scoped variables.
+ *
+ * @returns {void}
+ */
 function getInputValues() {
     newUsername = document.getElementById('signUpNameInput').value.trim();
     newMail = document.getElementById('signUpEmailInput').value.trim();
@@ -12,6 +17,11 @@ function getInputValues() {
     newPasswordConfirm = document.getElementById('signUpPasswordInputConfirm').value;
 }
 
+/**
+ * Builds a new user object with secure password credentials.
+ *
+ * @returns {Promise<Object>} User payload ready for persistence.
+ */
 async function buildNewUser() {
     const passwordCredentials = await createPasswordCredentials(newPassword);
 
@@ -25,6 +35,11 @@ async function buildNewUser() {
     };
 }
 
+/**
+ * Validates form state and creates a new user in remote storage.
+ *
+ * @returns {Promise<void>}
+ */
 async function addNewUser() {
     if (!checkPrivacyPolicyConfirmation()) {
         showUserMessage('Bitte akzeptieren Sie die Privacy Policy!');
@@ -62,6 +77,11 @@ async function addNewUser() {
     }
 }
 
+/**
+ * Validates signup email input against the allowed email pattern.
+ *
+ * @returns {boolean}
+ */
 function testMailinputWithRegex(){
     let inputMail = document.getElementById('signUpEmailInput');
     const regex = new RegExp("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$");
@@ -93,6 +113,11 @@ function checkIfFormIsValid() {
     }
 }
 
+/**
+ * Toggles privacy checkbox icon and revalidates form state.
+ *
+ * @returns {void}
+ */
 function togglePrivacyPolicyCheckbox() {
     let privacyCheckbox = document.getElementById('privacyCheckbox');
     let checkBoxImage = document.getElementById('checkboxImage');
@@ -105,19 +130,40 @@ function togglePrivacyPolicyCheckbox() {
     checkIfFormIsValid();
 }
 
+/**
+ * Returns whether the privacy policy checkbox is checked.
+ *
+ * @returns {boolean}
+ */
 function checkPrivacyPolicyConfirmation() {
     let privacyCheckbox = document.getElementById('privacyCheckbox');
     return privacyCheckbox.checked;
 }
 
+/**
+ * Navigates back to the login page.
+ *
+ * @returns {void}
+ */
 function redirectToLogin() {
     switchPage('index.html');
 }
 
+/**
+ * Persists legacy new-user payload to local storage.
+ *
+ * @returns {void}
+ */
 function setNewUsersToLocalStorage() {
     localStorage.setItem('newUsers', JSON.stringify(newUsers));
 }
 
+/**
+ * Shows a temporary signup feedback overlay message.
+ *
+ * @param {string} message - Message text displayed in the overlay.
+ * @returns {void}
+ */
 function showUserMessage(message) {
     let overlay = document.createElement("div");
     overlay.id = "userMessageOverlay";
@@ -143,6 +189,11 @@ function showUserMessage(message) {
     });
 }
 
+/**
+ * Checks whether password and confirmation values match.
+ *
+ * @returns {boolean}
+ */
 function checkPasswordsEqual() {
     return newPassword === newPasswordConfirm;
 }
@@ -150,6 +201,13 @@ function checkPasswordsEqual() {
 // --- Neue Validierungsfunktionen (mit onBlur und Fehlermeldung unterhalb der Input-Box) ---
 
 // Fügt die Fehlermeldung als Geschwisterelement (unterhalb des Containers) ein.
+/**
+ * Displays an inline validation error for a signup input.
+ *
+ * @param {HTMLInputElement} inputElement - Input field to annotate.
+ * @param {string} message - Human-readable validation message.
+ * @returns {void}
+ */
 function showError(inputElement, message) {
   const container = inputElement.closest('.signUpInputField');
   let errorEl = container.nextElementSibling;
@@ -171,6 +229,12 @@ function showError(inputElement, message) {
   inputElement.classList.add('error');
 }
 
+/**
+ * Clears the inline validation error from a signup input.
+ *
+ * @param {HTMLInputElement} inputElement - Input field to reset.
+ * @returns {void}
+ */
 function clearError(inputElement) {
   const container = inputElement.closest('.signUpInputField');
   let errorEl = container.nextElementSibling;
@@ -184,6 +248,11 @@ function clearError(inputElement) {
   inputElement.classList.remove('error');
 }
 
+/**
+ * Validates the signup name field.
+ *
+ * @returns {boolean}
+ */
 function validateName() {
   const nameInput = document.getElementById('signUpNameInput');
   const nameValue = nameInput.value.trim();
@@ -197,6 +266,11 @@ function validateName() {
   }
 }
 
+/**
+ * Validates the signup email field.
+ *
+ * @returns {boolean}
+ */
 function validateEmail() {
   const emailInput = document.getElementById('signUpEmailInput');
   const emailValue = emailInput.value.trim();
@@ -210,6 +284,11 @@ function validateEmail() {
   }
 }
 
+/**
+ * Validates the signup password field.
+ *
+ * @returns {boolean}
+ */
 function validatePassword() {
   const passwordInput = document.getElementById('signUpPasswordInput');
   const passwordValue = passwordInput.value;
@@ -222,6 +301,11 @@ function validatePassword() {
   }
 }
 
+/**
+ * Validates the signup password confirmation field.
+ *
+ * @returns {boolean}
+ */
 function validatePasswordConfirm() {
   const passwordInput = document.getElementById('signUpPasswordInput');
   const passwordConfirmInput = document.getElementById('signUpPasswordInputConfirm');
