@@ -1,6 +1,7 @@
 "use strict";
 
 (function registerContactPopupMutationsModule() {
+  /** Validates form data and creates a new contact entity in Firebase and local runtime state. */
   async function cpmSaveContact() {
     const formElements = ContactPopupValidation.getContactFormElements();
     if (!ContactPopupValidation.hasCompleteContactForm(formElements)) {
@@ -55,6 +56,12 @@
     }
   }
 
+  /**
+   * Persists edited contact data for a given contact id.
+   *
+   * @param {number} id - Contact id being edited.
+   * @returns {Promise<void>}
+   */
   async function cpmSaveEditedContact(id) {
     const loadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
       context: "contacts",
@@ -116,6 +123,12 @@
     cpmApplyContactsMutationResult(sourceUsers, id);
   }
 
+  /**
+   * Opens edit dialog for one contact and fills form values from current state.
+   *
+   * @param {number} id - Contact id to edit.
+   * @returns {void}
+   */
   function cpmEditContact(id) {
     ContactPopupOverlay.closeEditDelete({ restoreFocus: false });
     const contactIndex = contacts.findIndex((contact) => contact.id === id);
@@ -136,6 +149,12 @@
     currentContactId = id;
   }
 
+  /**
+   * Removes a contact id from legacy local-storage contacts cache.
+   *
+   * @param {number} contactId - Contact id to remove.
+   * @returns {void}
+   */
   function cpmDeleteContactFromLocalStorage(contactId) {
     var contactsInStorage = JSON.parse(localStorage.getItem("contacts"));
 
@@ -147,6 +166,12 @@
     }
   }
 
+  /**
+   * Deletes one contact from Firebase and updates local runtime/UI state.
+   *
+   * @param {number} id - Contact id to delete.
+   * @returns {Promise<void>}
+   */
   async function cpmDeleteContact(id) {
     const loadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
       context: "contacts",
@@ -169,11 +194,24 @@
     cpmApplyContactsMutationResult(sourceUsers);
   }
 
+  /**
+   * Closes responsive action menu and executes delete flow for one contact id.
+   *
+   * @param {number} id - Contact id to remove.
+   * @returns {Promise<void>}
+   */
   async function cpmRemoveContact(id) {
     ContactPopupOverlay.closeEditDelete({ restoreFocus: false });
     await cpmDeleteContact(id);
   }
 
+  /**
+   * Applies updated users array to contacts runtime and optionally reopens contact details.
+   *
+   * @param {Array<Object>} sourceUsers - Updated users array after mutation.
+   * @param {number|null} [selectedContactId=null] - Optional contact id to keep selected.
+   * @returns {void}
+   */
   function cpmApplyContactsMutationResult(sourceUsers, selectedContactId = null) {
     users = Array.isArray(sourceUsers) ? sourceUsers : [];
     getContactsOutOfUsers();
@@ -191,6 +229,12 @@
     }
   }
 
+  /**
+   * Shows transient success feedback overlay for contacts mutation operations.
+   *
+   * @param {string} message - User-facing success message.
+   * @returns {void}
+   */
   function cpmDisplaySuccessMessage(message) {
     const overlay = document.createElement("div");
     overlay.className = "contact-succ-created-overlay";

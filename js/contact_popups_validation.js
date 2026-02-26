@@ -7,6 +7,11 @@
     contactPhone: "Please enter a phone number.",
   });
 
+  /**
+   * Returns current contact form control references used by mutation flows.
+   *
+   * @returns {{nameInput: HTMLInputElement|null, mailInput: HTMLInputElement|null, phoneInput: HTMLInputElement|null, createButton: HTMLElement|null}}
+   */
   function cpvGetContactFormElements() {
     return {
       nameInput: document.getElementById("contactName"),
@@ -16,6 +21,12 @@
     };
   }
 
+  /**
+   * Resolves field-level error output element for a given contact form input.
+   *
+   * @param {HTMLInputElement|null} inputElement - Input to resolve error element for.
+   * @returns {HTMLElement|null}
+   */
   function cpvGetContactFieldErrorElement(inputElement) {
     if (!inputElement) {
       return null;
@@ -37,6 +48,13 @@
     return document.getElementById(`${inputElement.id}Error`);
   }
 
+  /**
+   * Sets one contact form field into invalid state and writes error text.
+   *
+   * @param {HTMLInputElement|null} inputElement - Input element to mark invalid.
+   * @param {string} message - Field-level error message.
+   * @returns {void}
+   */
   function cpvSetContactFieldError(inputElement, message) {
     if (!inputElement) {
       return;
@@ -49,6 +67,12 @@
     }
   }
 
+  /**
+   * Clears invalid state and error text for one contact input field.
+   *
+   * @param {HTMLInputElement|null} inputElement - Input element to clear.
+   * @returns {void}
+   */
   function cpvClearContactFieldError(inputElement) {
     if (!inputElement) {
       return;
@@ -61,12 +85,24 @@
     }
   }
 
+  /**
+   * Clears validation feedback for all known contact form input fields.
+   *
+   * @param {{nameInput?:HTMLInputElement|null,mailInput?:HTMLInputElement|null,phoneInput?:HTMLInputElement|null}} formElements - Contact form references.
+   * @returns {void}
+   */
   function cpvClearContactFieldErrors(formElements) {
     cpvClearContactFieldError(formElements?.nameInput || null);
     cpvClearContactFieldError(formElements?.mailInput || null);
     cpvClearContactFieldError(formElements?.phoneInput || null);
   }
 
+  /**
+   * Validates required contact fields and email format constraints.
+   *
+   * @param {{nameInput:HTMLInputElement|null,mailInput:HTMLInputElement|null,phoneInput:HTMLInputElement|null}} formElements - Contact form references.
+   * @returns {boolean}
+   */
   function cpvValidateContactFormFields(formElements) {
     const { nameInput, mailInput, phoneInput } = formElements;
     let isValid = true;
@@ -98,6 +134,12 @@
     return isValid;
   }
 
+  /**
+   * Checks whether all required contact form controls are currently mounted.
+   *
+   * @param {Object} formElements - Contact form references.
+   * @returns {boolean}
+   */
   function cpvHasCompleteContactForm(formElements) {
     return Boolean(
       formElements &&
@@ -108,6 +150,12 @@
     );
   }
 
+  /**
+   * Writes provided values into contact form fields for edit flows.
+   *
+   * @param {{name:string,mail:string,phone:string}} values - Values applied to the form.
+   * @returns {void}
+   */
   function cpvSetContactFormValues(values) {
     const formElements = cpvGetContactFormElements();
     if (!formElements.nameInput || !formElements.mailInput || !formElements.phoneInput) {
@@ -119,6 +167,12 @@
     formElements.phoneInput.value = values.phone;
   }
 
+  /**
+   * Normalizes email values for duplicate checks and persistence comparisons.
+   *
+   * @param {string} emailValue - Raw email value.
+   * @returns {string}
+   */
   function cpvNormalizeEmailForContactFlow(emailValue) {
     if (typeof normalizeAuthEmail === "function") {
       return normalizeAuthEmail(emailValue);
@@ -129,6 +183,12 @@
     return emailValue.trim().toLowerCase();
   }
 
+  /**
+   * Checks whether a normalized email already exists in current users data.
+   *
+   * @param {string} emailValue - Candidate email value.
+   * @returns {boolean}
+   */
   function cpvContactEmailExists(emailValue) {
     const sourceUsers = Array.isArray(users) ? users : [];
 
@@ -153,6 +213,12 @@
     });
   }
 
+  /**
+   * Resets contact form values, error state, and create button availability.
+   *
+   * @param {Object} [formElements=cpvGetContactFormElements()] - Contact form references.
+   * @returns {void}
+   */
   function cpvResetContactForm(formElements = cpvGetContactFormElements()) {
     cpvClearContactFieldErrors(formElements);
     if (formElements.nameInput) {
