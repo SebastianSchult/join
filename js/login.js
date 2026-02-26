@@ -18,6 +18,11 @@ showGlobalUserMessage
  */
 let users = [];
 
+/**
+ * Initializes login screen state and intro overlay animation.
+ *
+ * @returns {Promise<void>}
+ */
 async function loginInit() {
     checkIfUserIsRemembered();
 
@@ -88,6 +93,12 @@ async function loadUsers() {
     }
 }
 
+/**
+ * Finds a user in the loaded list by normalized email.
+ *
+ * @param {string} email - User-provided email address.
+ * @returns {Object|undefined} Matching user object when found.
+ */
 function findUserByEmail(email) {
     const normalizedEmail = normalizeAuthEmail(email);
     return users.find(
