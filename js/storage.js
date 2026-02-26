@@ -1,5 +1,9 @@
 const JOIN_APP_CONFIG = window.JOIN_APP_CONFIG || {};
 
+const StorageErrorPolicy = resolveStorageModule("StorageErrorPolicy");
+const StorageTransport = resolveStorageModule("StorageTransport");
+const StorageFirebaseAdapter = resolveStorageModule("StorageFirebaseAdapter");
+
 const STORAGE_TOKEN = getConfigValue("STORAGE_TOKEN");
 const STORAGE_URL = getConfigValue(
     "STORAGE_URL",
@@ -38,98 +42,32 @@ function assertConfig(requiredKeys) {
 }
 
 function normalizeFetchOptions(options = {}) {
-    const normalizedOptions = { ...options };
-
-    // Defensive normalization in case a caller accidentally uses `header` instead of `headers`.
-    if (
-        normalizedOptions.header &&
-        !normalizedOptions.headers &&
-        typeof normalizedOptions.header === "object"
-    ) {
-        normalizedOptions.headers = normalizedOptions.header;
-    }
-
-    delete normalizedOptions.header;
-    return normalizedOptions;
+    return StorageTransport.normalizeFetchOptions(options);
 }
 
 function parseResponsePayload(responseText) {
-    if (typeof responseText !== "string" || responseText.trim() === "") {
-        return null;
-    }
-
-    try {
-        return JSON.parse(responseText);
-    } catch (error) {
-        return responseText;
-    }
+    return StorageTransport.parseResponsePayload(responseText);
 }
 
 function getResponseErrorDetail(payload) {
-    if (!payload) {
-        return "";
-    }
-
-    if (typeof payload === "string") {
-        return payload;
-    }
-
-    if (typeof payload === "object") {
-        if (typeof payload.message === "string") {
-            return payload.message;
-        }
-        if (typeof payload.error === "string") {
-            return payload.error;
-        }
-    }
-
-    return "";
+    return StorageErrorPolicy.getResponseErrorDetail(payload);
 }
 
 function createFetchHttpError(response, context, payload) {
-    const statusText = response.statusText ? ` ${response.statusText}` : "";
-    const detail = getResponseErrorDetail(payload);
-    const detailSuffix = detail ? `: ${detail}` : "";
-    const error = new Error(
-        `${context} failed with status ${response.status}${statusText}${detailSuffix}`
-    );
-
-    error.status = response.status;
-    error.context = context;
-    error.payload = payload;
-    return error;
+    return StorageErrorPolicy.createFetchHttpError(response, context, payload);
 }
 
 async function fetchJson(url, options = {}, context = "fetchJson") {
-    let response;
-
-    try {
-        response = await fetch(url, normalizeFetchOptions(options));
-    } catch (error) {
-        const networkError = new Error(`${context} network error: ${error.message}`);
-        networkError.cause = error;
-        throw networkError;
-    }
-
-    const responseText = await response.text();
-    const payload = parseResponsePayload(responseText);
-
-    if (!response.ok) {
-        throw createFetchHttpError(response, context, payload);
-    }
-
-    return payload;
+    return StorageTransport.fetchJson(url, options, context, StorageErrorPolicy);
 }
 
 function getFirebaseUrl(path = "_") {
     assertConfig(["BASE_URL"]);
-    return `${BASE_URL}${path}.json`;
+    return StorageFirebaseAdapter.buildFirebaseUrl(BASE_URL, path);
 }
 
 function getFirebaseEntityPath(path = "_", entityId = "") {
-    const normalizedPath = String(path || "_").replace(/\/+$/, "");
-    const normalizedId = encodeURIComponent(String(entityId));
-    return `${normalizedPath}/${normalizedId}`;
+    return StorageFirebaseAdapter.getFirebaseEntityPath(path, entityId);
 }
 
 /**
@@ -143,11 +81,11 @@ async function firebaseCreateItem(jsonArray, path = "_") {
     return fetchJson(
         getFirebaseUrl(path),
         {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(jsonArray),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(jsonArray),
         },
         "firebaseCreateItem"
     );
@@ -164,11 +102,11 @@ async function firebaseUpdateItem(jsonArray, path = "_") {
     return fetchJson(
         getFirebaseUrl(path),
         {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(jsonArray),
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(jsonArray),
         },
         "firebaseUpdateItem"
     );
@@ -258,17 +196,7 @@ async function firebaseGetItem(path = "_") {
 }
 
 function normalizeFirebaseArrayPayload(payload) {
-    if (Array.isArray(payload)) {
-        return payload.filter((item) => item !== null && item !== undefined);
-    }
-
-    if (payload && typeof payload === "object") {
-        return Object.values(payload).filter(
-            (item) => item !== null && item !== undefined
-        );
-    }
-
-    return [];
+    return StorageFirebaseAdapter.normalizeFirebaseArrayPayload(payload);
 }
 
 /**
@@ -278,113 +206,23 @@ function normalizeFirebaseArrayPayload(payload) {
  * @returns {number} Collision-safe numeric id.
  */
 function generateCollisionSafeId(existingItems = []) {
-    const knownIds = new Set();
-
-    if (Array.isArray(existingItems)) {
-        existingItems.forEach((item) => {
-            const numericId = Number(item && item.id);
-            if (Number.isSafeInteger(numericId)) {
-                knownIds.add(numericId);
-            }
-        });
-    }
-
-    for (let attempt = 0; attempt < 10; attempt++) {
-        const timestampPart = Date.now() * 1000000;
-        const randomPart = getRandomInt(0, 999999);
-        const candidateId = timestampPart + randomPart;
-
-        if (Number.isSafeInteger(candidateId) && !knownIds.has(candidateId)) {
-            return candidateId;
-        }
-    }
-
-    return Date.now() * 1000 + getRandomInt(0, 999);
+    return StorageFirebaseAdapter.generateCollisionSafeId(existingItems);
 }
 
 function getRandomInt(min, max) {
-    const normalizedMin = Math.ceil(min);
-    const normalizedMax = Math.floor(max);
-    const range = normalizedMax - normalizedMin + 1;
-
-    if (
-        window.crypto &&
-        typeof window.crypto.getRandomValues === "function" &&
-        range > 0
-    ) {
-        const values = new Uint32Array(1);
-        window.crypto.getRandomValues(values);
-        return normalizedMin + (values[0] % range);
-    }
-
-    return normalizedMin + Math.floor(Math.random() * range);
+    return StorageFirebaseAdapter.getRandomInt(min, max);
 }
 
 function showGlobalUserMessage(message) {
-    if (!message) {
-        return;
-    }
-
-    if (typeof window.showUserMessage === "function") {
-        try {
-            window.showUserMessage(message);
-            return;
-        } catch (error) {
-            console.error("showUserMessage failed:", error);
-        }
-    }
-
-    const toastId = "joinGlobalMessageToast";
-    const existingToast = document.getElementById(toastId);
-    if (existingToast) {
-        existingToast.remove();
-    }
-
-    const toast = document.createElement("div");
-    toast.id = toastId;
-    toast.setAttribute("role", "alert");
-    toast.textContent = message;
-    toast.style.position = "fixed";
-    toast.style.bottom = "24px";
-    toast.style.left = "50%";
-    toast.style.transform = "translateX(-50%)";
-    toast.style.backgroundColor = "#2a3647";
-    toast.style.color = "#fff";
-    toast.style.padding = "12px 18px";
-    toast.style.borderRadius = "10px";
-    toast.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.25)";
-    toast.style.zIndex = "9999";
-    toast.style.fontSize = "14px";
-    document.body.appendChild(toast);
-
-    window.setTimeout(() => {
-        toast.remove();
-    }, 3200);
+    return StorageErrorPolicy.showGlobalUserMessage(message);
 }
 
 async function firebaseGetArraySafe(path = "_", options = {}) {
-    const {
-        context = "data",
-        errorMessage = `Could not load ${context}. Please try again.`,
-        showErrorMessage = true,
-    } = options;
-
-    try {
-        const payload = await firebaseGetItem(path);
-        return {
-            data: normalizeFirebaseArrayPayload(payload),
-            error: null,
-        };
-    } catch (error) {
-        console.error(`Failed to load ${context}:`, error);
-        if (showErrorMessage) {
-            showGlobalUserMessage(errorMessage);
-        }
-        return {
-            data: [],
-            error,
-        };
-    }
+    return StorageFirebaseAdapter.firebaseGetArraySafe(path, options, {
+        firebaseGetItem,
+        normalizeFirebaseArrayPayload,
+        errorPolicy: StorageErrorPolicy,
+    });
 }
 
 /**
@@ -441,12 +279,20 @@ async function remoteStorageSetItem(key, value) {
     return fetchJson(
         STORAGE_URL,
         {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
         },
         "remoteStorageSetItem"
     );
+}
+
+function resolveStorageModule(moduleName) {
+    const moduleRef = window[moduleName];
+    if (moduleRef) {
+        return moduleRef;
+    }
+    throw new Error(`Missing ${moduleName}. Ensure storage module scripts are loaded before js/storage.js.`);
 }
