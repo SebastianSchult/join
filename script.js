@@ -173,6 +173,10 @@ function switchPageNewTab(newUrl) {
 function setActiveNavButton() {
 	const navLinks = ["summary", "addTask", "board", "contacts"];
 	const activeNavLink = document.querySelector(".nav-btn.active");
+	const isMobileViewportActive =
+		typeof getIsMobileViewportState === "function"
+			? getIsMobileViewportState()
+			: false;
 
 	// Remove active class from any previously active nav link
 	if (activeNavLink) {
@@ -182,7 +186,7 @@ function setActiveNavButton() {
 		navLinks.forEach((link) => {
 			if (location.pathname.includes(link)) {
 				document.getElementById(link).classList.add("active");
-				if (isMobileViewport) document.getElementById(link).querySelector("img").src = `./assets/img/icon-${link}-marked.png`;
+				if (isMobileViewportActive) document.getElementById(link).querySelector("img").src = `./assets/img/icon-${link}-marked.png`;
 				else document.getElementById(link).querySelector("img").src = `./assets/img/icon-${link}.png`;
 			}
 		});

@@ -1,7 +1,5 @@
 "use strict";
 
-let isMobileViewport = false;
-
 const UI_BREAKPOINT_VARIABLES = Object.freeze({
 	mobileMax: "--ui-bp-mobile-max",
 	navigationTabletMax: "--ui-bp-navigation-tablet-max",
@@ -24,7 +22,7 @@ const UI_BREAKPOINT_FALLBACKS = Object.freeze({
  * @returns {void}
  */
 function initializeResponsiveNavigation() {
-	isMobileViewport = isUiBreakpointAtMost("mobileMax");
+	setIsMobileViewportState(isUiBreakpointAtMost("mobileMax"));
 	runFunctionsOnBreakpoint();
 	addResizeEventListener();
 }
@@ -37,8 +35,8 @@ function initializeResponsiveNavigation() {
 function addResizeEventListener() {
 	window.addEventListener("resize", () => {
 		const nextIsMobileViewport = isUiBreakpointAtMost("mobileMax");
-		if (nextIsMobileViewport !== isMobileViewport) {
-			isMobileViewport = nextIsMobileViewport;
+		if (nextIsMobileViewport !== getIsMobileViewportState()) {
+			setIsMobileViewportState(nextIsMobileViewport);
 			runFunctionsOnBreakpoint();
 		}
 	});
@@ -48,7 +46,7 @@ function addResizeEventListener() {
  * Runs specific functions based on the current breakpoint.
  */
 function runFunctionsOnBreakpoint() {
-	if (isMobileViewport) {
+	if (getIsMobileViewportState()) {
 		renderMobileNavigation();
 		setActiveNavButton();
 	} else {
@@ -134,4 +132,24 @@ function getUiBreakpointValue(breakpointKey) {
  */
 function isUiBreakpointAtMost(breakpointKey) {
 	return window.innerWidth <= getUiBreakpointValue(breakpointKey);
+}
+
+/**
+ * Stores current responsive navigation state on window to avoid lexical global collisions
+ * across mixed cache/deploy states.
+ *
+ * @param {boolean} value - Current mobile breakpoint state.
+ * @returns {void}
+ */
+function setIsMobileViewportState(value) {
+	window.__joinIsMobileViewport = value === true;
+}
+
+/**
+ * Returns current responsive navigation state from window storage.
+ *
+ * @returns {boolean} True if currently in mobile breakpoint mode.
+ */
+function getIsMobileViewportState() {
+	return window.__joinIsMobileViewport === true;
 }
