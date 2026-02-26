@@ -18,7 +18,10 @@ const HTML_FILES = [
 ];
 
 const TEMPLATE_FILES = [
-  "assets/templates/html_templates.js",
+  "assets/templates/templates_shared.js",
+  "assets/templates/templates_navigation_auth.js",
+  "assets/templates/templates_board.js",
+  "assets/templates/templates_addtask.js",
   "js/contacts_render.js",
 ];
 

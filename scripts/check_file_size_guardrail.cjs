@@ -17,13 +17,7 @@ const RULES = Object.freeze([
       { type: "dir", value: "assets/templates" },
       { type: "file", value: "script.js" },
     ],
-    exceptions: Object.freeze({
-      "assets/templates/html_templates.js": Object.freeze({
-        maxLines: 650,
-        reason:
-          "Legacy shared template bundle; scheduled for decomposition into focused template modules.",
-      }),
-    }),
+    exceptions: Object.freeze({}),
   },
   {
     id: "css",
