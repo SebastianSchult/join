@@ -97,6 +97,7 @@ Every refactor PR should include:
    - manual smoke checks for affected user journeys
 4. Backward compatibility notes for mixed deploy/cache states when runtime code is touched.
 5. Follow-up tickets for deferred cleanup.
+6. Refactor regression matrix evidence using [REFACTOR_REGRESSION_MATRIX.md](./REFACTOR_REGRESSION_MATRIX.md).
 
 Minimum smoke checks when runtime or shared modules change:
 
@@ -105,6 +106,7 @@ Minimum smoke checks when runtime or shared modules change:
 - board open/create/edit/delete path
 - add-task submit flow
 - contacts create/edit/delete flow
+- mobile navigation and overlays
 
 ## 5) Definition of Done for Standards Compliance
 
