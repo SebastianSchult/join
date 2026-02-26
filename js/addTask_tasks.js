@@ -106,6 +106,17 @@ function collectInformationsForNewCard(){
     if (!checkIfCardIsEditing()){
         newTask.id = getNewTaskId();
     }
+    if (
+        typeof AddTaskFormDomain === "object" &&
+        typeof AddTaskFormDomain.mapTaskPayloadFromForm === "function"
+    ) {
+        AddTaskFormDomain.mapTaskPayloadFromForm(newTask, {
+            assignedTo: tempAssignedContacts,
+            defaultType: "User Story",
+        });
+        return;
+    }
+
     newTask.title = document.getElementById('addTaskEnterTitleInput').value;
     newTask.description = document.getElementById('addTaskDescriptionInput').value;
     newTask.assignedTo = tempAssignedContacts;
