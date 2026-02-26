@@ -11,6 +11,7 @@ setTimeout(() => {
   initializeFilepickerUI();
 }, 1000);
 
+/** Initializes filepicker listeners and drag/drop observers once image UI is present. */
 function initializeFilepickerUI() {
   if (!hasRenderedAddTaskImageUi()) {
     observeDropArea();
@@ -24,6 +25,7 @@ function initializeFilepickerUI() {
   observeContainer();
 }
 
+/** Opens the hidden native file input used for image uploads. */
 function openFilepicker() {
   const filepicker = document.getElementById("filepicker");
   if (filepicker) {
@@ -33,6 +35,7 @@ function openFilepicker() {
   }
 }
 
+/** Attaches the file input change listener exactly once. */
 function addFilepickerListener() {
   const filepicker = document.getElementById("filepicker");
   if (!filepicker) return;
@@ -49,6 +52,7 @@ function addFilepickerListener() {
   });
 }
 
+/** Registers drag/drop handlers on the add-task drop zone when available. */
 function setupDragAndDrop() {
   const dropArea = document.getElementById("addImageBottom");
   if (!dropArea) {
@@ -87,6 +91,7 @@ function setupDragAndDrop() {
   return true;
 }
 
+/** Binds global drag/drop prevention listeners once per page runtime. */
 function bindGlobalDragAndDropListeners() {
   if (globalDragAndDropListenersBound) {
     return;
@@ -97,10 +102,12 @@ function bindGlobalDragAndDropListeners() {
   globalDragAndDropListenersBound = true;
 }
 
+/** Prevents browser default drag/drop navigation behavior. */
 function preventDefaultDragBehavior(event) {
   event.preventDefault();
 }
 
+/** Observes DOM mutations until the add-task drop zone exists, then wires listeners. */
 function observeDropArea() {
   if (dropAreaObserver || !document.body) {
     return;
@@ -121,6 +128,7 @@ function observeDropArea() {
   dropAreaObserver.observe(document.body, { childList: true, subtree: true });
 }
 
+/** Processes a FileList and forwards valid image files to async processing. */
 function handleFiles(files, container) {
   Array.from(files).forEach((file) => {
     if (!isImageFile(file)) {
@@ -131,10 +139,12 @@ function handleFiles(files, container) {
   });
 }
 
+/** Checks whether a file has an image MIME type. */
 function isImageFile(file) {
   return file.type.includes("image/");
 }
 
+/** Renders a user-facing validation error for unsupported files. */
 function displayFileError(file) {
   const errorEl = document.getElementById("error");
   if (errorEl) {
@@ -142,6 +152,7 @@ function displayFileError(file) {
   }
 }
 
+/** Compresses and appends one image preview, then refreshes preview rendering state. */
 async function processFile(file, container) {
   if (!container) {
     console.error("Kein Container gefunden zum Anhängen des Bildes.");
@@ -154,6 +165,7 @@ async function processFile(file, container) {
   renderAddTaskImages();
 }
 
+/** Compresses an image file to a bounded JPEG data URL for storage and preview. */
 async function compressImage(file, maxWidth, maxHeight, quality) {
   try {
     const img = await loadImageFromFile(file);
@@ -166,6 +178,7 @@ async function compressImage(file, maxWidth, maxHeight, quality) {
   }
 }
 
+/** Loads an image element from a File object URL. */
 function loadImageFromFile(file) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -175,6 +188,7 @@ function loadImageFromFile(file) {
   });
 }
 
+/** Calculates scaled dimensions that fit inside the configured bounds. */
 function calculateScaledDimensions(img, maxWidth, maxHeight) {
   const { width, height } = img;
   const scale = Math.min(maxWidth / width, maxHeight / height, 1);
@@ -184,6 +198,7 @@ function calculateScaledDimensions(img, maxWidth, maxHeight) {
   };
 }
 
+/** Draws an image into a temporary canvas used for compression output. */
 function drawImageOnCanvas(img, width, height) {
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -193,6 +208,7 @@ function drawImageOnCanvas(img, width, height) {
   return canvas;
 }
 
+/** Creates a standardized 100x100 preview image element for thumbnail lists. */
 function createImageElement(src) {
   const img = document.createElement("img");
   img.src = src;
@@ -203,6 +219,7 @@ function createImageElement(src) {
   return img;
 }
 
+/** Persists uploaded image metadata in the in-memory image collection. */
 function addImageToArray(file, compressedbase64) {
   allImages.push({
     name: file.name,
@@ -211,6 +228,7 @@ function addImageToArray(file, compressedbase64) {
   });
 }
 
+/** Re-renders thumbnail previews and reinitializes the Viewer.js gallery binding. */
 function renderAddTaskImages() {
   const container = getCurrentImageContainer();
   if (!container) {
@@ -240,6 +258,7 @@ function renderAddTaskImages() {
   initializeViewer();
 }
 
+/** Creates or refreshes the global Viewer.js instance for task image previews. */
 function initializeViewer() {
   const container = document.getElementById("subtasksImageContainer");
   if (!container) return;
@@ -251,6 +270,7 @@ function initializeViewer() {
   window.addTaskViewer = new Viewer(container, getDefaultViewerOptions());
 }
 
+/** Returns default Viewer.js toolbar/options used across add-task image previews. */
 function getDefaultViewerOptions() {
   return {
     navbar: false,
@@ -273,6 +293,7 @@ function getDefaultViewerOptions() {
 }
 
 
+/** Resolves the active preview container and creates a fallback container when needed. */
 function getCurrentImageContainer() {
   let editContainer = document.getElementById("editCardImagesContainer");
   let standardContainer = document.getElementById("subtasksImageContainer");
@@ -291,6 +312,7 @@ function getCurrentImageContainer() {
   return null;
 }
 
+/** Indicates whether add-task image UI containers are currently mounted in the DOM. */
 function hasRenderedAddTaskImageUi() {
   return Boolean(
     document.getElementById("subtasksImageContainer") ||
@@ -299,6 +321,7 @@ function hasRenderedAddTaskImageUi() {
   );
 }
 
+/** Observes DOM changes to bootstrap image rendering once preview containers appear. */
 function observeContainer() {
   if (document.getElementById("subtasksImageContainer")) {
     addFilepickerListener();

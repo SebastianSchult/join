@@ -1,6 +1,7 @@
 "use strict";
 
 (function registerAddTaskFormDomainModule() {
+    /** Sets today's date as minimum allowed value for due-date input. */
     function atfSetTodayDateAsMin() {
         let date = new Date();
         let day = date.getDate();
@@ -17,6 +18,7 @@
         }
     }
 
+    /** Registers required-field validation handlers and computes initial validity state. */
     function atfCheckValidity() {
         if (!atfHasRequiredInputFields()) {
             return;
@@ -33,6 +35,7 @@
         });
     }
 
+    /** Returns current validity state for one required field descriptor. */
     function atfGetStateOfRequriredField(requiredInputField) {
         let inputField = document.getElementById(requiredInputField.id);
         if (!inputField) {
@@ -48,6 +51,7 @@
         return true;
     }
 
+    /** Enables or disables create button based on aggregate required-field state. */
     function atfSetCreateBtnState() {
         if (!atfHasRequiredInputFields()) {
             atfDeactivateButton("createBtn");
@@ -61,6 +65,7 @@
         }
     }
 
+    /** Activates an action button and updates accessibility state attributes. */
     function atfActivateButton(id, actionName) {
         const button = document.getElementById(id);
         if (!button) {
@@ -78,6 +83,7 @@
         }
     }
 
+    /** Deactivates an action button and removes delegated action mapping. */
     function atfDeactivateButton(id) {
         const button = document.getElementById(id);
         if (!button) {
@@ -92,6 +98,7 @@
         delete button.dataset.action;
     }
 
+    /** Maps add-task form inputs into the provided task draft payload object. */
     function atfMapTaskPayloadFromForm(taskDraft, options = {}) {
         if (!taskDraft || typeof taskDraft !== "object") {
             return taskDraft;
@@ -117,6 +124,7 @@
         return taskDraft;
     }
 
+    /** Renders or clears required-field validation feedback for one field descriptor. */
     function atfToggleRequiredMessage(requiredInputField) {
         let requiredMessageField = document.getElementById(requiredInputField.requiredFieldId);
         let toUnderline = document.getElementById(requiredInputField.idForRedUnderline);
@@ -153,6 +161,7 @@
         atfSetCreateBtnState();
     }
 
+    /** Ensures required field configuration exists before binding validation logic. */
     function atfHasRequiredInputFields() {
         return typeof requiredInputFields !== "undefined" && Array.isArray(requiredInputFields);
     }

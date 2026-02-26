@@ -1,11 +1,13 @@
 "use strict";
 
 (function registerAddTaskUiModule() {
+    /** Sets add-task priority and syncs visual state plus task draft payload. */
     function atuSetPriority(priority) {
         atuSetPriorityAppearance(priority);
         setPriorityForNewCard(priority);
     }
 
+    /** Applies active styling/icons for the selected priority button group. */
     function atuSetPriorityAppearance(priority) {
         document.querySelectorAll(".addTaskPriorityButton").forEach((button) => {
             button.style.backgroundColor = "white";
@@ -27,6 +29,7 @@
             `./assets/img/icon-priority_${priority.toLowerCase()}_white.png`;
     }
 
+    /** Replaces the subtask footer with an editable subtask input and focuses it. */
     function atuRenderSubtaskInputField() {
         let subtaskBottom = document.getElementById("subtaskBottom");
         if (!subtaskBottom) {
@@ -40,6 +43,7 @@
         }
     }
 
+    /** Handles add/cancel actions from the subtask input footer controls. */
     function atuSubtaskAddOrCancel(option) {
         let subtaskBottom = document.getElementById("subtaskBottom");
         let subtaskInputField = document.getElementById("subtaskInputField");
@@ -55,6 +59,7 @@
         subtaskBottom.dataset.action = "render-subtask-input-field";
     }
 
+    /** Renders all draft subtasks into the add-task output container. */
     function atuRenderSubtasks() {
         let outputContainer = document.getElementById("subtasksOutputContainer");
         if (!outputContainer) {
@@ -68,6 +73,7 @@
         }
     }
 
+    /** Returns true when any subtask row is currently in inline edit mode. */
     function atuCheckIfAnySubtaskIsInEditingMode() {
         let subtaskContainers = document.getElementsByClassName("subTaskOutputDiv");
         for (let i = 0; i < subtaskContainers.length; i++) {
@@ -79,6 +85,7 @@
         return false;
     }
 
+    /** Maps a priority value to its configured add-task button color. */
     function atuGetButtonColor(priority) {
         switch (priority) {
             case "urgent":
@@ -92,6 +99,7 @@
         }
     }
 
+    /** Renders contact options into the assigned-to dropdown list. */
     function atuRenderContactsToDropdown() {
         let content = document.getElementById("dropdown-content-assignedTo");
         if (!content) {
@@ -109,6 +117,7 @@
         });
     }
 
+    /** Opens the browser date picker for the due-date field when supported. */
     function atuAddTaskDueDateOpenCalendear() {
         const dueDateInput = document.getElementById("addTaskDueDateInput");
         if (dueDateInput && typeof dueDateInput.showPicker === "function") {
@@ -116,6 +125,7 @@
         }
     }
 
+    /** Toggles selected appearance and checkbox icon for an assigned contact row. */
     function atuSetDropdownContactAppearance(dropdownContact, dropdownCheckboxImage) {
         if (!dropdownContact || !dropdownCheckboxImage) {
             return;
@@ -130,6 +140,7 @@
         }
     }
 
+    /** Shows or hides the assigned-contact badge container based on selection state. */
     function atuToggleAssignedContactsContainer() {
         let contactCards = document.getElementById("dropdown-content-assignedTo")?.childNodes;
         let assignedContactsContainer = document.getElementById("assignedContactsContainer");
@@ -151,6 +162,7 @@
         }
     }
 
+    /** Renders assigned contact badges from temporary contact id state. */
     function atuRenderAssignedContactsContainer() {
         let container = document.getElementById("assignedContactsContainer");
         if (!container) {
@@ -164,6 +176,7 @@
         });
     }
 
+    /** Applies selected category and closes category dropdown accessibility state. */
     function atuChooseCategory(chosenCategory) {
         let categoryContainer = document.getElementById("dropdown-category-title");
         if (categoryContainer) {
@@ -184,6 +197,7 @@
         newTask.type = chosenCategory;
     }
 
+    /** Checks whether any element in the current DOM is marked with editing mode. */
     function atuCheckIfCardIsEditing() {
         let editing = document.getElementsByTagName("*");
         for (let element of editing) {

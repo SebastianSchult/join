@@ -8,6 +8,7 @@
 
     let atdActiveDropdownState = null;
 
+    /** Toggles a dropdown panel via arrow interaction and updates close-target wiring. */
     function atdRenderArrow(arrowContainerId, contentContainerId) {
         const dropdownContainer = document.getElementById(contentContainerId);
         if (!dropdownContainer) {
@@ -25,6 +26,7 @@
         atdSetCloseDropdownContainer();
     }
 
+    /** Opens a dropdown panel, updates arrow/icon state, and stores opener focus context. */
     function atdOpenDropdown(arrowContainerId, contentContainerId) {
         const dropdownContainer = document.getElementById(contentContainerId);
         if (!dropdownContainer) {
@@ -57,6 +59,7 @@
         atdFocusFirstDropdownControl(dropdownContainer);
     }
 
+    /** Closes a dropdown panel and optionally restores focus to the opening control. */
     function atdCloseDropdown(contentContainerId, options = {}) {
         const dropdownContainer = document.getElementById(contentContainerId);
         if (!dropdownContainer || !dropdownContainer.classList.contains("dropdown-opened")) {
@@ -104,6 +107,7 @@
         return true;
     }
 
+    /** Closes all opened add-task dropdown panels in deterministic order. */
     function atdCloseOpenDropdowns(options = {}) {
         const { restoreFocus = false } = options;
         const openedDropdowns = Array.from(
@@ -124,6 +128,7 @@
         return true;
     }
 
+    /** Initializes baseline ARIA attributes for add-task dropdown trigger buttons. */
     function atdInitializeDropdownAccessibilityState() {
         document
             .querySelectorAll(
@@ -135,6 +140,7 @@
             });
     }
 
+    /** Moves focus to the first keyboard-focusable control inside a dropdown panel. */
     function atdFocusFirstDropdownControl(dropdownContainer) {
         if (!dropdownContainer) {
             return;
@@ -145,6 +151,7 @@
         focusElementIfPossible(firstControl);
     }
 
+    /** Updates delegated outside-click action attributes for currently opened dropdowns. */
     function atdSetCloseDropdownContainer() {
         const openedDropdowns = document.getElementsByClassName("dropdown-opened");
         const container = atdGetContainerToSetDropdownCloseAction();
@@ -173,6 +180,7 @@
         delete container.dataset.contentContainer;
     }
 
+    /** Resolves the DOM container used for delegated dropdown-close interactions. */
     function atdGetContainerToSetDropdownCloseAction() {
         if (window.location.href.includes("addTask")) {
             return document.getElementById("bodyContent");
@@ -185,10 +193,12 @@
         return document.getElementById("addTaskHoverContainer");
     }
 
+    /** Returns the currently tracked active dropdown focus/opener state. */
     function atdGetActiveDropdownState() {
         return atdActiveDropdownState;
     }
 
+    /** Clears tracked active dropdown state after close/teardown flows. */
     function atdClearActiveDropdownState() {
         atdActiveDropdownState = null;
     }
