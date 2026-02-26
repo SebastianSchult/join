@@ -7,7 +7,7 @@
     contactPhone: "Please enter a phone number.",
   });
 
-  function getContactFormElements() {
+  function cpvGetContactFormElements() {
     return {
       nameInput: document.getElementById("contactName"),
       mailInput: document.getElementById("contactMail"),
@@ -16,7 +16,7 @@
     };
   }
 
-  function getContactFieldErrorElement(inputElement) {
+  function cpvGetContactFieldErrorElement(inputElement) {
     if (!inputElement) {
       return null;
     }
@@ -37,68 +37,68 @@
     return document.getElementById(`${inputElement.id}Error`);
   }
 
-  function setContactFieldError(inputElement, message) {
+  function cpvSetContactFieldError(inputElement, message) {
     if (!inputElement) {
       return;
     }
 
     inputElement.setAttribute("aria-invalid", "true");
-    const errorElement = getContactFieldErrorElement(inputElement);
+    const errorElement = cpvGetContactFieldErrorElement(inputElement);
     if (errorElement) {
       errorElement.textContent = message;
     }
   }
 
-  function clearContactFieldError(inputElement) {
+  function cpvClearContactFieldError(inputElement) {
     if (!inputElement) {
       return;
     }
 
     inputElement.setAttribute("aria-invalid", "false");
-    const errorElement = getContactFieldErrorElement(inputElement);
+    const errorElement = cpvGetContactFieldErrorElement(inputElement);
     if (errorElement) {
       errorElement.textContent = "";
     }
   }
 
-  function clearContactFieldErrors(formElements) {
-    clearContactFieldError(formElements?.nameInput || null);
-    clearContactFieldError(formElements?.mailInput || null);
-    clearContactFieldError(formElements?.phoneInput || null);
+  function cpvClearContactFieldErrors(formElements) {
+    cpvClearContactFieldError(formElements?.nameInput || null);
+    cpvClearContactFieldError(formElements?.mailInput || null);
+    cpvClearContactFieldError(formElements?.phoneInput || null);
   }
 
-  function validateContactFormFields(formElements) {
+  function cpvValidateContactFormFields(formElements) {
     const { nameInput, mailInput, phoneInput } = formElements;
     let isValid = true;
 
     if (!nameInput || nameInput.value.trim() === "") {
-      setContactFieldError(nameInput, CONTACT_REQUIRED_FIELD_ERRORS.contactName);
+      cpvSetContactFieldError(nameInput, CONTACT_REQUIRED_FIELD_ERRORS.contactName);
       isValid = false;
     } else {
-      clearContactFieldError(nameInput);
+      cpvClearContactFieldError(nameInput);
     }
 
     if (!mailInput || mailInput.value.trim() === "") {
-      setContactFieldError(mailInput, CONTACT_REQUIRED_FIELD_ERRORS.contactMail);
+      cpvSetContactFieldError(mailInput, CONTACT_REQUIRED_FIELD_ERRORS.contactMail);
       isValid = false;
     } else if (!mailInput.checkValidity()) {
-      setContactFieldError(mailInput, "Please enter a valid email address.");
+      cpvSetContactFieldError(mailInput, "Please enter a valid email address.");
       isValid = false;
     } else {
-      clearContactFieldError(mailInput);
+      cpvClearContactFieldError(mailInput);
     }
 
     if (!phoneInput || phoneInput.value.trim() === "") {
-      setContactFieldError(phoneInput, CONTACT_REQUIRED_FIELD_ERRORS.contactPhone);
+      cpvSetContactFieldError(phoneInput, CONTACT_REQUIRED_FIELD_ERRORS.contactPhone);
       isValid = false;
     } else {
-      clearContactFieldError(phoneInput);
+      cpvClearContactFieldError(phoneInput);
     }
 
     return isValid;
   }
 
-  function hasCompleteContactForm(formElements) {
+  function cpvHasCompleteContactForm(formElements) {
     return Boolean(
       formElements &&
         formElements.nameInput &&
@@ -108,8 +108,8 @@
     );
   }
 
-  function setContactFormValues(values) {
-    const formElements = getContactFormElements();
+  function cpvSetContactFormValues(values) {
+    const formElements = cpvGetContactFormElements();
     if (!formElements.nameInput || !formElements.mailInput || !formElements.phoneInput) {
       return;
     }
@@ -119,7 +119,7 @@
     formElements.phoneInput.value = values.phone;
   }
 
-  function normalizeEmailForContactFlow(emailValue) {
+  function cpvNormalizeEmailForContactFlow(emailValue) {
     if (typeof normalizeAuthEmail === "function") {
       return normalizeAuthEmail(emailValue);
     }
@@ -129,7 +129,7 @@
     return emailValue.trim().toLowerCase();
   }
 
-  function contactEmailExists(emailValue) {
+  function cpvContactEmailExists(emailValue) {
     const sourceUsers = Array.isArray(users) ? users : [];
 
     if (typeof doesEmailExist === "function") {
@@ -140,7 +140,7 @@
       return checkMailExist(emailValue, sourceUsers);
     }
 
-    const normalized = normalizeEmailForContactFlow(emailValue);
+    const normalized = cpvNormalizeEmailForContactFlow(emailValue);
     if (normalized === "") {
       return false;
     }
@@ -149,12 +149,12 @@
       if (!user || typeof user !== "object") {
         return false;
       }
-      return normalizeEmailForContactFlow(user.mail) === normalized;
+      return cpvNormalizeEmailForContactFlow(user.mail) === normalized;
     });
   }
 
-  function resetContactForm(formElements = getContactFormElements()) {
-    clearContactFieldErrors(formElements);
+  function cpvResetContactForm(formElements = cpvGetContactFormElements()) {
+    cpvClearContactFieldErrors(formElements);
     if (formElements.nameInput) {
       formElements.nameInput.value = "";
     }
@@ -170,14 +170,14 @@
   }
 
   window.ContactPopupValidation = Object.freeze({
-    getContactFormElements,
-    setContactFieldError,
-    clearContactFieldErrors,
-    validateContactFormFields,
-    hasCompleteContactForm,
-    setContactFormValues,
-    normalizeEmailForContactFlow,
-    contactEmailExists,
-    resetContactForm,
+    getContactFormElements: cpvGetContactFormElements,
+    setContactFieldError: cpvSetContactFieldError,
+    clearContactFieldErrors: cpvClearContactFieldErrors,
+    validateContactFormFields: cpvValidateContactFormFields,
+    hasCompleteContactForm: cpvHasCompleteContactForm,
+    setContactFormValues: cpvSetContactFormValues,
+    normalizeEmailForContactFlow: cpvNormalizeEmailForContactFlow,
+    contactEmailExists: cpvContactEmailExists,
+    resetContactForm: cpvResetContactForm,
   });
 })();

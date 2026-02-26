@@ -1,7 +1,7 @@
 "use strict";
 
 (function registerContactPopupMutationsModule() {
-  async function saveContact() {
+  async function cpmSaveContact() {
     const formElements = ContactPopupValidation.getContactFormElements();
     if (!ContactPopupValidation.hasCompleteContactForm(formElements)) {
       showGlobalUserMessage("Contact form is not available. Please reopen it.");
@@ -46,8 +46,8 @@
       sourceUsers.push(newContact);
       ContactPopupValidation.resetContactForm(formElements);
       ContactPopupOverlay.closeOverlay("addContact");
-      displaySuccessMessage("Contact successfully created");
-      applyContactsMutationResult(sourceUsers, newContact.id);
+      cpmDisplaySuccessMessage("Contact successfully created");
+      cpmApplyContactsMutationResult(sourceUsers, newContact.id);
     } catch (error) {
       console.error("Error saving contact:", error);
       showGlobalUserMessage("Could not save contact. Please try again.");
@@ -55,7 +55,7 @@
     }
   }
 
-  async function saveEditedContact(id) {
+  async function cpmSaveEditedContact(id) {
     const loadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
       context: "contacts",
       errorMessage: "Could not load contacts for editing. Please try again.",
@@ -112,11 +112,11 @@
 
     await firebaseSetEntity(user, FIREBASE_USERS_ID);
     ContactPopupOverlay.closeOverlay("editContact");
-    displaySuccessMessage("Contact successfully edited");
-    applyContactsMutationResult(sourceUsers, id);
+    cpmDisplaySuccessMessage("Contact successfully edited");
+    cpmApplyContactsMutationResult(sourceUsers, id);
   }
 
-  function editContact(id) {
+  function cpmEditContact(id) {
     ContactPopupOverlay.closeEditDelete({ restoreFocus: false });
     const contactIndex = contacts.findIndex((contact) => contact.id === id);
     if (contactIndex === -1) {
@@ -136,7 +136,7 @@
     currentContactId = id;
   }
 
-  function deleteContactFromLocalStorage(contactId) {
+  function cpmDeleteContactFromLocalStorage(contactId) {
     var contactsInStorage = JSON.parse(localStorage.getItem("contacts"));
 
     if (contactsInStorage) {
@@ -147,7 +147,7 @@
     }
   }
 
-  async function deleteContact(id) {
+  async function cpmDeleteContact(id) {
     const loadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
       context: "contacts",
       errorMessage: "Could not load contacts for deleting. Please try again.",
@@ -164,17 +164,17 @@
 
     sourceUsers.splice(userIndex, 1);
     await firebaseDeleteEntity(id, FIREBASE_USERS_ID);
-    deleteContactFromLocalStorage(id);
-    displaySuccessMessage("Contact successfully deleted");
-    applyContactsMutationResult(sourceUsers);
+    cpmDeleteContactFromLocalStorage(id);
+    cpmDisplaySuccessMessage("Contact successfully deleted");
+    cpmApplyContactsMutationResult(sourceUsers);
   }
 
-  async function removeContact(id) {
+  async function cpmRemoveContact(id) {
     ContactPopupOverlay.closeEditDelete({ restoreFocus: false });
-    await deleteContact(id);
+    await cpmDeleteContact(id);
   }
 
-  function applyContactsMutationResult(sourceUsers, selectedContactId = null) {
+  function cpmApplyContactsMutationResult(sourceUsers, selectedContactId = null) {
     users = Array.isArray(sourceUsers) ? sourceUsers : [];
     getContactsOutOfUsers();
     loadContacts();
@@ -191,7 +191,7 @@
     }
   }
 
-  function displaySuccessMessage(message) {
+  function cpmDisplaySuccessMessage(message) {
     const overlay = document.createElement("div");
     overlay.className = "contact-succ-created-overlay";
 
@@ -219,13 +219,13 @@
   }
 
   window.ContactPopupMutations = Object.freeze({
-    saveContact,
-    saveEditedContact,
-    editContact,
-    deleteContact,
-    removeContact,
-    deleteContactFromLocalStorage,
-    applyContactsMutationResult,
-    displaySuccessMessage,
+    saveContact: cpmSaveContact,
+    saveEditedContact: cpmSaveEditedContact,
+    editContact: cpmEditContact,
+    deleteContact: cpmDeleteContact,
+    removeContact: cpmRemoveContact,
+    deleteContactFromLocalStorage: cpmDeleteContactFromLocalStorage,
+    applyContactsMutationResult: cpmApplyContactsMutationResult,
+    displaySuccessMessage: cpmDisplaySuccessMessage,
   });
 })();

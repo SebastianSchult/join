@@ -5,21 +5,21 @@
   let contactsKeyboardAccessibilityRegistered = false;
   let editDeleteMenuOpener = null;
 
-  function addContactCard() {
+  function cpoAddContactCard() {
     contactOverlayOpener = document.activeElement;
     if (!document.getElementById("addContact")) {
-      renderAddContacts();
+      cpoRenderAddContacts();
     }
     document.getElementById("addContact").innerHTML = renderAddContactsHTML();
-    addOverlay("addContact");
+    cpoAddOverlay("addContact");
     activateFocusLayer("addContact", {
       opener: contactOverlayOpener,
       initialFocus: "#contactName",
-      onEscape: () => closeOverlay("addContact"),
+      onEscape: () => cpoCloseOverlay("addContact"),
     });
   }
 
-  function addOverlay(overlayId) {
+  function cpoAddOverlay(overlayId) {
     const overlay = document.createElement("div");
     overlay.classList.add("overlay");
     overlay.dataset.action = "close-overlay";
@@ -29,7 +29,7 @@
     document.body.style.overflow = "hidden";
   }
 
-  function closeOverlay(id) {
+  function cpoCloseOverlay(id) {
     deactivateFocusLayer({ restoreFocus: true });
     const container = document.getElementById(id);
     if (!container) {
@@ -55,7 +55,7 @@
     }, 100);
   }
 
-  function renderAddContacts() {
+  function cpoRenderAddContacts() {
     let newDiv = document.createElement("div");
     newDiv.id = "addContact";
     setAttributes(newDiv, {
@@ -67,7 +67,7 @@
     document.getElementById("addContactContainer").appendChild(newDiv);
   }
 
-  function renderEditContact() {
+  function cpoRenderEditContact() {
     let newDiv = document.createElement("div");
     newDiv.id = "editContact";
     setAttributes(newDiv, {
@@ -78,19 +78,19 @@
     document.getElementById("contactMainEdit").appendChild(newDiv);
   }
 
-  function showAddContactContainer() {
+  function cpoShowAddContactContainer() {
     const addContactContainer = document.getElementById("addContactContainer");
     addContactContainer.classList.remove("hidden");
   }
 
-  function openEditDelete() {
+  function cpoOpenEditDelete() {
     const openButton = document.getElementById("openEditDeleteResponsive");
     const editDeleteMenu = document.getElementById("editDelete");
     if (!openButton || !editDeleteMenu) {
       return;
     }
 
-    registerContactsKeyboardAccessibility();
+    cpoRegisterContactsKeyboardAccessibility();
     editDeleteMenuOpener = openButton;
 
     openButton.classList.add("d-none");
@@ -102,7 +102,7 @@
     focusElementIfPossible(firstMenuButton || editDeleteMenu);
   }
 
-  function closeEditDelete(options = {}) {
+  function cpoCloseEditDelete(options = {}) {
     const { restoreFocus = true } = options;
     const openButton = document.getElementById("openEditDeleteResponsive");
     const editDeleteMenu = document.getElementById("editDelete");
@@ -121,16 +121,16 @@
     editDeleteMenuOpener = null;
   }
 
-  function registerContactsKeyboardAccessibility() {
+  function cpoRegisterContactsKeyboardAccessibility() {
     if (contactsKeyboardAccessibilityRegistered) {
       return;
     }
 
-    document.addEventListener("keydown", handleContactsKeyboardAccessibility, true);
+    document.addEventListener("keydown", cpoHandleContactsKeyboardAccessibility, true);
     contactsKeyboardAccessibilityRegistered = true;
   }
 
-  function handleContactsKeyboardAccessibility(event) {
+  function cpoHandleContactsKeyboardAccessibility(event) {
     const editDeleteMenu = document.getElementById("editDelete");
     if (
       !editDeleteMenu ||
@@ -143,7 +143,7 @@
     if (event.key === "Escape") {
       event.preventDefault();
       event.stopPropagation();
-      closeEditDelete({ restoreFocus: true });
+      cpoCloseEditDelete({ restoreFocus: true });
       return;
     }
 
@@ -176,30 +176,30 @@
     }
   }
 
-  function editContactCard(contact) {
+  function cpoEditContactCard(contact) {
     contactOverlayOpener = document.activeElement;
     if (!document.getElementById("editContact")) {
-      renderEditContact();
+      cpoRenderEditContact();
     }
     document.getElementById("editContact").innerHTML = renderEditContactHTML(
       contact.id,
       contact.name,
       contact.contactColor
     );
-    addOverlay("editContact");
+    cpoAddOverlay("editContact");
     activateFocusLayer("editContact", {
       opener: contactOverlayOpener,
       initialFocus: "#contactName",
-      onEscape: () => closeOverlay("editContact"),
+      onEscape: () => cpoCloseOverlay("editContact"),
     });
   }
 
   window.ContactPopupOverlay = Object.freeze({
-    addContactCard,
-    closeOverlay,
-    openEditDelete,
-    closeEditDelete,
-    editContactCard,
-    showAddContactContainer,
+    addContactCard: cpoAddContactCard,
+    closeOverlay: cpoCloseOverlay,
+    openEditDelete: cpoOpenEditDelete,
+    closeEditDelete: cpoCloseEditDelete,
+    editContactCard: cpoEditContactCard,
+    showAddContactContainer: cpoShowAddContactContainer,
   });
 })();
