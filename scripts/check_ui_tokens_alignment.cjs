@@ -37,8 +37,8 @@ const cssChecks = [
   { file: "style.css", kind: "max", token: "mobileMax" },
   { file: "assets/css/legalNotice.css", kind: "max", token: "contentNarrowMax" },
   { file: "assets/css/privacy.css", kind: "max", token: "contentNarrowMax" },
-  { file: "assets/css/contacts.css", kind: "max", token: "mobileMax" },
-  { file: "assets/css/contacts.css", kind: "min", token: "mobileMin" },
+  { file: "assets/css/contacts.responsive.css", kind: "max", token: "mobileMax" },
+  { file: "assets/css/contacts.responsive.css", kind: "min", token: "mobileMin" },
 ];
 
 for (const check of cssChecks) {

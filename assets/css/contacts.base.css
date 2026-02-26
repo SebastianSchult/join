@@ -1,0 +1,351 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.contact-main {
+  display: flex;
+  font-family: OpenSans, sans-serif;
+  font-weight: 400;
+  font-size: 1.438rem;
+  box-sizing: border-box;
+}
+
+.contacts-container {
+  padding-left: 1.719rem;
+  padding-top: 1rem;
+  width: 28.5rem;
+  align-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+.contacts-container-outer {
+  box-shadow: 2px 0px 5.5px rgba(0, 0, 0, 0.2);
+  padding: 32px 0;
+  display: flex;
+}
+
+
+@keyframes moveInRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.add-contact.move-out-right {
+  animation: moveOutRight 125ms ease-out forwards;
+}
+
+@keyframes moveOutRight {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.right-side {
+  animation: none; 
+}
+
+.right-side.animate-in {
+  animation: moveInRight 0.125s ease forwards;
+}
+
+.right-side.animate-out {
+  animation: moveOutRight 0.125s ease forwards;
+}
+
+.add-contact {
+  top: 0;
+  width: 584px;
+  right: 0px;
+  position: fixed;
+  border-radius: 30px 0px 30px 30px;
+  animation: moveInRight 125ms ease-in-out;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.add-contact-header-close {
+  display: flex;
+  justify-content: end;
+  padding: 24px 24px 35px 0;
+  border-radius: 30px 0 0 0;
+
+  box-sizing: border-box;
+  background-color: #005dff;
+}
+
+.icon-action-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.add-contact-header-close img {
+  cursor: pointer;
+}
+
+.add-contact-header-logo {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  background-color: #005dff;
+  border: solid 1px #005dff !important;
+  color: white;
+  padding-bottom: 91px;
+  gap: 12px;
+  font-size: 58px;
+}
+
+.add-contact-header-logo img {
+  height: 66px;
+}
+
+.add-contact-header-logo span {
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.add-contact-header-logo {
+  font-size: 27px;
+}
+
+.add-contact-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  border: solid 1px #e3e3e3;
+  border-radius: 0px 0px 30px 30px;
+  border-bottom: none;
+  height: 100%;
+}
+
+.profile-badge-group-add-contact {
+  padding: 72px 0 16px 0;
+}
+
+.profile-badge-add-contact {
+  display: flex;
+  justify-content: center;
+  border-radius: 70px;
+  box-shadow: 0px 0px 4px 0px #0000001a;
+  border-radius: 70px;
+}
+
+.profile-badge-add-contact img {
+  height: 120px;
+  width: 120px;
+}
+
+.edit-contact {
+  top: 0;
+  width: 584px;
+  left: 0px;
+  margin-right: 159px;
+  position: fixed;
+  border-radius: 0px 30px 30px 30px;
+  animation: moveInLeft 125ms ease-in-out;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.edit-contact-header-close {
+  display: flex;
+  justify-content: end;
+  padding: 24px 24px 35px 0;
+  border-radius: 0 30px 0 0;
+  box-sizing: border-box;
+  background-color: #005dff;
+}
+
+.edit-contact-header-close img {
+  cursor: pointer;
+}
+
+.edit-contact-header-logo {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  background-color: #005dff;
+  border: solid 1px #005dff !important;
+  color: white;
+  padding-bottom: 91px;
+  gap: 12px;
+  font-size: 58px;
+}
+
+.edit-contact-header-logo img {
+  height: 66px;
+}
+
+.edit-contact-header-logo span {
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.edit-contact-header-logo {
+  font-size: 27px;
+}
+
+.edit-contact-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  border: solid 1px #e3e3e3;
+  border-radius: 0px 0px 30px 0px;
+  border-bottom: none;
+  height: 100%;
+}
+
+.profile-badge-group-edit-contact {
+  padding: 72px 0 16px 0;
+}
+
+.profile-badge-edit-contact {
+  display: flex;
+  justify-content: center;
+  border-radius: 70px;
+  box-shadow: 0px 0px 4px 0px #0000001a;
+  border-radius: 70px;
+  border: solid 3px white;
+}
+
+.profile-badge-edit-contact img {
+  height: 120px;
+  width: 120px;
+}
+
+.add-contact-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@keyframes moveInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.input-frame {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  width: 100%;
+  gap: 32px;
+}
+
+input {
+  justify-content: space-between;
+  width: 100%;
+  font-size: 19px;
+  display: flex;
+  padding: 12px 21px;
+  align-items: center;
+  outline: none;
+  border: none;
+  border-bottom: 1px solid #d1d1d1;
+}
+
+.input-frame img {
+  position: absolute;
+  padding: 16px;
+}
+
+.input-frame input[aria-invalid="true"] {
+  box-shadow: inset 0 -2px 0 #ff8190;
+}
+
+.contact-error-message {
+  display: block;
+  width: 100%;
+  min-height: 18px;
+  margin-top: -16px;
+  font-size: 14px;
+  line-height: 1.3;
+  color: #ff8190;
+}
+
+input::placeholder {
+  color: #d1d1d1;
+}
+
+.addContactButton {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 35px;
+  margin-bottom: 63px;
+}
+
+.cancelButton {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 16px;
+  border-radius: 10px;
+  color: #647188;
+  background-color: white;
+  gap: 10px;
+  font-size: 23px;
+  border: 1px solid #647188;
+  transition-duration: 120ms;
+}
+
+.cancelButton:hover {
+  color: #005dff;
+  border: solid 1px #005dff;
+  box-shadow: 0px 1px 20px 0px rgba(0, 0, 0, 0.4);
+}
+
+.createButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 10px;
+  border-radius: 10px;
+  border: none;
+  background-color: #4589ff;
+  color: white;
+  font-size: 23px;
+  transition-duration: 120ms;
+  cursor: pointer;
+  min-width: 174px;
+}
+
+.createButton img {
+  padding-left: 24px;
+}
+
+.createButton:hover {
+  background-color: #005dff;
+  box-shadow: 0px 1px 20px 0px rgba(0, 0, 0, 0.4);
+}

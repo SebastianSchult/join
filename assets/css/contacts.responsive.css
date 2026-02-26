@@ -1,0 +1,344 @@
+@media screen and (max-width: 1199px) {
+  .contact-details-name {
+    font-size: 2.25rem;
+  }
+}
+
+@media screen and (max-width: 1124px) {
+  .contact-details-header {
+    gap: 2rem;
+  }
+
+  .contact-details-name {
+    font-size: 1.5rem;
+  }
+
+  .contact-details-badge {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .contact-details-badge-initials {
+    font-size: 1.75rem;
+  }
+
+  .contact-information {
+    font-size: 1rem;
+  }
+
+  .contact-email-container {
+    font-size: 0.875rem;
+  }
+
+  .contact-phone-container {
+    font-size: 0.875rem;
+  }
+
+  .right-side{
+    padding: 4.5rem 0 0 1.5rem;
+  }
+}
+
+@media screen and (max-width: 1010px) {
+  .contacts-container {
+    width: 25rem;
+    padding-left: 0.5rem;
+  }
+
+  .button-add-contact {
+    width: 20rem;
+  }
+
+  .contact-card {
+    gap: 1rem
+  }
+
+  .contact-list {
+    padding: 1.25rem 0.75rem 1.25rem 0.75rem;
+  }
+
+  .contact-details-header {
+    gap: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 890px) {
+  .contact-details-badge-group {
+    display: none;
+  }
+
+  .contact-details-header {
+    gap: 1rem;
+  }
+
+  .contacts-container {
+    padding-left: 0.5rem;
+  }
+}
+
+@media screen and (min-width: 802px) {
+
+  .contact-details-header-responsive {
+    display: none;
+  }
+  
+  .contact-details-back-button {
+    display: none;
+  }
+}
+
+
+@media screen and (max-width: 801px) {
+  
+  .right-side {
+    display: flex;
+    left: 0;
+    position: absolute;
+    background-color: white;
+    width: 100%;
+    height: 90%;
+    z-index: 2;
+    transition: left 0.5s ease-in-out;
+  }
+
+  .contact-Details {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+  }
+
+  .contact-details-header-and-button {
+    display: flex;
+    justify-content: space-between;
+    gap: 21px;
+  }
+
+  .add-contact-header-close{
+    border-radius: 30px 30px 0 0;
+  }
+
+  .add-contact-bottom{
+    border-radius: 0 0 30px 30px;
+  }
+
+  .contact-details-header-responsive {
+    display: flex;
+    font-size: 18px;
+    line-height: 23px;
+    font-weight: 700;
+  }
+
+  .contact-details-back-button {
+    display: flex;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+  }
+
+  .contact-details-back-button :hover {
+    scale: 1.1;
+  }
+
+  .contact-information {
+    display: none;
+  }
+
+  .contact-details-badge-group {
+    display: flex;
+  }
+
+  .contact-email-container {
+    display: flex;
+  }
+  .button-add-contact {
+    display: none;
+  }
+
+  .openEditDeleteResponsive {
+    display: flex;
+  }
+
+  .openEditDeleteResponsive img {
+    max-width: 78px;
+    max-height: 78px;
+  }
+
+  .contacts-container-outer {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .contacts-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .contact-list {
+    height: 80%;
+  }
+
+  .icon-edit {
+    display: none;
+  }
+
+  .icon-delete {
+    display: none;
+  }
+
+  .openEditDeleteResponsive {
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .openEditDeleteResponsive :hover {
+    transform: scale(1.2);
+  }
+
+  .add-contact-button {
+    display: flex;
+    z-index: 2;
+    position: absolute;
+    bottom: 6rem;
+    right: 3rem;
+    height: 64px;
+    width: 64px;
+    justify-content: center;
+    align-items: flex-start;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+
+  .add-contact,
+  .edit-contact {    
+    height: 100%;
+    border-radius: 30px 30px 30px 30px;
+  }
+
+  .add-contact-button :hover {
+    transform: scale(1.1);
+  }
+
+  .add-contact-input-group,
+  .profile-badge-group-add-contact {
+    padding: 0;
+    transform: translateY(-60px);
+  }
+
+  .add-contact-input-group{
+    gap: 15px;
+  }
+
+  .edit-contact .profile-badge-group-add-contact {
+    transform: translateY(-45px);
+    padding-bottom: 24px;
+  }
+
+  .edit-contact-header-close {
+    border-radius: 30px 30px 0 0;
+  }
+
+  .edit-contact-bottom {
+    border-radius: 0 0 30px 30px;
+  }
+
+  .editDelete {
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    position: absolute;
+    bottom: 6rem;
+    right: 3rem;
+    height: 10vh;
+    width: 12vw;
+    justify-content: center;
+    align-items: flex-start;
+    box-sizing: border-box;
+    background-color: white;
+    border-radius: 20px 20px 0 20px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: -1px 3px 3px rgba(0, 0, 0, 0.1);
+    min-width: 120px;
+    padding: 10px;
+  }
+
+  .editDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px;
+    border: none;
+    background-color: transparent;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    }
+
+    .editDiv:hover {
+      scale: 1.1;
+    }
+
+    .deleteDiv {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 8px;
+      border: none;
+      background-color: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+  }
+}
+
+.deleteDiv:hover {
+  scale: 1.1;
+}
+
+.editDiv:focus-visible,
+.deleteDiv:focus-visible {
+  outline: 2px solid #2a3647;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media screen and (max-width: 580px) {
+  .add-contact,
+  .edit-contact {
+    min-width: 100%;
+    width: auto;
+}
+
+.edit-contact p {
+  font-size: 24px;
+}
+
+@media screen and (max-width: 420px) {
+  .cancelButton{
+    display: none
+  }
+
+  .add-contact-header-logo p{
+    font-size: 21px;
+  }
+} }
+
+
+@media screen and (max-width: 380px) {
+  .contacts-container {
+    padding-left: 24px;
+  }
+
+  .contact-list {
+    padding-left: 58px;
+  }
+}

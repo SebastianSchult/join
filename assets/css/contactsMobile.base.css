@@ -1,0 +1,107 @@
+body {
+    margin: 0;
+    line-height: normal;
+  }
+  
+  :root {
+    /* fonts */
+    --version-2-body: "Open Sans";
+    --font-inter: Inter;
+  
+    /* font sizes */
+    --font-size-mini: 0.938rem;
+    --version-2-body-size: 1rem;
+    --version-2-t6-size: 1.188rem;
+    --font-size-xs: 0.75rem;
+    --font-size-lg: 1.125rem;
+  
+    /* Colors */
+    --version-2-main-color: #4589ff;
+    --white: #fff;
+    --menu-color: #42526e;
+    --color-black: #000;
+    --color-tomato: #ff4646;
+    --color-darkslateblue: #462f8a;
+    --color-turquoise: #1fd7c1;
+    --color-goldenrod: #ffbb2b;
+    --color-violet: #fc71ff;
+    --color-blueviolet-100: #6e52ff;
+    --color-blueviolet-200: #9327ff;
+  
+    /* Gaps */
+    --gap-xl: 1.25rem;
+    --gap-9xs: 0.25rem;
+    --gap-16xl: 2.187rem;
+    --gap-8xs: 0.312rem;
+    --gap-mid: 1.062rem;
+  
+    /* Paddings */
+    --padding-mid: 1.062rem;
+    --padding-base: 1rem;
+    --padding-mini: 0.937rem;
+    --padding-6xs-5: 0.406rem;
+    --padding-lgi: 1.187rem;
+    --padding-7xs-5: 0.343rem;
+    --padding-xl: 1.25rem;
+    --padding-4xs: 0.562rem;
+    --padding-3xs-5: 0.593rem;
+    --padding-9xs-5: 0.218rem;
+    --padding-3xl: 1.375rem;
+    --padding-sm: 0.875rem;
+    --padding-5xl: 1.5rem;
+    --padding-5xs: 0.5rem;
+    --padding-17xl: 2.25rem;
+    --padding-6xl: 1.562rem;
+    --padding-6xs: 0.437rem;
+  
+    /* Border radiuses */
+    --br-5xs: 8px;
+    --br-3xs: 10px;
+    --br-26xl: 45px;
+    --br-10xs: 3px;
+  
+    /* Effects */
+    --nuevo: 0px 0px 4px rgba(0, 0, 0, 0.1);
+    --stronger: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    --barra-superior: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  }
+
+.contacts-mobile-child {
+    width: 1rem;
+    height: 48.063rem;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: none;
+  }
+  .capa-1-icon {
+    height: 2.438rem;
+    width: 2rem;
+    position: relative;
+  }
+  .capa-3 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  .header-moile-child {
+    height: 2.5rem;
+    width: 2.5rem;
+    position: relative;
+    min-height: 2.5rem;
+  }
+  .header-moile {
+    align-self: stretch;
+    box-shadow: var(--barra-superior);
+    background-color: var(--version-2-main-color);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--padding-xl) var(--padding-6xl);
+    top: 0;
+    z-index: 99;
+    position: sticky;
+    gap: var(--gap-xl);
+  }
