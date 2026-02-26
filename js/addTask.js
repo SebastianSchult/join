@@ -13,13 +13,13 @@ async function addTaskInit(){
     checkValidity();
 }
 
-const DROPDOWN_ARROW_BY_CONTENT_ID = {
-    'dropdown-content-assignedTo': 'custom-arrow-assignedTo',
-    'dropdown-content-category': 'custom-arrow-category',
-};
-
-let addTaskKeyboardAccessibilityRegistered = false;
-let activeDropdownState = null;
+function callAddTaskModuleMethod(moduleName, methodName, args = [], fallbackValue) {
+    const moduleRef = window[moduleName];
+    if (!moduleRef || typeof moduleRef[methodName] !== "function") {
+        return fallbackValue;
+    }
+    return moduleRef[methodName](...args);
+}
 
 
 /**
@@ -161,18 +161,12 @@ function getButtonColor(priority) {
  */
 function renderArrow(arrowContainer, contentContainer){
     registerAddTaskKeyboardAccessibility();
-    const dropdownContainer = document.getElementById(contentContainer);
-    if (!dropdownContainer) {
-        return;
-    }
-    const shouldOpen = !dropdownContainer.classList.contains('dropdown-opened');
-
-    closeOpenDropdowns({ restoreFocus: false });
-
-    if (shouldOpen) {
-        openDropdown(arrowContainer, contentContainer);
-    }
-    setCloseDropdownContainer();
+    callAddTaskModuleMethod(
+        "AddTaskDropdown",
+        "renderArrow",
+        [arrowContainer, contentContainer],
+        undefined
+    );
 }
 
 
@@ -184,33 +178,12 @@ function renderArrow(arrowContainer, contentContainer){
  * @returns {void}
  */
 function openDropdown(arrowContainerId, contentContainerId){
-    const dropdownContainer = document.getElementById(contentContainerId);
-    if (!dropdownContainer) {
-        return;
-    }
-
-    const arrowContainer = document.getElementById(arrowContainerId);
-    const arrowImg = arrowContainer ? arrowContainer.querySelector('img[data-direction]') : null;
-    if (arrowImg) {
-        arrowImg.dataset.direction = 'up';
-        arrowImg.src = `./assets/img/icon-arrow_dropdown_${arrowImg.dataset.direction}.png`;
-    }
-
-    dropdownContainer.classList.remove('d-none');
-    dropdownContainer.classList.add('dropdown-opened');
-
-    const opener = arrowContainer ? arrowContainer.closest('button') : null;
-    if (opener) {
-        opener.setAttribute('aria-expanded', 'true');
-        opener.setAttribute('aria-controls', contentContainerId);
-    }
-
-    activeDropdownState = {
-        contentContainerId,
-        opener,
-    };
-
-    focusFirstDropdownControl(dropdownContainer);
+    callAddTaskModuleMethod(
+        "AddTaskDropdown",
+        "openDropdown",
+        [arrowContainerId, contentContainerId],
+        undefined
+    );
 }
 
 
@@ -222,41 +195,12 @@ function openDropdown(arrowContainerId, contentContainerId){
  * @returns {boolean} True when a dropdown was closed.
  */
 function closeDropdown(contentContainerId, options = {}){
-    const dropdownContainer = document.getElementById(contentContainerId);
-    if (!dropdownContainer || !dropdownContainer.classList.contains('dropdown-opened')) {
-        return false;
-    }
-
-    const { restoreFocus = false } = options;
-    const arrowContainerId = DROPDOWN_ARROW_BY_CONTENT_ID[contentContainerId];
-    const arrowContainer = arrowContainerId ? document.getElementById(arrowContainerId) : null;
-    const arrowImg = arrowContainer ? arrowContainer.querySelector('img[data-direction]') : null;
-    if (arrowImg) {
-        arrowImg.dataset.direction = 'down';
-        arrowImg.src = `./assets/img/icon-arrow_dropdown_${arrowImg.dataset.direction}.png`;
-    }
-
-    dropdownContainer.classList.add('d-none');
-    dropdownContainer.classList.remove('dropdown-opened');
-
-    const openerFromState =
-        activeDropdownState &&
-        activeDropdownState.contentContainerId === contentContainerId
-            ? activeDropdownState.opener
-            : null;
-    const opener = openerFromState || (arrowContainer ? arrowContainer.closest('button') : null);
-    if (opener) {
-        opener.setAttribute('aria-expanded', 'false');
-    }
-    if (restoreFocus) {
-        focusElementIfPossible(opener);
-    }
-
-    if (activeDropdownState && activeDropdownState.contentContainerId === contentContainerId) {
-        activeDropdownState = null;
-    }
-
-    return true;
+    return callAddTaskModuleMethod(
+        "AddTaskDropdown",
+        "closeDropdown",
+        [contentContainerId, options],
+        false
+    );
 }
 
 
@@ -267,19 +211,12 @@ function closeDropdown(contentContainerId, options = {}){
  * @returns {boolean} True when at least one dropdown was closed.
  */
 function closeOpenDropdowns(options = {}){
-    const { restoreFocus = false } = options;
-    const openedDropdowns = Array.from(document.getElementsByClassName('dropdown-opened'));
-    if (openedDropdowns.length === 0) {
-        return false;
-    }
-
-    openedDropdowns.forEach((dropdownContainer, index) => {
-        const isLast = index === openedDropdowns.length - 1;
-        closeDropdown(dropdownContainer.id, { restoreFocus: restoreFocus && isLast });
-    });
-
-    setCloseDropdownContainer();
-    return true;
+    return callAddTaskModuleMethod(
+        "AddTaskDropdown",
+        "closeOpenDropdowns",
+        [options],
+        false
+    );
 }
 
 
@@ -289,10 +226,12 @@ function closeOpenDropdowns(options = {}){
  * @returns {void}
  */
 function initializeDropdownAccessibilityState(){
-    document.querySelectorAll('.addTask-dropdown-contact, .addTask-dropdown-category').forEach(triggerButton => {
-        triggerButton.setAttribute('aria-expanded', 'false');
-        triggerButton.setAttribute('aria-haspopup', 'listbox');
-    });
+    callAddTaskModuleMethod(
+        "AddTaskDropdown",
+        "initializeDropdownAccessibilityState",
+        [],
+        undefined
+    );
 }
 
 
@@ -302,11 +241,12 @@ function initializeDropdownAccessibilityState(){
  * @returns {void}
  */
 function registerAddTaskKeyboardAccessibility(){
-    if (addTaskKeyboardAccessibilityRegistered) {
-        return;
-    }
-    document.addEventListener('keydown', handleAddTaskKeyboardAccessibility);
-    addTaskKeyboardAccessibilityRegistered = true;
+    callAddTaskModuleMethod(
+        "AddTaskKeyboard",
+        "registerAddTaskKeyboardAccessibility",
+        [],
+        undefined
+    );
 }
 
 
@@ -317,63 +257,12 @@ function registerAddTaskKeyboardAccessibility(){
  * @returns {void}
  */
 function handleAddTaskKeyboardAccessibility(event){
-    if (event.defaultPrevented) {
-        return;
-    }
-
-    if (!activeDropdownState || !activeDropdownState.contentContainerId) {
-        return;
-    }
-
-    const dropdownContainer = document.getElementById(activeDropdownState.contentContainerId);
-    if (!dropdownContainer || !dropdownContainer.classList.contains('dropdown-opened')) {
-        activeDropdownState = null;
-        return;
-    }
-
-    if (event.key === 'Escape') {
-        if (closeDropdown(activeDropdownState.contentContainerId, { restoreFocus: true })) {
-            setCloseDropdownContainer();
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        return;
-    }
-
-    if (event.key !== 'Tab') {
-        return;
-    }
-
-    const focusableControls =
-        typeof getFocusableElements === 'function'
-            ? getFocusableElements(dropdownContainer)
-            : Array.from(
-                  dropdownContainer.querySelectorAll(
-                      "button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex='-1'])"
-                  )
-              );
-    if (focusableControls.length === 0) {
-        event.preventDefault();
-        focusElementIfPossible(dropdownContainer);
-        return;
-    }
-
-    const first = focusableControls[0];
-    const last = focusableControls[focusableControls.length - 1];
-    const activeElement = document.activeElement;
-
-    if (event.shiftKey) {
-        if (activeElement === first || !dropdownContainer.contains(activeElement)) {
-            event.preventDefault();
-            focusElementIfPossible(last);
-        }
-        return;
-    }
-
-    if (activeElement === last || !dropdownContainer.contains(activeElement)) {
-        event.preventDefault();
-        focusElementIfPossible(first);
-    }
+    callAddTaskModuleMethod(
+        "AddTaskKeyboard",
+        "handleAddTaskKeyboardAccessibility",
+        [event],
+        undefined
+    );
 }
 
 
@@ -384,13 +273,12 @@ function handleAddTaskKeyboardAccessibility(event){
  * @returns {void}
  */
 function focusFirstDropdownControl(dropdownContainer){
-    if (!dropdownContainer) {
-        return;
-    }
-    const firstControl = dropdownContainer.querySelector(
-        "button, a[href], input:not([disabled]), [tabindex]:not([tabindex='-1'])"
+    callAddTaskModuleMethod(
+        "AddTaskDropdown",
+        "focusFirstDropdownControl",
+        [dropdownContainer],
+        undefined
     );
-    focusElementIfPossible(firstControl);
 }
 
 
@@ -400,31 +288,12 @@ function focusFirstDropdownControl(dropdownContainer){
  * @return {void}
  */
 function setCloseDropdownContainer(){
-    let openendDropdowns = document.getElementsByClassName('dropdown-opened');
-    let container = getContainerToSetDropdownCloseAction();
-    if (!container) {
-        return;
-    }
-
-    if (!openendDropdowns.length == 0){
-        for (let i=0; i<openendDropdowns.length; i++){
-            if (openendDropdowns[i].id == 'dropdown-content-assignedTo'){
-                container.dataset.action = 'toggle-addtask-dropdown';
-                container.dataset.arrowContainer = 'custom-arrow-assignedTo';
-                container.dataset.contentContainer = 'dropdown-content-assignedTo';
-            }
-            if (openendDropdowns[i].id == 'dropdown-content-category'){
-                container.dataset.action = 'toggle-addtask-dropdown';
-                container.dataset.arrowContainer = 'custom-arrow-category';
-                container.dataset.contentContainer = 'dropdown-content-category';
-            }
-        }
-    }
-    else{
-        delete container.dataset.action;
-        delete container.dataset.arrowContainer;
-        delete container.dataset.contentContainer;
-    }
+    callAddTaskModuleMethod(
+        "AddTaskDropdown",
+        "setCloseDropdownContainer",
+        [],
+        undefined
+    );
 }
 
 
@@ -434,15 +303,12 @@ function setCloseDropdownContainer(){
  * @return {HTMLElement} Container used for outside-click dropdown close behavior.
  */
 function getContainerToSetDropdownCloseAction(){
-    if (window.location.href.includes('addTask')){
-        return document.getElementById('bodyContent')
-    } else {
-        if (document.getElementById('openCardContainer')){
-            return document.getElementById('openCardContainer')
-        }else{
-            return document.getElementById('addTaskHoverContainer')
-        }
-    }
+    return callAddTaskModuleMethod(
+        "AddTaskDropdown",
+        "getContainerToSetDropdownCloseAction",
+        [],
+        null
+    );
 }
 
 
@@ -556,17 +422,12 @@ function checkIfCardIsEditing(){
  * Sets the minimum value of the "addTaskDueDateInput" element to the current date.
  */
 function setTodayDateAsMin(){
-    let date = new Date(),
-        day = date.getDate(),
-        month = date.getMonth() + 1,
-        year = date.getFullYear();
-
-    if (month < 10) month = "0" + month;
-    if (day < 10) day = "0" + day;
-
-    const todayDate = `${year}-${month}-${day}`;
-
-    document.getElementById("addTaskDueDateInput").setAttribute('min', todayDate)
+    callAddTaskModuleMethod(
+        "AddTaskFormDomain",
+        "setTodayDateAsMin",
+        [],
+        undefined
+    );
 }
 
 
@@ -575,12 +436,12 @@ function setTodayDateAsMin(){
  *
  */
 function checkValidity(){
-    requiredInputFields.forEach(requiredInputField => {
-        document.getElementById(requiredInputField.id).addEventListener('input', () => {
-            toggleRequiredMessage(requiredInputField);
-        })
-        toggleRequiredMessage(requiredInputField);
-    })
+    callAddTaskModuleMethod(
+        "AddTaskFormDomain",
+        "checkValidity",
+        [],
+        undefined
+    );
 }
 
 
@@ -591,13 +452,12 @@ function checkValidity(){
  * @return {boolean} Returns true if the field is not empty, false otherwise.
  */
 function getStateOfRequriredField(requiredInputField){
-    let inputField = document.getElementById(requiredInputField.id);
-    if (inputField.value == ''){
-        inputField.style = 'color: #D1D1D1 !important';
-        return false;
-    }
-    inputField.style = 'color: black !important';
-    return true;
+    return callAddTaskModuleMethod(
+        "AddTaskFormDomain",
+        "getStateOfRequriredField",
+        [requiredInputField],
+        false
+    );
 }
 
 
@@ -605,11 +465,12 @@ function getStateOfRequriredField(requiredInputField){
  * Sets the state of the create button based on the state of required input fields.
  */
 function setCreateBtnState() {
-	if (requiredInputFields.every((r) => r.state == true)) {
-        activateButton('createBtn', 'create-task');
-	} else {
-        deactivateButton('createBtn');
-	}
+	callAddTaskModuleMethod(
+        "AddTaskFormDomain",
+        "setCreateBtnState",
+        [],
+        undefined
+    );
 }
 
 
@@ -620,17 +481,12 @@ function setCreateBtnState() {
  * @param {string} actionName - The data-action value handled by delegated events.
  */
 function activateButton(id, actionName){
-    if(document.getElementById(id)){
-        let btn = document.getElementById(id);
-        btn.classList.remove("disabled");
-        if (btn.tagName === "BUTTON") {
-            btn.disabled = false;
-            btn.setAttribute("aria-disabled", "false");
-        }
-        if (actionName) {
-            btn.dataset.action = actionName;
-        }
-    }
+    callAddTaskModuleMethod(
+        "AddTaskFormDomain",
+        "activateButton",
+        [id, actionName],
+        undefined
+    );
 }
 
 
@@ -640,13 +496,10 @@ function activateButton(id, actionName){
  * @param {string} id - The ID of the button element.
  */
 function deactivateButton(id){
-    if(document.getElementById(id)){
-        let btn = document.getElementById(id);
-        btn.classList.add("disabled");
-        if (btn.tagName === "BUTTON") {
-            btn.disabled = true;
-            btn.setAttribute("aria-disabled", "true");
-        }
-        delete btn.dataset.action;
-    }
+    callAddTaskModuleMethod(
+        "AddTaskFormDomain",
+        "deactivateButton",
+        [id],
+        undefined
+    );
 }
