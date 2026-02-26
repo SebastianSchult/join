@@ -59,12 +59,13 @@ async function closeCard(){
     }
     deactivateFocusLayer({ restoreFocus: true });
     openCardContainer.remove();
-    openCardContainer.classList.add('d-none');
-    openCardContainer.removeAttribute('editing');
 
-    await saveTasksToRemoteStorage();
-    renderCategories(tasks);
-    toggleBoardOverlay('disable');
+    try {
+        await saveTasksToRemoteStorage();
+        renderCategories(tasks);
+    } finally {
+        toggleBoardOverlay('disable');
+    }
 }
 
 
