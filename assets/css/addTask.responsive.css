@@ -1,0 +1,79 @@
+@media (max-width: 1070px) {
+  .addTaskBody {
+    align-items: center;
+    flex-direction: column;
+    width: min-content;
+  }
+
+  .addTaskBodyLeft {
+    width: min-content;
+  }
+
+  .addTaskBodyRight {
+    position: relative;
+    background-color: white;
+    justify-content: center;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+  }
+
+  .addTaskEmptyDiv {
+    display: none;
+  }
+}
+
+@media (max-width: 801px) {
+  .main {
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .addTaskBodyTop,
+  .addTaskBodyBottom {
+    max-width: 400px;
+  }
+
+  .addTaskBtnContainer {
+    justify-content: center;
+  }
+
+  .addTaskBodyLeft {
+    padding: 3px;
+  }
+}
+
+@media (max-width: 450px) {
+  .clearBtn {
+    display: none;
+  }
+
+  .addTaskBody {
+    font-size: medium;
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  .addTaskBodyTop,
+  .addTaskBodyBottom {
+    width: 300px;
+  }
+  .addTask-custom-select {
+    font-size: medium;
+  }
+
+  .addTaskPriorityButtonContainer {
+    gap: 5px;
+  }
+
+  .addTaskPriorityButton {
+    width: 100px;
+    font-size: medium;
+
+    img {
+      width: 16px;
+    }
+  }
+}

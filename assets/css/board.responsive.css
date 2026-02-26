@@ -1,0 +1,215 @@
+@media (max-width: 1400px) {
+  .category-container {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    overflow-x: hidden;
+  }
+
+  .category {
+    display: flex;
+    gap: var(--ui-space-md);
+    width: 100%;
+  }
+
+  .categoryTasks {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: start;
+    overflow-x: auto;
+    padding: 18px;
+  }
+
+  .card {
+    height: 100%;
+  }
+
+  .empty-category {
+    height: 273px;
+  }
+
+  .empty-category {
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 801px) {
+  .boardAddTaskButtonContainer {
+    display: none;
+  }
+
+  .searchTaskContainer {
+    width: 100%;
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+.btnBoard {
+  height: 51px;
+}
+
+@media (max-width: 560px) {
+  .addTaskBody {
+    padding: 24px 24px 0 24px;
+  }
+
+  .addTaskBodyTop,
+  .addTaskBodyBottom {
+    max-width: 400px;
+    font-size: medium;
+  }
+
+  .addTaskBtnContainer {
+    justify-content: center;
+    right: 0;
+    bottom: 0;
+  }
+
+  .addTaskHoverContainer {
+    position: fixed;
+    top: 20px;
+    right: var(--ui-content-gap-lg);
+    left: 20px;
+    height: 95%;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .createBtn {
+      right: 0;
+    }
+
+    .addTaskBodyLeft {
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: var(--ui-space-sm);
+      height: 80%;
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .openCardContainer[editing] {
+    .addTaskBodyLeft {
+      /* padding-inline: 18px; */
+      width: 100%;
+    }
+  }
+
+  .openCardContainer {
+    width: 396px;
+    padding: 32px 24px 32px 24px;
+
+    .openCardInnerContainer * {
+      font-size: 1rem;
+    }
+
+    .cardTitle {
+      font-size: 2.25rem;
+    }
+
+    .clearBtn {
+      display: none;
+    }
+
+    .addTaskBody {
+      font-size: medium;
+
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .addTaskBodyTop,
+    .addTaskBodyBottom {
+      width: 100%;
+    }
+
+    .addTask-custom-select {
+      font-size: medium;
+    }
+
+    .addTaskPriorityButtonContainer {
+      justify-content: center;
+      gap: var(--ui-space-md);
+    }
+
+    .addTaskPriorityButton {
+      width: 100px;
+      font-size: medium;
+
+      img {
+        width: 16px;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 450px) {
+  .openCardContainer,
+  .openCardContainer[editing] {
+    /* width: clamp(290px, 100%, 400px); */
+    width: 100%;
+    padding: 24px 30px 24px 30px;
+  }
+  .addTaskHoverContainer {
+    left: 0;
+    right: 0;
+
+    .boardAddTaskHeader {
+      padding: 30px;
+      justify-content: space-between;
+      border-radius: 0;
+      align-items: center;
+    }
+    .addTaskBodyLeft {
+      padding-inline: 20px;
+      padding: 5px;
+    }
+
+    .addTaskBtnContainer {
+      bottom: 0;
+      right: 0;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .openCardContainer[editing] {
+    padding: 24px 16px 24px 16px;
+
+    .addTaskPriorityButtonContainer {
+      gap: 5px;
+    }
+  }
+}
+
+@media (max-width: 350px) {
+  .cardTitle {
+    font-size: 1rem !important;
+  }
+  .openCardContainer {
+    padding: 15px;
+  }
+
+  .openCardContainer[editing] {
+    padding: 5px;
+    .boardEditTaskHeader,
+    .addTaskBodyRight {
+      padding: var(--ui-space-sm);
+      bottom: 10px;
+    }
+  }
+}
