@@ -130,17 +130,20 @@ function assertBreakpointFallbacks(tokenValues) {
 
 function assertJsBreakpointUsage() {
   const summaryPath = path.resolve(process.cwd(), "js/summary.js");
-  const boardPath = path.resolve(process.cwd(), "js/board.js");
+  const boardPaths = [
+    path.resolve(process.cwd(), "js/board.js"),
+    path.resolve(process.cwd(), "js/board_rendering.js"),
+  ];
 
   ensureFileMatches(
     summaryPath,
     /getUiBreakpointValue\(['"]navigationTabletMax['"]\)/,
     "js/summary.js should read 'navigationTabletMax' via getUiBreakpointValue(...)."
   );
-  ensureFileMatches(
-    boardPath,
+  ensureAnyFileMatches(
+    boardPaths,
     /getUiBreakpointValue\(['"]boardColumnsMax['"]\)/,
-    "js/board.js should read 'boardColumnsMax' via getUiBreakpointValue(...)."
+    "Board runtime should read 'boardColumnsMax' via getUiBreakpointValue(...)."
   );
 }
 
@@ -171,6 +174,23 @@ function ensureFileMatches(filePath, regex, message) {
 
   const source = fs.readFileSync(filePath, "utf8");
   if (!regex.test(source)) {
+    violations.push(message);
+  }
+}
+
+function ensureAnyFileMatches(filePaths, regex, message) {
+  const existingPaths = filePaths.filter((filePath) => fs.existsSync(filePath));
+  if (existingPaths.length === 0) {
+    violations.push(`Missing files for token check: ${filePaths.map(relative).join(", ")}.`);
+    return;
+  }
+
+  const hasMatch = existingPaths.some((filePath) => {
+    const source = fs.readFileSync(filePath, "utf8");
+    return regex.test(source);
+  });
+
+  if (!hasMatch) {
     violations.push(message);
   }
 }
