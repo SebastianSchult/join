@@ -1,0 +1,250 @@
+{
+  "generatedAt": "2026-02-26T12:43:16.244Z",
+  "totalFiles": 40,
+  "totalFunctions": 317,
+  "documentedFunctions": 240,
+  "missingFunctions": 77,
+  "coveragePercent": 76,
+  "files": {
+    "js/contact_popups.js": {
+      "totalFunctions": 24,
+      "documentedFunctions": 1,
+      "missingFunctions": 23,
+      "coveragePercent": 4
+    },
+    "js/filepicker.js": {
+      "totalFunctions": 23,
+      "documentedFunctions": 0,
+      "missingFunctions": 23,
+      "coveragePercent": 0
+    },
+    "js/ui-event-delegation.js": {
+      "totalFunctions": 13,
+      "documentedFunctions": 0,
+      "missingFunctions": 13,
+      "coveragePercent": 0
+    },
+    "js/storage.js": {
+      "totalFunctions": 21,
+      "documentedFunctions": 11,
+      "missingFunctions": 10,
+      "coveragePercent": 52
+    },
+    "js/addTask_tasks.js": {
+      "totalFunctions": 19,
+      "documentedFunctions": 15,
+      "missingFunctions": 4,
+      "coveragePercent": 79
+    },
+    "js/runtime-fallbacks.js": {
+      "totalFunctions": 7,
+      "documentedFunctions": 4,
+      "missingFunctions": 3,
+      "coveragePercent": 57
+    },
+    "js/help.js": {
+      "totalFunctions": 1,
+      "documentedFunctions": 0,
+      "missingFunctions": 1,
+      "coveragePercent": 0
+    },
+    "js/addTask_dropdown.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/addTask_form_domain.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/addTask_keyboard.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/addTask_ui.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/addTask.js": {
+      "totalFunctions": 37,
+      "documentedFunctions": 37,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/auth.js": {
+      "totalFunctions": 14,
+      "documentedFunctions": 14,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/board_drag_and_drop.js": {
+      "totalFunctions": 5,
+      "documentedFunctions": 5,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/board_media.js": {
+      "totalFunctions": 5,
+      "documentedFunctions": 5,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/board_popups.js": {
+      "totalFunctions": 10,
+      "documentedFunctions": 10,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/board_rendering.js": {
+      "totalFunctions": 12,
+      "documentedFunctions": 12,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/board_state.js": {
+      "totalFunctions": 13,
+      "documentedFunctions": 13,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/board.js": {
+      "totalFunctions": 1,
+      "documentedFunctions": 1,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/contact_list.js": {
+      "totalFunctions": 3,
+      "documentedFunctions": 3,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/contact_popups_mutations.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/contact_popups_overlay.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/contact_popups_validation.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/contacts_render.js": {
+      "totalFunctions": 5,
+      "documentedFunctions": 5,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/contacts.js": {
+      "totalFunctions": 22,
+      "documentedFunctions": 22,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/cookiebot-bootstrap.js": {
+      "totalFunctions": 3,
+      "documentedFunctions": 3,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/helper_dom.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/helper_focus.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/helper_sanitize.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/helper.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/login.js": {
+      "totalFunctions": 18,
+      "documentedFunctions": 18,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/privacy_and_legal.js": {
+      "totalFunctions": 3,
+      "documentedFunctions": 3,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/responsive-navigation.js": {
+      "totalFunctions": 11,
+      "documentedFunctions": 11,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/signUp.js": {
+      "totalFunctions": 17,
+      "documentedFunctions": 17,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/storage_compat_fallbacks.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/storage_error_policy.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/storage_firebase_adapter.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/storage_transport.js": {
+      "totalFunctions": 0,
+      "documentedFunctions": 0,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "js/summary.js": {
+      "totalFunctions": 16,
+      "documentedFunctions": 16,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    },
+    "script.js": {
+      "totalFunctions": 14,
+      "documentedFunctions": 14,
+      "missingFunctions": 0,
+      "coveragePercent": 100
+    }
+  }
+}
