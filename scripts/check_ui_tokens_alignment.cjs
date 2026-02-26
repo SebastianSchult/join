@@ -29,11 +29,11 @@ const cssChecks = [
   { file: "assets/css/navigation.css", kind: "max", token: "navigationTabletMax" },
   { file: "assets/css/navigation.css", kind: "max", token: "mobileMax" },
   { file: "assets/css/navigation.css", kind: "max", token: "phoneMax" },
-  { file: "assets/css/board.css", kind: "max", token: "boardColumnsMax" },
-  { file: "assets/css/board.css", kind: "max", token: "mobileMax" },
-  { file: "assets/css/board.css", kind: "max", token: "phoneMax" },
-  { file: "assets/css/addTask.css", kind: "max", token: "mobileMax" },
-  { file: "assets/css/addTask.css", kind: "max", token: "phoneMax" },
+  { file: "assets/css/board.responsive.css", kind: "max", token: "boardColumnsMax" },
+  { file: "assets/css/board.responsive.css", kind: "max", token: "mobileMax" },
+  { file: "assets/css/board.responsive.css", kind: "max", token: "phoneMax" },
+  { file: "assets/css/addTask.responsive.css", kind: "max", token: "mobileMax" },
+  { file: "assets/css/addTask.responsive.css", kind: "max", token: "phoneMax" },
   { file: "style.css", kind: "max", token: "mobileMax" },
   { file: "assets/css/legalNotice.css", kind: "max", token: "contentNarrowMax" },
   { file: "assets/css/privacy.css", kind: "max", token: "contentNarrowMax" },
@@ -148,21 +148,21 @@ function assertJsBreakpointUsage() {
 }
 
 function assertTokenizedSpacingUsage() {
-  const addTaskPath = path.resolve(process.cwd(), "assets/css/addTask.css");
+  const addTaskPath = path.resolve(process.cwd(), "assets/css/addTask.base.css");
   ensureFileMatches(
     addTaskPath,
     /--addTaskGap-8:\s*var\(--ui-space-xs\);/,
-    "assets/css/addTask.css should map --addTaskGap-8 to --ui-space-xs."
+    "assets/css/addTask.base.css should map --addTaskGap-8 to --ui-space-xs."
   );
   ensureFileMatches(
     addTaskPath,
     /--addTaskGap-12:\s*var\(--ui-space-sm-md\);/,
-    "assets/css/addTask.css should map --addTaskGap-12 to --ui-space-sm-md."
+    "assets/css/addTask.base.css should map --addTaskGap-12 to --ui-space-sm-md."
   );
   ensureFileMatches(
     addTaskPath,
     /--addTaskGap-24:\s*var\(--ui-space-lg\);/,
-    "assets/css/addTask.css should map --addTaskGap-24 to --ui-space-lg."
+    "assets/css/addTask.base.css should map --addTaskGap-24 to --ui-space-lg."
   );
 }
 

@@ -1,0 +1,314 @@
+:root {
+  --addTaskGap-8: var(--ui-space-xs);
+  --addTaskGap-12: var(--ui-space-sm-md);
+  --addTaskGap-24: var(--ui-space-lg);
+  --clr-prio-urgent: #ff3d00;
+  --clr-prio-medium: #ffa800;
+  --clr-prio-low: #7ae229;
+  --clr-contact-marked: #4589ff;
+  --clr-contact-marked-hover: #005dff;
+  --clr-contact-hover: #d2e3ff;
+  --clr-border: #d1d1d1;
+  --clr-border-hover: var(--clr-contact-marked);
+  --padding-1216: var(--ui-space-sm-md) var(--ui-space-md);
+  --padding-0616: var(--ui-space-2xs) var(--ui-space-md);
+  --clr-btn-border: #647188;
+  --addTask-transistion: all 0.1s ease;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.cursorDefault {
+  cursor: default;
+}
+
+.cursorPointer {
+  cursor: pointer;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--clr-border);
+
+  &:hover {
+    border-bottom: 1px solid var(--clr-border-hover);
+  }
+}
+
+select,
+input,
+textarea {
+  border: none;
+  width: 100%;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: 1.188rem;
+  margin: 0;
+}
+
+input:focus,
+select:focus,
+button:focus {
+  outline: none;
+}
+
+input:focus {
+  border-bottom: 1px solid var(--clr-input-focus);
+}
+
+select:hover {
+  border-bottom: 1px solid var(--clr-input-focus);
+}
+
+textarea {
+  height: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0 10px 10px 10px;
+}
+
+textarea:focus {
+  outline: none !important;
+  border: 1px solid var(--clr-input-focus);
+}
+
+select {
+  cursor: pointer;
+}
+
+#addTaskDescriptionInput {
+  padding: 18px var(--ui-space-md);
+}
+
+.addTaskRequired {
+  width: 125px;
+  height: 16px;
+  color: red;
+  margin-top: 4px;
+  font-size: 0.813rem;
+}
+
+.is-invalid {
+  border-bottom: 1px solid red !important;
+}
+
+.addTaskBody {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+
+  padding: var(--ui-content-gap-lg) 0;
+  font-size: 1.188rem;
+  gap: var(--addTaskGap-24);
+
+  *::placeholder {
+    color: #d1d1d1;
+  }
+
+  input[type="date"] {
+    color: #d1d1d1;
+  }
+}
+
+.addTaskBodyLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--addTaskGap-24);
+  overflow-y: auto;
+  padding: 44px var(--ui-space-sm) 0 var(--ui-space-lg);
+  cursor: default;
+  width: min-content;
+}
+
+.openCardContainer .addTaskBodyRight {
+  left: 0;
+}
+
+.addTaskBodyRight {
+  display: flex;
+  align-items: flex-end;
+  justify-content: right;
+  width: min-content;
+  position: fixed;
+  bottom: 55px;
+  left: 777px;
+}
+
+.addTaskBtnContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 25px;
+  cursor: default;
+  padding-bottom: 5px;
+}
+
+.addTaskBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100px;
+  height: 60px;
+  border: 1px solid var(--clr-btn-border);
+  padding: var(--ui-space-md) var(--ui-space-sm);
+  border-radius: 10px;
+  font-size: 1.438rem;
+  transition: var(--addTask-transistion);
+}
+
+.clearBtn {
+  display: flex;
+  gap: var(--ui-space-sm);
+  background-color: #fff;
+  color: var(--clr-btn-border);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--clr-contact-marked);
+    border-color: var(--clr-contact-marked) !important;
+
+    box-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5), 0px 1px 3px rgba(0, 0, 0, 0.4),
+      0px 0px 0px 1px var(--clr-contact-marked);
+
+    .clearBtnImg {
+      background-image: url("../img/icon-close.png");
+    }
+  }
+}
+
+.clearBtnImg {
+  display: block;
+  background-image: url("../img/icon-close_gray.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 24px;
+  aspect-ratio: 1;
+}
+
+.createBtn {
+  display: flex;
+  gap: var(--ui-space-xxs);
+  background-color: var(--clr-contact-marked);
+  color: white;
+  width: max-content;
+  border: none;
+  height: 61px;
+
+  &:hover:not(.disabled) {
+    background-color: var(--clr-contact-marked-hover);
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5),
+        0px 1px 3px rgba(0, 0, 0, 0.4);
+      transition: var(--addTask-transistion);
+    }
+  }
+}
+
+.createBtnImg {
+  display: block;
+  background-image: url("../img/icon-check.png");
+  width: 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+  aspect-ratio: 1;
+}
+
+.addTaskAddTitleContainer {
+  padding-bottom: var(--addTaskPaddingBottom);
+}
+
+.addTaskAddTitleContainer input {
+  width: 100%;
+  padding: 13px 16px 13px 16px;
+  font-size: 2rem;
+}
+
+.addTaskDescription {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding-bottom: var(--addTaskPaddingBottom);
+  gap: var(--addTaskGap-8);
+
+  & .addTaskRequired {
+    margin-top: 0;
+  }
+}
+
+.addTaskDueDate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--addTaskGap-8);
+}
+
+.addTaskDueDateInputContainer {
+  position: relative;
+  display: flex;
+  width: 100%;
+  padding: var(--padding-1216);
+
+  input {
+    padding: 0;
+    border-bottom: none;
+    cursor: pointer;
+    width: 100%;
+  }
+}
+
+.addTaskDueDate input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  height: 100%;
+  width: auto;
+  top: 0;
+  left: 50px;
+  right: 0;
+  left: 0;
+}
+
+.addTaskDueDateImage {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  background-image: url("../img/icon-event.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+/* #addTaskDueDateInput{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+} */
+
+.addTaskBodyTop {
+  display: flex;
+  flex-direction: column;
+  width: 440px;
+  gap: var(--addTaskGap-12);
+}
+
+#addTaskDescription {
+  width: 100%;
+}
+
+.addTaskTitle {
+  width: 100%;
+}
+
+.addTaskBodyBottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--addTaskGap-24);
+  width: 440px;
+}
+
+/* Assigned To */
+
