@@ -12,6 +12,12 @@ setTimeout(() => {
 }, 1000);
 
 function initializeFilepickerUI() {
+  if (!hasRenderedAddTaskImageUi()) {
+    observeDropArea();
+    observeContainer();
+    return;
+  }
+
   addFilepickerListener();
   setupDragAndDrop();
   renderAddTaskImages();
@@ -208,7 +214,6 @@ function addImageToArray(file, compressedbase64) {
 function renderAddTaskImages() {
   const container = getCurrentImageContainer();
   if (!container) {
-    console.warn("Kein Container vorhanden zum Rendern der Bilder.");
     return;
   }
   container.innerHTML = "";
@@ -274,8 +279,6 @@ function getCurrentImageContainer() {
 
   if (editContainer) return editContainer;
   if (standardContainer) return standardContainer;
-
-  console.warn("Kein Container gefunden! Erstelle neuen Container 'subtasksImageContainer' innerhalb von 'addImageBottom'.");
   
   const dropArea = document.getElementById("addImageBottom");
   if (dropArea) {
@@ -284,6 +287,16 @@ function getCurrentImageContainer() {
     dropArea.appendChild(newContainer);
     return newContainer;
   } 
+
+  return null;
+}
+
+function hasRenderedAddTaskImageUi() {
+  return Boolean(
+    document.getElementById("subtasksImageContainer") ||
+      document.getElementById("editCardImagesContainer") ||
+      document.getElementById("addImageBottom")
+  );
 }
 
 function observeContainer() {
