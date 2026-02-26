@@ -1,8 +1,17 @@
 const JOIN_APP_CONFIG = window.JOIN_APP_CONFIG || {};
 
-const StorageErrorPolicy = resolveStorageModule("StorageErrorPolicy");
-const StorageTransport = resolveStorageModule("StorageTransport");
-const StorageFirebaseAdapter = resolveStorageModule("StorageFirebaseAdapter");
+const StorageErrorPolicy = resolveStorageModule(
+    "StorageErrorPolicy",
+    createStorageErrorPolicyFallback
+);
+const StorageTransport = resolveStorageModule(
+    "StorageTransport",
+    createStorageTransportFallback
+);
+const StorageFirebaseAdapter = resolveStorageModule(
+    "StorageFirebaseAdapter",
+    createStorageFirebaseAdapterFallback
+);
 
 const STORAGE_TOKEN = getConfigValue("STORAGE_TOKEN");
 const STORAGE_URL = getConfigValue(
@@ -289,10 +298,237 @@ async function remoteStorageSetItem(key, value) {
     );
 }
 
-function resolveStorageModule(moduleName) {
+function resolveStorageModule(moduleName, createFallback) {
     const moduleRef = window[moduleName];
     if (moduleRef) {
         return moduleRef;
     }
-    throw new Error(`Missing ${moduleName}. Ensure storage module scripts are loaded before js/storage.js.`);
+
+    console.warn(
+        `${moduleName} missing. Falling back to inline compatibility implementation.`
+    );
+    if (typeof createFallback === "function") {
+        return createFallback();
+    }
+
+    throw new Error(
+        `Missing ${moduleName}. Ensure storage module scripts are loaded before js/storage.js.`
+    );
+}
+
+function createStorageErrorPolicyFallback() {
+    function getResponseErrorDetail(payload) {
+        if (!payload) return "";
+        if (typeof payload === "string") return payload;
+        if (typeof payload === "object") {
+            if (typeof payload.message === "string") return payload.message;
+            if (typeof payload.error === "string") return payload.error;
+        }
+        return "";
+    }
+
+    function createFetchHttpError(response, context, payload) {
+        const statusText = response.statusText ? ` ${response.statusText}` : "";
+        const detail = getResponseErrorDetail(payload);
+        const detailSuffix = detail ? `: ${detail}` : "";
+        const error = new Error(
+            `${context} failed with status ${response.status}${statusText}${detailSuffix}`
+        );
+        error.status = response.status;
+        error.context = context;
+        error.payload = payload;
+        return error;
+    }
+
+    function createNetworkError(context, cause) {
+        const networkError = new Error(`${context} network error: ${cause.message}`);
+        networkError.cause = cause;
+        return networkError;
+    }
+
+    function showGlobalUserMessage(message) {
+        if (!message) return;
+        if (typeof window.showUserMessage === "function") {
+            try {
+                window.showUserMessage(message);
+                return;
+            } catch (error) {
+                console.error("showUserMessage failed:", error);
+            }
+        }
+        alert(message);
+    }
+
+    function handleSafeArrayReadError(error, options = {}) {
+        const {
+            context = "data",
+            errorMessage = `Could not load ${context}. Please try again.`,
+            showErrorMessage = true,
+        } = options;
+
+        console.error(`Failed to load ${context}:`, error);
+        if (showErrorMessage) {
+            showGlobalUserMessage(errorMessage);
+        }
+        return { data: [], error };
+    }
+
+    return Object.freeze({
+        getResponseErrorDetail,
+        createFetchHttpError,
+        createNetworkError,
+        showGlobalUserMessage,
+        handleSafeArrayReadError,
+    });
+}
+
+function createStorageTransportFallback() {
+    function normalizeFetchOptions(options = {}) {
+        const normalizedOptions = { ...options };
+        if (
+            normalizedOptions.header &&
+            !normalizedOptions.headers &&
+            typeof normalizedOptions.header === "object"
+        ) {
+            normalizedOptions.headers = normalizedOptions.header;
+        }
+        delete normalizedOptions.header;
+        return normalizedOptions;
+    }
+
+    function parseResponsePayload(responseText) {
+        if (typeof responseText !== "string" || responseText.trim() === "") {
+            return null;
+        }
+        try {
+            return JSON.parse(responseText);
+        } catch (error) {
+            return responseText;
+        }
+    }
+
+    async function fetchJson(url, options = {}, context = "fetchJson", errorPolicy) {
+        const policy = errorPolicy || createStorageErrorPolicyFallback();
+        let response;
+
+        try {
+            response = await fetch(url, normalizeFetchOptions(options));
+        } catch (error) {
+            throw policy.createNetworkError(context, error);
+        }
+
+        const responseText = await response.text();
+        const payload = parseResponsePayload(responseText);
+
+        if (!response.ok) {
+            throw policy.createFetchHttpError(response, context, payload);
+        }
+
+        return payload;
+    }
+
+    return Object.freeze({
+        normalizeFetchOptions,
+        parseResponsePayload,
+        fetchJson,
+    });
+}
+
+function createStorageFirebaseAdapterFallback() {
+    function buildFirebaseUrl(baseUrl, path = "_") {
+        return `${baseUrl}${path}.json`;
+    }
+
+    function getFirebaseEntityPath(path = "_", entityId = "") {
+        const normalizedPath = String(path || "_").replace(/\/+$/, "");
+        const normalizedId = encodeURIComponent(String(entityId));
+        return `${normalizedPath}/${normalizedId}`;
+    }
+
+    function normalizeFirebaseArrayPayload(payload) {
+        if (Array.isArray(payload)) {
+            return payload.filter((item) => item !== null && item !== undefined);
+        }
+        if (payload && typeof payload === "object") {
+            return Object.values(payload).filter(
+                (item) => item !== null && item !== undefined
+            );
+        }
+        return [];
+    }
+
+    function getRandomInt(min, max) {
+        const normalizedMin = Math.ceil(min);
+        const normalizedMax = Math.floor(max);
+        const range = normalizedMax - normalizedMin + 1;
+
+        if (
+            window.crypto &&
+            typeof window.crypto.getRandomValues === "function" &&
+            range > 0
+        ) {
+            const values = new Uint32Array(1);
+            window.crypto.getRandomValues(values);
+            return normalizedMin + (values[0] % range);
+        }
+        return normalizedMin + Math.floor(Math.random() * range);
+    }
+
+    function generateCollisionSafeId(existingItems = []) {
+        const knownIds = new Set();
+        if (Array.isArray(existingItems)) {
+            existingItems.forEach((item) => {
+                const numericId = Number(item && item.id);
+                if (Number.isSafeInteger(numericId)) {
+                    knownIds.add(numericId);
+                }
+            });
+        }
+
+        for (let attempt = 0; attempt < 10; attempt++) {
+            const candidateId = Date.now() * 1000000 + getRandomInt(0, 999999);
+            if (Number.isSafeInteger(candidateId) && !knownIds.has(candidateId)) {
+                return candidateId;
+            }
+        }
+        return Date.now() * 1000 + getRandomInt(0, 999);
+    }
+
+    async function firebaseGetArraySafe(path = "_", options = {}, dependencies = {}) {
+        const {
+            context = "data",
+            errorMessage = `Could not load ${context}. Please try again.`,
+            showErrorMessage = true,
+        } = options;
+
+        const {
+            firebaseGetItem,
+            normalizeFirebaseArrayPayload: normalizePayload = normalizeFirebaseArrayPayload,
+            errorPolicy = StorageErrorPolicy,
+        } = dependencies;
+
+        if (typeof firebaseGetItem !== "function") {
+            throw new Error("firebaseGetArraySafe requires a firebaseGetItem dependency.");
+        }
+
+        try {
+            const payload = await firebaseGetItem(path);
+            return { data: normalizePayload(payload), error: null };
+        } catch (error) {
+            return errorPolicy.handleSafeArrayReadError(error, {
+                context,
+                errorMessage,
+                showErrorMessage,
+            });
+        }
+    }
+
+    return Object.freeze({
+        buildFirebaseUrl,
+        getFirebaseEntityPath,
+        normalizeFirebaseArrayPayload,
+        getRandomInt,
+        generateCollisionSafeId,
+        firebaseGetArraySafe,
+    });
 }
