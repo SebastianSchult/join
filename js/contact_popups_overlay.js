@@ -5,6 +5,7 @@
   let contactsKeyboardAccessibilityRegistered = false;
   let editDeleteMenuOpener = null;
 
+  /** Opens the add-contact dialog, overlay backdrop, and focus trap context. */
   function cpoAddContactCard() {
     contactOverlayOpener = document.activeElement;
     if (!document.getElementById("addContact")) {
@@ -19,6 +20,12 @@
     });
   }
 
+  /**
+   * Appends a shared fullscreen overlay backdrop for contact dialogs.
+   *
+   * @param {string} overlayId - Dialog id that should close on overlay click.
+   * @returns {void}
+   */
   function cpoAddOverlay(overlayId) {
     const overlay = document.createElement("div");
     overlay.classList.add("overlay");
@@ -29,6 +36,12 @@
     document.body.style.overflow = "hidden";
   }
 
+  /**
+   * Closes a contact dialog, removes overlay backdrop, and restores scroll/focus state.
+   *
+   * @param {string} id - Dialog id to close and remove.
+   * @returns {void}
+   */
   function cpoCloseOverlay(id) {
     deactivateFocusLayer({ restoreFocus: true });
     const container = document.getElementById(id);
@@ -55,6 +68,7 @@
     }, 100);
   }
 
+  /** Creates and mounts the add-contact dialog container if missing. */
   function cpoRenderAddContacts() {
     let newDiv = document.createElement("div");
     newDiv.id = "addContact";
@@ -67,6 +81,7 @@
     document.getElementById("addContactContainer").appendChild(newDiv);
   }
 
+  /** Creates and mounts the edit-contact dialog container if missing. */
   function cpoRenderEditContact() {
     let newDiv = document.createElement("div");
     newDiv.id = "editContact";
@@ -78,11 +93,13 @@
     document.getElementById("contactMainEdit").appendChild(newDiv);
   }
 
+  /** Unhides the add-contact host container in responsive layouts. */
   function cpoShowAddContactContainer() {
     const addContactContainer = document.getElementById("addContactContainer");
     addContactContainer.classList.remove("hidden");
   }
 
+  /** Opens responsive edit/delete menu and moves keyboard focus into it. */
   function cpoOpenEditDelete() {
     const openButton = document.getElementById("openEditDeleteResponsive");
     const editDeleteMenu = document.getElementById("editDelete");
@@ -102,6 +119,12 @@
     focusElementIfPossible(firstMenuButton || editDeleteMenu);
   }
 
+  /**
+   * Closes responsive edit/delete menu and optionally restores opener focus.
+   *
+   * @param {{restoreFocus?: boolean}} [options={}] - Close behavior options.
+   * @returns {void}
+   */
   function cpoCloseEditDelete(options = {}) {
     const { restoreFocus = true } = options;
     const openButton = document.getElementById("openEditDeleteResponsive");
@@ -121,6 +144,7 @@
     editDeleteMenuOpener = null;
   }
 
+  /** Registers global keyboard handling for responsive contact action menu. */
   function cpoRegisterContactsKeyboardAccessibility() {
     if (contactsKeyboardAccessibilityRegistered) {
       return;
@@ -130,6 +154,12 @@
     contactsKeyboardAccessibilityRegistered = true;
   }
 
+  /**
+   * Handles ESC and TAB focus loop behavior for responsive contact action menu.
+   *
+   * @param {KeyboardEvent} event - Native keydown event.
+   * @returns {void}
+   */
   function cpoHandleContactsKeyboardAccessibility(event) {
     const editDeleteMenu = document.getElementById("editDelete");
     if (
@@ -176,6 +206,12 @@
     }
   }
 
+  /**
+   * Opens edit-contact dialog prefilled with selected contact values.
+   *
+   * @param {{id:number,name:string,contactColor:string}} contact - Contact to edit.
+   * @returns {void}
+   */
   function cpoEditContactCard(contact) {
     contactOverlayOpener = document.activeElement;
     if (!document.getElementById("editContact")) {
