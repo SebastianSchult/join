@@ -49,6 +49,12 @@ jobs:
           set -euo pipefail
           npm run lint:ui-tokens
 
+      - name: Guardrail check for JS/CSS file-size thresholds
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run lint:file-size
+
       - name: Guardrail check for undefined/redeclared JS references across page bundles
         shell: bash
         run: |
