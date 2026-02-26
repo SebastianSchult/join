@@ -274,6 +274,7 @@ function getNewTaskId(){
     return generateCollisionSafeId(tasks);
 }
 
+/** Marks a task id for patch upsert and removes conflicting pending delete state. */
 function queueTaskUpsert(taskId){
     const normalizedId = Number(taskId);
     if (!Number.isSafeInteger(normalizedId)) {
@@ -283,6 +284,7 @@ function queueTaskUpsert(taskId){
     pendingTaskUpserts.add(normalizedId);
 }
 
+/** Marks a task id for deletion and removes conflicting pending upsert state. */
 function queueTaskDelete(taskId){
     const normalizedId = Number(taskId);
     if (!Number.isSafeInteger(normalizedId)) {
@@ -292,6 +294,7 @@ function queueTaskDelete(taskId){
     pendingTaskDeletes.add(normalizedId);
 }
 
+/** Builds a sparse Firebase patch payload for the given task id list. */
 function buildTaskPatchPayload(taskIds){
     const payload = {};
     taskIds.forEach((id) => {
@@ -303,6 +306,7 @@ function buildTaskPatchPayload(taskIds){
     return payload;
 }
 
+/** Resolves a task entity by id from the in-memory tasks collection. */
 function getTaskById(taskId){
     for (let i = 0; i < tasks.length; i++) {
         if (Number(tasks[i].id) === Number(taskId)) {
