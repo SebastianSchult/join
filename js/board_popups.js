@@ -191,14 +191,17 @@ function hideAddTaskContainer(){
  * @param {string} actionName - Delegated action to trigger on overlay click.
  */
 function toggleBoardOverlay(actionName){
-    let overlay = document.getElementById('boardOverlay')
-    if (overlay.classList.contains('d-none')){
-        overlay.classList.remove('d-none')
-        overlay.dataset.action = actionName;
-    } else if (actionName == 'disable') {
-        overlay.classList.add('d-none')
+    let overlay = document.getElementById('boardOverlay');
+    if (!overlay) return;
+
+    if (actionName == 'disable') {
+        overlay.classList.add('d-none');
         delete overlay.dataset.action;
+        return;
     }
+
+    overlay.classList.remove('d-none');
+    overlay.dataset.action = actionName;
 }
 
 
