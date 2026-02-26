@@ -44,3 +44,4 @@ npm run a11y:report
 - UI tokens and breakpoints: [UI_TOKENS.md](./UI_TOKENS.md)
 - Secure rendering / XSS rules: [SECURITY_RENDERING.md](./SECURITY_RENDERING.md)
 - Refactor baseline and roadmap: [REFACTOR_RESEARCH.md](./REFACTOR_RESEARCH.md)
+- Engineering standards (docs, naming, ownership, refactor checklist): [ENGINEERING_STANDARDS.md](./ENGINEERING_STANDARDS.md)
