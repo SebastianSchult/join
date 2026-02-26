@@ -317,7 +317,7 @@ function resolveStorageModule(moduleName, createFallback) {
 }
 
 function createStorageErrorPolicyFallback() {
-    function getResponseErrorDetail(payload) {
+    const fallbackGetResponseErrorDetail = (payload) => {
         if (!payload) return "";
         if (typeof payload === "string") return payload;
         if (typeof payload === "object") {
@@ -325,11 +325,11 @@ function createStorageErrorPolicyFallback() {
             if (typeof payload.error === "string") return payload.error;
         }
         return "";
-    }
+    };
 
-    function createFetchHttpError(response, context, payload) {
+    const fallbackCreateFetchHttpError = (response, context, payload) => {
         const statusText = response.statusText ? ` ${response.statusText}` : "";
-        const detail = getResponseErrorDetail(payload);
+        const detail = fallbackGetResponseErrorDetail(payload);
         const detailSuffix = detail ? `: ${detail}` : "";
         const error = new Error(
             `${context} failed with status ${response.status}${statusText}${detailSuffix}`
@@ -338,15 +338,15 @@ function createStorageErrorPolicyFallback() {
         error.context = context;
         error.payload = payload;
         return error;
-    }
+    };
 
-    function createNetworkError(context, cause) {
+    const fallbackCreateNetworkError = (context, cause) => {
         const networkError = new Error(`${context} network error: ${cause.message}`);
         networkError.cause = cause;
         return networkError;
-    }
+    };
 
-    function showGlobalUserMessage(message) {
+    const fallbackShowGlobalUserMessage = (message) => {
         if (!message) return;
         if (typeof window.showUserMessage === "function") {
             try {
@@ -357,9 +357,9 @@ function createStorageErrorPolicyFallback() {
             }
         }
         alert(message);
-    }
+    };
 
-    function handleSafeArrayReadError(error, options = {}) {
+    const fallbackHandleSafeArrayReadError = (error, options = {}) => {
         const {
             context = "data",
             errorMessage = `Could not load ${context}. Please try again.`,
@@ -368,22 +368,22 @@ function createStorageErrorPolicyFallback() {
 
         console.error(`Failed to load ${context}:`, error);
         if (showErrorMessage) {
-            showGlobalUserMessage(errorMessage);
+            fallbackShowGlobalUserMessage(errorMessage);
         }
         return { data: [], error };
-    }
+    };
 
     return Object.freeze({
-        getResponseErrorDetail,
-        createFetchHttpError,
-        createNetworkError,
-        showGlobalUserMessage,
-        handleSafeArrayReadError,
+        getResponseErrorDetail: fallbackGetResponseErrorDetail,
+        createFetchHttpError: fallbackCreateFetchHttpError,
+        createNetworkError: fallbackCreateNetworkError,
+        showGlobalUserMessage: fallbackShowGlobalUserMessage,
+        handleSafeArrayReadError: fallbackHandleSafeArrayReadError,
     });
 }
 
 function createStorageTransportFallback() {
-    function normalizeFetchOptions(options = {}) {
+    const fallbackNormalizeFetchOptions = (options = {}) => {
         const normalizedOptions = { ...options };
         if (
             normalizedOptions.header &&
@@ -394,9 +394,9 @@ function createStorageTransportFallback() {
         }
         delete normalizedOptions.header;
         return normalizedOptions;
-    }
+    };
 
-    function parseResponsePayload(responseText) {
+    const fallbackParseResponsePayload = (responseText) => {
         if (typeof responseText !== "string" || responseText.trim() === "") {
             return null;
         }
@@ -405,47 +405,52 @@ function createStorageTransportFallback() {
         } catch (error) {
             return responseText;
         }
-    }
+    };
 
-    async function fetchJson(url, options = {}, context = "fetchJson", errorPolicy) {
+    const fallbackFetchJson = async (
+        url,
+        options = {},
+        context = "fetchJson",
+        errorPolicy
+    ) => {
         const policy = errorPolicy || createStorageErrorPolicyFallback();
         let response;
 
         try {
-            response = await fetch(url, normalizeFetchOptions(options));
+            response = await fetch(url, fallbackNormalizeFetchOptions(options));
         } catch (error) {
             throw policy.createNetworkError(context, error);
         }
 
         const responseText = await response.text();
-        const payload = parseResponsePayload(responseText);
+        const payload = fallbackParseResponsePayload(responseText);
 
         if (!response.ok) {
             throw policy.createFetchHttpError(response, context, payload);
         }
 
         return payload;
-    }
+    };
 
     return Object.freeze({
-        normalizeFetchOptions,
-        parseResponsePayload,
-        fetchJson,
+        normalizeFetchOptions: fallbackNormalizeFetchOptions,
+        parseResponsePayload: fallbackParseResponsePayload,
+        fetchJson: fallbackFetchJson,
     });
 }
 
 function createStorageFirebaseAdapterFallback() {
-    function buildFirebaseUrl(baseUrl, path = "_") {
+    const fallbackBuildFirebaseUrl = (baseUrl, path = "_") => {
         return `${baseUrl}${path}.json`;
-    }
+    };
 
-    function getFirebaseEntityPath(path = "_", entityId = "") {
+    const fallbackGetFirebaseEntityPath = (path = "_", entityId = "") => {
         const normalizedPath = String(path || "_").replace(/\/+$/, "");
         const normalizedId = encodeURIComponent(String(entityId));
         return `${normalizedPath}/${normalizedId}`;
-    }
+    };
 
-    function normalizeFirebaseArrayPayload(payload) {
+    const fallbackNormalizeFirebaseArrayPayload = (payload) => {
         if (Array.isArray(payload)) {
             return payload.filter((item) => item !== null && item !== undefined);
         }
@@ -455,9 +460,9 @@ function createStorageFirebaseAdapterFallback() {
             );
         }
         return [];
-    }
+    };
 
-    function getRandomInt(min, max) {
+    const fallbackGetRandomInt = (min, max) => {
         const normalizedMin = Math.ceil(min);
         const normalizedMax = Math.floor(max);
         const range = normalizedMax - normalizedMin + 1;
@@ -472,9 +477,9 @@ function createStorageFirebaseAdapterFallback() {
             return normalizedMin + (values[0] % range);
         }
         return normalizedMin + Math.floor(Math.random() * range);
-    }
+    };
 
-    function generateCollisionSafeId(existingItems = []) {
+    const fallbackGenerateCollisionSafeId = (existingItems = []) => {
         const knownIds = new Set();
         if (Array.isArray(existingItems)) {
             existingItems.forEach((item) => {
@@ -491,10 +496,14 @@ function createStorageFirebaseAdapterFallback() {
                 return candidateId;
             }
         }
-        return Date.now() * 1000 + getRandomInt(0, 999);
-    }
+        return Date.now() * 1000 + fallbackGetRandomInt(0, 999);
+    };
 
-    async function firebaseGetArraySafe(path = "_", options = {}, dependencies = {}) {
+    const fallbackFirebaseGetArraySafe = async (
+        path = "_",
+        options = {},
+        dependencies = {}
+    ) => {
         const {
             context = "data",
             errorMessage = `Could not load ${context}. Please try again.`,
@@ -503,7 +512,8 @@ function createStorageFirebaseAdapterFallback() {
 
         const {
             firebaseGetItem,
-            normalizeFirebaseArrayPayload: normalizePayload = normalizeFirebaseArrayPayload,
+            normalizeFirebaseArrayPayload:
+                normalizePayload = fallbackNormalizeFirebaseArrayPayload,
             errorPolicy = StorageErrorPolicy,
         } = dependencies;
 
@@ -521,14 +531,14 @@ function createStorageFirebaseAdapterFallback() {
                 showErrorMessage,
             });
         }
-    }
+    };
 
     return Object.freeze({
-        buildFirebaseUrl,
-        getFirebaseEntityPath,
-        normalizeFirebaseArrayPayload,
-        getRandomInt,
-        generateCollisionSafeId,
-        firebaseGetArraySafe,
+        buildFirebaseUrl: fallbackBuildFirebaseUrl,
+        getFirebaseEntityPath: fallbackGetFirebaseEntityPath,
+        normalizeFirebaseArrayPayload: fallbackNormalizeFirebaseArrayPayload,
+        getRandomInt: fallbackGetRandomInt,
+        generateCollisionSafeId: fallbackGenerateCollisionSafeId,
+        firebaseGetArraySafe: fallbackFirebaseGetArraySafe,
     });
 }
