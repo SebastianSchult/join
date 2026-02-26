@@ -30,7 +30,6 @@ These are explicit temporary exceptions with higher hard-fail caps.
 
 | File | Exception hard-fail cap | Reason |
 | --- | --- | --- |
-| `assets/templates/html_templates.js` | 650 lines | Legacy shared template bundle pending decomposition into focused template modules. |
 | `assets/css/contacts.css` | 1200 lines | Legacy contacts stylesheet pending modular split by component/responsibility. |
 
 When a refactor reduces one of these files below default limits, remove the exception.
