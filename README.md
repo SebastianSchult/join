@@ -45,6 +45,7 @@ npm run a11y:report
 - GitHub issue/PR/project/deploy automation: [GITHUB_AUTOMATION.md](./GITHUB_AUTOMATION.md)
 - Accessibility checks: [ACCESSIBILITY_CHECKS.md](./ACCESSIBILITY_CHECKS.md)
 - File-size guardrails: [FILE_SIZE_GUARDRAILS.md](./FILE_SIZE_GUARDRAILS.md)
+- Page script dependency manifest: [PAGE_SCRIPT_DEPENDENCIES.md](./PAGE_SCRIPT_DEPENDENCIES.md)
 - CSS guardrails (Stylelint): [CSS_GUARDRAILS.md](./CSS_GUARDRAILS.md)
 - JSDoc guardrails: [JSDOC_GUARDRAILS.md](./JSDOC_GUARDRAILS.md)
 - UI tokens and breakpoints: [UI_TOKENS.md](./UI_TOKENS.md)
