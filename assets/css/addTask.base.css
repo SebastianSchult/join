@@ -121,6 +121,7 @@
 
 .openCardContainer .addTaskBodyRight {
   left: 0;
+  right: auto;
 }
 
 .addTaskBodyRight {
@@ -130,7 +131,9 @@
   width: min-content;
   position: fixed;
   bottom: 55px;
-  left: 777px;
+  right: clamp(24px, 6vw, 72px);
+  left: auto;
+  max-width: calc(100vw - 32px);
 }
 
 .addTaskBtnContainer {

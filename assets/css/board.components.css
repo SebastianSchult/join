@@ -238,9 +238,11 @@
   top: 30px;
   left: 50%;
   transform: translateX(-50%);
-  width: 528px;
+  inline-size: min(528px, calc(100vw - clamp(24px, 6vw, 56px)));
+  max-inline-size: 100vw;
+  box-sizing: border-box;
   height: min-content;
-  max-height: calc(100% - 50px);
+  max-height: calc(100dvh - 50px);
   display: flex;
   flex-direction: column;
   gap: 5px;

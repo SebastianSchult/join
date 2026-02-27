@@ -314,23 +314,32 @@
 @media screen and (max-width: 580px) {
   .add-contact,
   .edit-contact {
-    min-width: 100%;
-    width: auto;
-}
+    inline-size: calc(100vw - 16px);
+    max-inline-size: calc(100vw - 16px);
+  }
 
-.edit-contact p {
-  font-size: 24px;
+  .add-contact {
+    right: 8px;
+  }
+
+  .edit-contact {
+    left: 8px;
+  }
+
+  .edit-contact p {
+    font-size: 24px;
+  }
 }
 
 @media screen and (max-width: 420px) {
-  .cancelButton{
-    display: none
+  .cancelButton {
+    display: none;
   }
 
-  .add-contact-header-logo p{
+  .add-contact-header-logo p {
     font-size: 21px;
   }
-} }
+}
 
 
 @media screen and (max-width: 380px) {

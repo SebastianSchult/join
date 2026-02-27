@@ -72,10 +72,12 @@
 
   .addTaskHoverContainer {
     position: fixed;
-    top: 20px;
-    right: var(--ui-content-gap-lg);
-    left: 20px;
-    height: 95%;
+    top: clamp(8px, 3vw, 20px);
+    right: clamp(8px, 3vw, 20px);
+    bottom: clamp(8px, 3vw, 20px);
+    left: clamp(8px, 3vw, 20px);
+    height: auto;
+    max-height: calc(100dvh - clamp(16px, 6vw, 40px));
     border-radius: 30px;
     display: flex;
     flex-direction: column;
@@ -106,7 +108,7 @@
   }
 
   .openCardContainer {
-    width: 396px;
+    inline-size: min(396px, calc(100vw - 24px));
     padding: 32px 24px 32px 24px;
 
     .openCardInnerContainer * {
@@ -144,7 +146,7 @@
     }
 
     .addTaskPriorityButton {
-      width: 100px;
+      width: clamp(88px, 26vw, 120px);
       font-size: medium;
 
       img {
@@ -160,8 +162,8 @@
 @media (max-width: 450px) {
   .openCardContainer,
   .openCardContainer[editing] {
-    /* width: clamp(290px, 100%, 400px); */
-    width: 100%;
+    inline-size: calc(100vw - 12px);
+    max-inline-size: calc(100vw - 12px);
     padding: 24px 30px 24px 30px;
   }
   .addTaskHoverContainer {

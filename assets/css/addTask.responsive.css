@@ -2,11 +2,12 @@
   .addTaskBody {
     align-items: center;
     flex-direction: column;
-    width: min-content;
+    width: 100%;
+    max-width: min(100%, 920px);
   }
 
   .addTaskBodyLeft {
-    width: min-content;
+    width: 100%;
   }
 
   .addTaskBodyRight {
@@ -30,8 +31,13 @@
 }
 
 @media screen and (max-width: 560px) {
+  .addTaskBody {
+    width: 100%;
+  }
+
   .addTaskBodyTop,
   .addTaskBodyBottom {
+    width: min(100%, 400px);
     max-width: 400px;
   }
 
@@ -58,7 +64,7 @@
   }
   .addTaskBodyTop,
   .addTaskBodyBottom {
-    width: 300px;
+    width: min(100%, 300px);
   }
   .addTask-custom-select {
     font-size: medium;
@@ -69,7 +75,7 @@
   }
 
   .addTaskPriorityButton {
-    width: 100px;
+    width: clamp(88px, 26vw, 120px);
     font-size: medium;
 
     img {
