@@ -5,16 +5,16 @@
     grid-template-rows: auto;
     justify-content: center;
     align-items: center;
-    grid-column-gap: 8px;
-    grid-row-gap: 16px;
-    padding: 13px;
+    grid-column-gap: clamp(8px, 2vw, 12px);
+    grid-row-gap: clamp(12px, 3vw, 16px);
+    padding: clamp(8px, 3vw, 13px);
   }
 
   .urgent {
     grid-column: 1 / 3;
     grid-row: 1 / 2;
-    width: 280px;
-    height: 150px;
+    width: min(100%, var(--summary-card-wide-2));
+    min-height: clamp(142px, 34vw, 150px);
   }
 
   .date {
@@ -42,8 +42,8 @@
   .square-button {
     padding: 0;
     margin: 0;
-    width: 132px;
-    height: 142px;
+    width: 100%;
+    min-height: clamp(132px, 32vw, 142px);
     span {
       font-weight: 400;
       font-size: 17px;
@@ -102,8 +102,8 @@
 
   #toDoButton {
     background-color: var(--clr-summary-square-button-focus);
-    width: 280px;
-    height: 106px;
+    width: min(100%, var(--summary-card-wide-2));
+    min-height: clamp(96px, 22vw, 106px);
   }
 }
 
@@ -123,17 +123,17 @@
     grid-template-rows: auto;
     justify-content: center;
     align-items: center;
-    grid-column-gap: 21px;
-    grid-row-gap: 21px;
+    grid-column-gap: clamp(12px, 3vw, 21px);
+    grid-row-gap: clamp(12px, 3vw, 21px);
     height: auto;
-    padding: 7px;
+    padding: clamp(6px, 2vw, 12px);
   }
 
   .urgent {
     grid-column: 1 / 3;
     grid-row: 1 / 2;
-    width: 396px;
-    height: 150px;
+    width: min(100%, var(--summary-card-wide-2));
+    min-height: clamp(142px, 29vw, 150px);
   }
 
   .toDo {
@@ -166,8 +166,8 @@
 
   #toDoButton {
     background-color: var(--clr-summary-square-button-focus);
-    width: 396px;
-    height: 106px;
+    width: min(100%, var(--summary-card-wide-2));
+    min-height: clamp(96px, 18vw, 106px);
 
     /*das ist neu von unten:*/
     .inner-square-button {
@@ -207,8 +207,8 @@
   .square-button {
     padding: 0;
     margin: 0;
-    width: 186px;
-    height: 152px;
+    width: 100%;
+    min-height: clamp(142px, 24vw, 152px);
 
     span {
       font-weight: 400;
@@ -261,6 +261,12 @@
 }
 
 @media (min-width: 600px) and (max-width: 950px) {
+  :root {
+    --summary-card-width-md: clamp(188px, 28vw, 252px);
+    --summary-grid-gap-md: clamp(12px, 2vw, 21px);
+    --summary-card-wide-md: calc((var(--summary-card-width-md) * 2) + var(--summary-grid-gap-md));
+  }
+
   .sub-main-summary {
     padding: 16px 52px;
   }
@@ -289,16 +295,17 @@
     grid-template-rows: auto;
     justify-content: center;
     align-items: center;
-    grid-column-gap: 21px;
-    grid-row-gap: 21px;
+    grid-column-gap: var(--summary-grid-gap-md);
+    grid-row-gap: var(--summary-grid-gap-md);
     height: auto;
   }
 
   .square-button {
     padding: 0;
     margin: 0;
-    height: 152px;
-    width: 252px;
+    width: 100%;
+    max-width: var(--summary-card-width-md);
+    min-height: clamp(146px, 18vw, 152px);
   }
 
   .daytimeGreeting {
@@ -341,20 +348,20 @@
   .urgent {
     grid-column: 1 / 3;
     grid-row: 1 / 1;
-    height: 219px;
-    width: 528px;
+    width: min(100%, var(--summary-card-wide-md));
+    min-height: clamp(180px, 26vw, 219px);
   }
 
   #toDoButton {
-    width: 528px;
+    width: min(100%, var(--summary-card-wide-md));
   }
 
   .toDo {
     background-color: var(--clr-summary-square-button-focus);
     grid-column: 1 / 3;
     grid-row: 2 / 3;
-    width: 396px;
-    height: 106px;
+    width: min(100%, var(--summary-card-wide-md));
+    min-height: clamp(96px, 14vw, 106px);
   }
 
   .inBoard {
@@ -392,6 +399,12 @@
 /*/ ///////////////////////////////////////////////////////////////////min    950px*/
 
 @media only screen and (min-width: 950px) and (max-width: 1200px) {
+  :root {
+    --summary-card-width-lg: clamp(180px, 17vw, 204px);
+    --summary-grid-gap-lg: clamp(16px, 2vw, 24px);
+    --summary-card-wide-lg: calc((var(--summary-card-width-lg) * 3) + (var(--summary-grid-gap-lg) * 2));
+  }
+
   .summary-box {
     margin-top: 0;
     gap: 20px;
@@ -413,20 +426,29 @@
 
   .button-container {
     display: grid;
-    grid-template-columns: 204px 204px 204px;
+    grid-template-columns: repeat(3, minmax(0, var(--summary-card-width-lg)));
     grid-template-rows: auto;
     justify-content: center;
     align-items: center;
-    grid-column-gap: 24px;
-    grid-row-gap: 24px;
+    grid-column-gap: var(--summary-grid-gap-lg);
+    grid-row-gap: var(--summary-grid-gap-lg);
     padding: 10px 20px;
   }
 
   .urgent {
     grid-column: 1 / 4;
     grid-row: 1 / 2;
-    width: calc((204px * 3) + (2 * 24px));
+    width: min(100%, var(--summary-card-wide-lg));
     /* height: 150px; */
+  }
+
+  .toDo,
+  .inBoard,
+  .inProgress,
+  .feedback,
+  .done {
+    min-height: var(--summary-card-height);
+    width: var(--summary-card-width-lg);
   }
 
   .toDo {
@@ -434,33 +456,23 @@
     grid-column: 1 / 2;
     grid-row: 2 / 3;
     background: white;
-    height: 219px;
-    width: 204px;
   }
 
   .inBoard {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
-    height: 219px;
-    width: 204px;
   }
 
   .inProgress {
     grid-column: 3 / 4;
     grid-row: 2 / 3;
-    height: 219px;
-    width: 204px;
   }
 
   .feedback {
-    height: 219px;
-    width: 204px;
     /* margin-bottom: 24px; */
   }
 
   .done {
-    height: 219px;
-    width: 204px;
     /* margin-bottom: 24px; */
   }
 }
@@ -468,59 +480,63 @@
 /*////////////////////////////////////////////////////////////////////min 1204px*/
 /* Medium Devices, Desktops */
 @media only screen and (min-width: 1200px) {
+  :root {
+    --summary-card-width-xl: clamp(180px, 14vw, 204px);
+    --summary-grid-gap-xl: clamp(16px, 2vw, 24px);
+    --summary-card-wide-xl: calc((var(--summary-card-width-xl) * 3) + (var(--summary-grid-gap-xl) * 2));
+  }
+
   .button-container {
     display: grid;
-    grid-template-columns: 204px 204px 204px 204px;
+    grid-template-columns: repeat(4, minmax(0, var(--summary-card-width-xl)));
     grid-template-rows: auto;
     justify-content: center;
     align-items: center;
     /* gap: 24px; */
-    grid-column-gap: 24px;
-    grid-row-gap: 24px;
+    grid-column-gap: var(--summary-grid-gap-xl);
+    grid-row-gap: var(--summary-grid-gap-xl);
   }
 
   .urgent {
     grid-column: 1 / 4;
     grid-row: 1 / 2;
-    width: calc((204px * 3) + (2 * 24px));
+    width: min(100%, var(--summary-card-wide-xl));
+  }
+
+  .toDo,
+  .inBoard,
+  .inProgress,
+  .feedback,
+  .done {
+    min-height: var(--summary-card-height);
+    width: var(--summary-card-width-xl);
   }
 
   .toDo {
     grid-column: 1 / 2;
     grid-row: 2 / 3;
     background: white;
-    height: 219px;
-    width: 204px;
     background-color: var(--clr-summary-square-button-focus);
   }
 
   .inBoard {
     grid-column: 4 / 5;
     grid-row: 1 / 2;
-
-    height: 219px;
-    width: 204px;
   }
 
   .inProgress {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
-    height: 219px;
-    width: 204px;
   }
 
   .feedback {
     grid-column: 3 / 4;
     grid-row: 2 / 3;
-    height: 219px;
-    width: 204px;
   }
 
   .done {
     grid-column: 4 / 5;
     grid-row: 2 / 3;
-    height: 219px;
-    width: 204px;
   }
 
   #usernameForGreeting {

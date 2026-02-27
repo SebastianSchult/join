@@ -41,8 +41,8 @@
 .urgent {
   grid-column: 1 / 3;
   grid-row: 1 / 2;
-  height: 219px;
-  width: calc((204px * 2) + 24px);
+  min-height: var(--summary-card-height);
+  width: var(--summary-card-wide-2);
 }
 
 .urgentAndDate:hover {
