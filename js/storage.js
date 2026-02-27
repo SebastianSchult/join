@@ -1,5 +1,17 @@
 "use strict";
 
+/**
+ * Builds a minimal runtime object when `window.StorageRuntime` is unavailable.
+ *
+ * Compatibility rationale:
+ * - Supports mixed-cache deploy phases where `storage_runtime.js` may be stale or missing.
+ * - Reuses existing fallback factories from `StorageCompatFallbacks` where available.
+ *
+ * Side effects:
+ * - Writes the synthesized runtime object to `window.StorageRuntime`.
+ *
+ * @returns {Object} Runtime facade containing config values and resolved storage modules.
+ */
 const createStorageRuntimeFallbackObject = () => {
   const joinAppConfig = window.JOIN_APP_CONFIG || {};
   const storageCompatFallbacks = window.StorageCompatFallbacks || null;
@@ -95,14 +107,35 @@ const BASE_URL = storageRuntime.BASE_URL;
 const FIREBASE_TASKS_ID = storageRuntime.FIREBASE_TASKS_ID;
 const FIREBASE_USERS_ID = storageRuntime.FIREBASE_USERS_ID;
 
+/**
+ * Validates presence of required runtime config keys.
+ *
+ * @param {Array<string>} requiredKeys - Keys expected in `JOIN_APP_CONFIG`.
+ * @returns {void}
+ * @throws {Error} Throws when one or more keys are missing.
+ */
 function assertConfig(requiredKeys) {
   storageRuntime.assertConfig(requiredKeys);
 }
 
+/**
+ * Executes JSON HTTP requests through the storage transport layer.
+ *
+ * @param {string} url - Request URL.
+ * @param {RequestInit} [options={}] - Fetch options.
+ * @param {string} [context="fetchJson"] - Context label used for error mapping.
+ * @returns {Promise<Object>} Parsed JSON response payload.
+ */
 async function fetchJson(url, options = {}, context = "fetchJson") {
   return StorageTransport.fetchJson(url, options, context, StorageErrorPolicy);
 }
 
+/**
+ * Resolves a Firebase URL for the configured base endpoint.
+ *
+ * @param {string} [path="_"] - Firebase path suffix.
+ * @returns {string} Full Firebase JSON endpoint URL.
+ */
 function getFirebaseUrl(path = "_") {
   assertConfig(["BASE_URL"]);
   return StorageFirebaseAdapter.buildFirebaseUrl(BASE_URL, path);
@@ -243,10 +276,23 @@ function generateCollisionSafeId(existingItems = []) {
   return StorageFirebaseAdapter.generateCollisionSafeId(existingItems);
 }
 
+/**
+ * Displays a user-facing global storage message via the configured error policy.
+ *
+ * @param {string} message - Message text shown to the user.
+ * @returns {void}
+ */
 function showGlobalUserMessage(message) {
   return StorageErrorPolicy.showGlobalUserMessage(message);
 }
 
+/**
+ * Reads a Firebase collection and normalizes it to a safe array result.
+ *
+ * @param {string} [path="_"] - Firebase collection path.
+ * @param {Object} [options={}] - Adapter options (context, fallback messages, etc.).
+ * @returns {Promise<{data:Array,error:Error|null}>} Safe load result.
+ */
 async function firebaseGetArraySafe(path = "_", options = {}) {
   return StorageFirebaseAdapter.firebaseGetArraySafe(path, options, {
     firebaseGetItem,
@@ -293,6 +339,14 @@ function getCurrentUser() {
   }
 }
 
+/**
+ * Restores user backup data into Firebase users collection.
+ *
+ * Side effects:
+ * - Issues a Firebase write call using global `users_backup` content.
+ *
+ * @returns {void}
+ */
 function restoreUsersOnFirebase() {
   firebaseUpdateItem(users_backup, FIREBASE_USERS_ID);
 }

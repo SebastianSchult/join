@@ -12,6 +12,14 @@ const UI_MOUSEOVER_ACTIONS = uiEventRegistry.mouseover || {};
 const UI_MOUSEOUT_ACTIONS = uiEventRegistry.mouseout || {};
 const UI_DBLCLICK_ACTIONS = uiEventRegistry.dblclick || {};
 
+/**
+ * Registers delegated listeners for all supported UI event types.
+ *
+ * Side effects:
+ * - Attaches document-level listeners and routes interactions via data-* contracts.
+ *
+ * @returns {void}
+ */
 function initializeUiEventDelegation() {
   document.addEventListener("click", handleDelegatedClick);
   document.addEventListener("submit", handleDelegatedSubmit);
@@ -25,6 +33,12 @@ function initializeUiEventDelegation() {
   document.addEventListener("drop", handleDelegatedDrop);
 }
 
+/**
+ * Handles delegated click actions and optional default/prevent propagation behavior.
+ *
+ * @param {MouseEvent} event - Click event bubbled to document level.
+ * @returns {void}
+ */
 function handleDelegatedClick(event) {
   const stopPropagationElement = event.target.closest(
     '[data-stop-propagation="true"]'
@@ -50,6 +64,12 @@ function handleDelegatedClick(event) {
   actionHandler(actionElement, event);
 }
 
+/**
+ * Handles delegated submit actions mapped via `data-submit-action`.
+ *
+ * @param {SubmitEvent} event - Submit event bubbled from form elements.
+ * @returns {void}
+ */
 function handleDelegatedSubmit(event) {
   const formElement = event.target.closest("form[data-submit-action]");
   if (!formElement) {
@@ -65,6 +85,12 @@ function handleDelegatedSubmit(event) {
   submitHandler(formElement, event);
 }
 
+/**
+ * Handles delegated keyup actions mapped via `data-keyup-action`.
+ *
+ * @param {KeyboardEvent} event - Keyup event bubbled to document.
+ * @returns {void}
+ */
 function handleDelegatedKeyup(event) {
   const keyupElement = event.target.closest("[data-keyup-action]");
   if (!keyupElement) {
@@ -79,6 +105,12 @@ function handleDelegatedKeyup(event) {
   keyupHandler(keyupElement, event);
 }
 
+/**
+ * Handles delegated double-click actions mapped via `data-dblclick-action`.
+ *
+ * @param {MouseEvent} event - Dblclick event bubbled to document.
+ * @returns {void}
+ */
 function handleDelegatedDblclick(event) {
   const dblclickElement = event.target.closest("[data-dblclick-action]");
   if (!dblclickElement) {
@@ -93,6 +125,12 @@ function handleDelegatedDblclick(event) {
   dblclickHandler(dblclickElement, event);
 }
 
+/**
+ * Handles delegated mouseover actions and ignores transitions within the same element.
+ *
+ * @param {MouseEvent} event - Mouseover event bubbled to document.
+ * @returns {void}
+ */
 function handleDelegatedMouseover(event) {
   const hoverElement = event.target.closest("[data-hover-action]");
   if (!hoverElement || hoverElement.contains(event.relatedTarget)) {
@@ -107,6 +145,12 @@ function handleDelegatedMouseover(event) {
   hoverHandler(hoverElement, event);
 }
 
+/**
+ * Handles delegated mouseout actions and ignores transitions within the same element.
+ *
+ * @param {MouseEvent} event - Mouseout event bubbled to document.
+ * @returns {void}
+ */
 function handleDelegatedMouseout(event) {
   const leaveElement = event.target.closest("[data-leave-action]");
   if (!leaveElement || leaveElement.contains(event.relatedTarget)) {
@@ -121,6 +165,12 @@ function handleDelegatedMouseout(event) {
   leaveHandler(leaveElement, event);
 }
 
+/**
+ * Handles delegated dragstart actions mapped via `data-dragstart-action`.
+ *
+ * @param {DragEvent} event - Dragstart event bubbled to document.
+ * @returns {void}
+ */
 function handleDelegatedDragstart(event) {
   const dragstartElement = event.target.closest("[data-dragstart-action]");
   if (!dragstartElement) {
@@ -135,6 +185,12 @@ function handleDelegatedDragstart(event) {
   dragstartHandler(dragstartElement, event);
 }
 
+/**
+ * Handles delegated dragend actions mapped via `data-dragend-action`.
+ *
+ * @param {DragEvent} event - Dragend event bubbled to document.
+ * @returns {void}
+ */
 function handleDelegatedDragend(event) {
   const dragendElement = event.target.closest("[data-dragend-action]");
   if (!dragendElement) {
@@ -149,6 +205,12 @@ function handleDelegatedDragend(event) {
   dragendHandler(dragendElement, event);
 }
 
+/**
+ * Handles delegated dragover actions mapped via `data-dragover-action`.
+ *
+ * @param {DragEvent} event - Dragover event bubbled to document.
+ * @returns {void}
+ */
 function handleDelegatedDragover(event) {
   const dragoverElement = event.target.closest("[data-dragover-action]");
   if (!dragoverElement) {
@@ -163,6 +225,12 @@ function handleDelegatedDragover(event) {
   dragoverHandler(dragoverElement, event);
 }
 
+/**
+ * Handles delegated drop actions mapped via `data-drop-action`.
+ *
+ * @param {DragEvent} event - Drop event bubbled to document.
+ * @returns {void}
+ */
 function handleDelegatedDrop(event) {
   const dropElement = event.target.closest("[data-drop-action]");
   if (!dropElement) {
@@ -177,6 +245,12 @@ function handleDelegatedDrop(event) {
   dropHandler(dropElement, event);
 }
 
+/**
+ * Determines whether default browser behavior should be prevented for a delegated action target.
+ *
+ * @param {Element} element - Action element resolved from event target.
+ * @returns {boolean} `true` when default behavior should be prevented.
+ */
 function shouldPreventDefault(element) {
   if (element.dataset.preventDefault === "true") {
     return true;
@@ -190,6 +264,17 @@ function shouldPreventDefault(element) {
   return false;
 }
 
+/**
+ * Resolves a function by name from `window` and executes it with provided arguments.
+ *
+ * Side effects:
+ * - Executes globally registered handlers.
+ * - Logs a warning when a handler is missing.
+ *
+ * @param {string} functionName - Global function name to execute.
+ * @param {Array<*>} [args=[]] - Positional arguments forwarded to the handler.
+ * @returns {void}
+ */
 function executeNamedFunction(functionName, args = []) {
   const callback = window[functionName];
   if (typeof callback !== "function") {

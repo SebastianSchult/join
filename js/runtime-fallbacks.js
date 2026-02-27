@@ -56,10 +56,24 @@ function initializeLegacyRuntimeFallbacks() {
 	markRuntimeFallbackVersionApplied();
 }
 
+/**
+ * Checks whether the current fallback version was already applied to this runtime.
+ *
+ * @returns {boolean} `true` when current fallback version is already active.
+ */
 function isRuntimeFallbackVersionApplied() {
 	return window.__joinRuntimeFallbackVersion === RUNTIME_FALLBACKS_HEADER.version;
 }
 
+/**
+ * Marks current fallback version as applied and stores immutable metadata for diagnostics.
+ *
+ * Side effects:
+ * - Writes `window.__joinRuntimeFallbackVersion`.
+ * - Writes `window.__joinRuntimeFallbackMetadata`.
+ *
+ * @returns {void}
+ */
 function markRuntimeFallbackVersionApplied() {
 	window.__joinRuntimeFallbackVersion = RUNTIME_FALLBACKS_HEADER.version;
 	window.__joinRuntimeFallbackMetadata = Object.freeze({
@@ -164,6 +178,13 @@ function applyHelperFallbacks() {
 	});
 }
 
+/**
+ * Registers a fallback implementation on `window` only when function is missing.
+ *
+ * @param {string} functionName - Global function identifier.
+ * @param {Function} implementation - Fallback implementation to register.
+ * @returns {void}
+ */
 function ensureWindowFunction(functionName, implementation) {
 	if (typeof window[functionName] !== "function") {
 		window[functionName] = implementation;
