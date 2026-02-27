@@ -3,6 +3,11 @@
 This project now ships a baseline Content Security Policy on all static HTML
 entry pages using a `<meta http-equiv="Content-Security-Policy">` tag.
 
+Important limitation:
+
+- `frame-ancestors` is ignored in CSP `<meta>` tags by browsers.
+- If clickjacking protection is required, set `frame-ancestors` via HTTP response header.
+
 Covered entry pages:
 
 - `index.html`
@@ -23,7 +28,6 @@ Covered entry pages:
 default-src 'self';
 base-uri 'self';
 object-src 'none';
-frame-ancestors 'self';
 form-action 'self';
 script-src 'self' https://cdnjs.cloudflare.com https://consent.cookiebot.com https://consentcdn.cookiebot.com;
 style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
@@ -32,6 +36,19 @@ font-src 'self' data:;
 connect-src 'self' https://remote-storage.developerakademie.org https://*.firebasedatabase.app https://*.firebaseio.com https://consent.cookiebot.com https://consentcdn.cookiebot.com;
 frame-src 'self' https://consent.cookiebot.com https://consentcdn.cookiebot.com;
 worker-src 'self' blob:;
+```
+
+## Header-only directives
+
+Use server headers for directives not supported in `<meta>` CSP (especially
+`frame-ancestors`).
+
+Apache (`.htaccess`) example:
+
+```apache
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "frame-ancestors 'self'"
+</IfModule>
 ```
 
 ## Why these sources are allowed
