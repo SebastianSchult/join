@@ -17,19 +17,21 @@ npm run lint:file-size
 | File type | Warning threshold | Hard-fail threshold |
 | --- | --- | --- |
 | JavaScript (`.js`) | > 300 lines | > 400 lines |
-| CSS (`.css`) | > 800 lines | > 1000 lines |
+| CSS default (`.css`) | > 420 lines | > 700 lines |
+| CSS base layer (`*.base.css`) | > 320 lines | > 500 lines |
+| CSS components layer (`*.components.css`) | > 380 lines | > 560 lines |
+| CSS responsive layer (`*.responsive.css`) | > 340 lines | > 620 lines |
 
 Behavior:
 
 - files above warning threshold are reported as warnings
 - files above hard-fail threshold fail CI
 
+Layering note:
+
+- layer-specific thresholds override CSS default thresholds
+- files without layer suffixes (for example `login.css`, `help.css`) use CSS default thresholds
+
 ## Current Exceptions
 
-These are explicit temporary exceptions with higher hard-fail caps.
-
-| File | Exception hard-fail cap | Reason |
-| --- | --- | --- |
-| `assets/css/contacts.css` | 1200 lines | Legacy contacts stylesheet pending modular split by component/responsibility. |
-
-When a refactor reduces one of these files below default limits, remove the exception.
+No active exceptions are configured.
