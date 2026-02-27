@@ -192,10 +192,10 @@
   padding: 0;
 }
 
-input:focus,
-select:focus,
-textarea:focus,
-button:focus {
+.board-Container input:focus,
+.board-Container select:focus,
+.board-Container textarea:focus,
+.board-Container button:focus {
   outline: none;
 }
 
@@ -275,4 +275,3 @@ button:focus {
   color: #a8a8a8;
   width: 253px;
 }
-
