@@ -1,25 +1,6 @@
 "use strict";
 
 /**
- * Generates initials from a full name.
- *
- * @param {string} name - The full name from which to generate initials.
- * @returns {string} The initials generated from the provided full name.
- */
-function getInitials(name) {
-  let returnName = "";
-  if (name.includes(" ")) {
-    let [firstName, lastName] = name.split(" ");
-    let firstInitial = firstName.charAt(0).toUpperCase();
-    let lastInitial = lastName.charAt(0).toUpperCase();
-    returnName = firstInitial + lastInitial;
-  } else {
-    returnName = name.charAt(0).toUpperCase();
-  }
-  return returnName;
-}
-
-/**
  * Creates a letter element representing the first letter of a group of contacts.
  *
  * @function createFirstLetter

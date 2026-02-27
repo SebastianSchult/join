@@ -69,6 +69,28 @@ function getDiv(id) {
 
 
 /**
+ * Builds initials from a full name for avatar/header rendering.
+ *
+ * @param {string} name - Full name string.
+ * @returns {string} Initials (1-2 chars), defaults to "G" for empty input.
+ */
+function getInitials(name) {
+	if (typeof name !== "string" || name.trim() === "") {
+		return "G";
+	}
+
+	const nameParts = name.trim().split(/\s+/).filter(Boolean);
+	if (nameParts.length === 1) {
+		return nameParts[0].charAt(0).toUpperCase();
+	}
+
+	return (
+		nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)
+	).toUpperCase();
+}
+
+
+/**
  * rendering the board-page,
  * calling renderCategories to render all available tasks to each category
  */
