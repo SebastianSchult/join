@@ -4,7 +4,13 @@
   /* font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; */
   font-family: "Open Sans", sans-serif;
-  max-width: 1440px;
+}
+
+:root {
+  --auth-form-max-width: 422px;
+  --auth-card-max-width: 652px;
+  --auth-logo-size: clamp(48px, 9vw, 64px);
+  --auth-input-padding-inline: clamp(12px, 3vw, 21px);
 }
 
 .loginMainContainer {
@@ -62,7 +68,8 @@
   align-items: center;
   border: 1px solid lightgrey;
   border-radius: 30px;
-  padding: 48px 115px;
+  width: min(100%, var(--auth-card-max-width));
+  padding: clamp(24px, 6vw, 48px) clamp(16px, 8vw, 115px);
   gap: 39px;
   box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.08);
 }
@@ -101,10 +108,10 @@
   display: flex;
   justify-content: space-between;
   align-items: self-end;
-  width: 422px;
+  width: min(100%, var(--auth-form-max-width));
   border-bottom: 1px solid #d1d1d1;
   /* margin-bottom: 24px; */
-  padding: 12px 21px;
+  padding: 12px var(--auth-input-padding-inline);
   gap: 34px;
 }
 
@@ -261,7 +268,7 @@ input[type="password"]:focus {
 
 .goal img {
   height: 78px;
-  width: 64px;
+  width: var(--auth-logo-size);
   transition: all 500ms ease-in-out;
 }
 
@@ -281,7 +288,7 @@ input[type="password"]:focus {
 /*/////////////////////////MOBILE///////////////////////////*/
 @media (max-width: 970px) {
   .joinLogoBlue img {
-    width: 64px;
+    width: var(--auth-logo-size);
     height: 78px;
   }
 }
@@ -325,7 +332,7 @@ input[type="password"]:focus {
   }
 
   .joinLogoBlue img {
-    width: 64px;
+    width: var(--auth-logo-size);
     height: 78px;
   }
 
@@ -366,7 +373,7 @@ input[type="password"]:focus {
   }
 
   .joinLogoBlue img {
-    width: 64px;
+    width: var(--auth-logo-size);
     height: 78px;
   }
 
@@ -395,7 +402,7 @@ input[type="password"]:focus {
   }
 
   .loginInputField {
-    width: 250px;
+    width: min(100%, var(--auth-form-max-width));
   }
 
   .loginButtonsBox {
@@ -433,7 +440,7 @@ input[type="password"]:focus {
     font-size: 16px;
     font-weight: 400;
     padding-top: 12.5px;
-    width: 160px;
+    width: 100%;
   }
 
   .horizontalH1Underline {
@@ -445,7 +452,7 @@ input[type="password"]:focus {
   }
 
   .loginButtons {
-    width: 142px;
+    width: clamp(132px, 38vw, 180px);
     height: 48px;
     font-size: 18px;
     font-weight: 400;
