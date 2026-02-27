@@ -26,7 +26,7 @@ Move the codebase toward maintainable industry-standard structure:
 - `assets/css/summary.css` (~980)
 - `assets/css/board.css` (~961)
 - `assets/css/addTask.css` (~846)
-- `assets/css/contactsMobile.css` (~709)
+- `assets/css/contactsMobile.css` (~709, removed in #123 after usage audit)
 - `assets/css/login.css` (~455)
 - `assets/css/signUp.css` (~454)
 
