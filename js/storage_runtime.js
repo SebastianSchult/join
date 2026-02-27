@@ -58,7 +58,7 @@ window.StorageRuntime = window.StorageRuntime || (function createStorageRuntime(
     return baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
   }
 
-  function assertConfig(requiredKeys) {
+  const assertConfigValues = (requiredKeys) => {
     const missing = requiredKeys.filter((key) => {
       const value = joinAppConfig[key];
       return typeof value !== "string" || value.trim() === "";
@@ -69,7 +69,7 @@ window.StorageRuntime = window.StorageRuntime || (function createStorageRuntime(
         `Missing JOIN_APP_CONFIG values: ${missing.join(", ")}. Create js/config.js from js/config.example.js.`
       );
     }
-  }
+  };
 
   return {
     config: joinAppConfig,
@@ -93,6 +93,6 @@ window.StorageRuntime = window.StorageRuntime || (function createStorageRuntime(
     BASE_URL: normalizeBaseUrl(getConfigValue("BASE_URL")),
     FIREBASE_TASKS_ID: getConfigValue("FIREBASE_TASKS_ID"),
     FIREBASE_USERS_ID: getConfigValue("FIREBASE_USERS_ID"),
-    assertConfig,
+    assertConfig: assertConfigValues,
   };
 })();
