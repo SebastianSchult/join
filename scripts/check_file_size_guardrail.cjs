@@ -23,19 +23,33 @@ const RULES = Object.freeze([
     id: "css",
     label: "CSS",
     extensions: new Set([".css"]),
-    warningLines: 800,
-    errorLines: 1000,
+    warningLines: 420,
+    errorLines: 700,
+    thresholds: Object.freeze([
+      Object.freeze({
+        pattern: /(?:^|\/)[^/]+\.base\.css$/,
+        warningLines: 320,
+        errorLines: 500,
+        label: "base layer",
+      }),
+      Object.freeze({
+        pattern: /(?:^|\/)[^/]+\.components\.css$/,
+        warningLines: 380,
+        errorLines: 560,
+        label: "components layer",
+      }),
+      Object.freeze({
+        pattern: /(?:^|\/)[^/]+\.responsive\.css$/,
+        warningLines: 340,
+        errorLines: 620,
+        label: "responsive layer",
+      }),
+    ]),
     include: [
       { type: "dir", value: "assets/css" },
       { type: "file", value: "style.css" },
     ],
-    exceptions: Object.freeze({
-      "assets/css/contacts.css": Object.freeze({
-        maxLines: 1200,
-        reason:
-          "Legacy contacts stylesheet; scheduled for modular CSS split by component/responsibility.",
-      }),
-    }),
+    exceptions: Object.freeze({}),
   },
 ]);
 
@@ -49,25 +63,32 @@ for (const rule of RULES) {
   for (const filePath of files) {
     const source = fs.readFileSync(filePath, "utf8");
     const lineCount = source.split(/\r?\n/).length;
+    const thresholds = resolveThresholds(rule, filePath);
     const exception = rule.exceptions[filePath];
-    const maxLines = exception ? exception.maxLines : rule.errorLines;
+    const maxLines = exception ? exception.maxLines : thresholds.errorLines;
 
     if (lineCount > maxLines) {
       findings.errors.push({
         rule,
         filePath,
         lineCount,
+        warningLines: thresholds.warningLines,
+        errorLines: thresholds.errorLines,
+        thresholdLabel: thresholds.label,
         maxLines,
         exception,
       });
       continue;
     }
 
-    if (lineCount > rule.warningLines) {
+    if (lineCount > thresholds.warningLines) {
       findings.warnings.push({
         rule,
         filePath,
         lineCount,
+        warningLines: thresholds.warningLines,
+        errorLines: thresholds.errorLines,
+        thresholdLabel: thresholds.label,
         maxLines,
         exception,
       });
@@ -82,7 +103,7 @@ if (findings.warnings.length > 0) {
   for (const warning of findings.warnings) {
     console.warn(
       formatFinding("warning", warning, {
-        label: `>${warning.rule.warningLines}`,
+        label: `>${warning.warningLines}`,
       })
     );
   }
@@ -153,8 +174,12 @@ function collectDirectoryFiles(dirPath, extensions, result) {
 function formatFinding(level, finding, threshold) {
   const parts = [
     `[${finding.rule.id.toUpperCase()}][${level}] ${finding.filePath}: ${finding.lineCount} lines`,
-    `(warn>${finding.rule.warningLines}, hard>${finding.maxLines})`,
+    `(warn>${finding.warningLines}, hard>${finding.maxLines})`,
   ];
+
+  if (finding.thresholdLabel) {
+    parts.push(`threshold: ${finding.thresholdLabel}`);
+  }
 
   if (finding.exception) {
     parts.push(`exception: ${finding.exception.reason}`);
@@ -169,4 +194,28 @@ function formatFinding(level, finding, threshold) {
 
 function normalizePath(filePath) {
   return filePath.split(path.sep).join("/");
+}
+
+function resolveThresholds(rule, filePath) {
+  let resolved = {
+    warningLines: rule.warningLines,
+    errorLines: rule.errorLines,
+    label: "default",
+  };
+
+  if (!Array.isArray(rule.thresholds)) {
+    return resolved;
+  }
+
+  for (const threshold of rule.thresholds) {
+    if (!(threshold.pattern instanceof RegExp)) continue;
+    if (!threshold.pattern.test(filePath)) continue;
+    resolved = {
+      warningLines: threshold.warningLines,
+      errorLines: threshold.errorLines,
+      label: threshold.label || "custom",
+    };
+  }
+
+  return resolved;
 }
