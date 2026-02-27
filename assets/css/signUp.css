@@ -1,6 +1,13 @@
-.main {
+:root {
+  --signup-box-max-width: 600px;
+  --signup-field-max-width: 422px;
+}
+
+.main .signUpMainContainer {
   position: relative;
   height: 100vh;
+  max-width: none;
+  width: 100vw;
   background-color: var(--clr-main);
 }
 
@@ -9,6 +16,11 @@
   top: 80px;
   left: 77px;
   z-index: 1;
+}
+
+.main.signup-active {
+  max-width: none !important;
+  width: 100% !important;
 }
 
 .signUpMainContainer {
@@ -20,6 +32,11 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
+}
+
+.signUpMainContainer {
+  max-width: none;
+  width: 100%;
 }
 
 .signUp-page {
@@ -35,8 +52,8 @@
   background-color: #fff;
   border: 1px solid grey;
   border-radius: 30px;
-  width: 600px;
-  padding: 48px 115px;
+  width: min(100%, var(--signup-box-max-width));
+  padding: clamp(24px, 5vw, 48px) clamp(16px, 8vw, 115px);
   gap: 39px;
   box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.08);
   position: relative;
@@ -56,11 +73,12 @@
 }
 
 .input-wrapper {
-    margin-bottom: 10px; 
+  margin-bottom: 10px;
+  width: min(100%, var(--signup-field-max-width));
 }
 
 .input-wrapper {
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
 }
 
 .error-message {
@@ -115,7 +133,7 @@ button#registerBtn:disabled {
   display: flex;
   justify-content: space-between;
   align-items: self-end;
-  width: 422px;
+  width: min(100%, var(--signup-field-max-width));
   border-bottom: 1px solid #d1d1d1;
   gap: 10px;
 }
@@ -125,7 +143,7 @@ button#registerBtn:disabled {
   justify-content: space-between;
   border-bottom: 1px solid #d1d1d1;
   padding: 12px 21px;
-  width: 140%;
+  width: 100%;
 }
 
 input::placeholder {
@@ -137,6 +155,7 @@ input::placeholder {
   gap: 32px;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 input:-webkit-autofill,
@@ -150,7 +169,7 @@ input:-webkit-autofill:active {
   display: flex;
   justify-content: space-between;
   align-items: self-end;
-  width: 422px;
+  width: min(100%, var(--signup-field-max-width));
   border-bottom: 1px solid #d1d1d1;
   gap: 10px;
 }
@@ -232,7 +251,8 @@ a {
   gap: 16px;
 }
 
-.signUpFooter > div {
+.signUpFooter > div,
+.signUpFooter > button {
   cursor: pointer;
 }
 
@@ -241,6 +261,9 @@ a {
   font-size: 16px;
   font-weight: 400;
   color: #fff;
+  border: none;
+  background: transparent;
+  padding: 0;
 }
 
 .privacyPolicySignUp:hover,
@@ -366,21 +389,22 @@ a {
 
   .signUpEmailBox,
   .signUpNameBox {
-    width: 364px;
+    width: min(100%, var(--signup-field-max-width));
   }
 
   .signUpPasswordBox {
-    width: 364px;
+    width: min(100%, var(--signup-field-max-width));
   }
 
   .signUp-box {
-    width: 482px;
+    --signup-box-max-width: 482px;
+    --signup-field-max-width: 364px;
   }
 }
 /*///////////////////////////////////////////////media 550///////////////////////*/
 @media (max-width: 550px) {
   .signUp-box {
-    width: 402px;
+    --signup-box-max-width: 402px;
   }
 }
 
@@ -396,7 +420,7 @@ a {
   }
 
   .signUp-box {
-    width: 290px;
+    --signup-box-max-width: 290px;
     z-index: 1;
   }
 
@@ -417,14 +441,14 @@ a {
 
   .signUpEmailBox,
   .signUpNameBox {
-    width: 250px;
+    width: min(100%, 250px);
     padding: 0;
     gap: 0px;
   }
 
   .signUpPasswordBox {
     justify-content: center;
-    width: 250px;
+    width: min(100%, 250px);
     padding: 0;
     gap: 0px;
   }

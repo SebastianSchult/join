@@ -1,5 +1,7 @@
 .legal_notice-wrapper {
-  margin: 76px var(--ui-page-inline);
+  width: min(100%, 1080px);
+  margin: 76px auto;
+  padding-inline: var(--ui-page-inline);
 }
 
 h1 {
@@ -42,7 +44,7 @@ h3 {
 
 .h1LegalNoticeBackButton img {
   display: block;
-  width: 40px;
+  width: clamp(32px, 6vw, 40px);
   margin-bottom: 42px;
 }
 
@@ -72,7 +74,7 @@ a:not(.active):hover {
 .navigation-container {
   display: flex;
   flex-direction: column;
-  width: 232px;
+  width: min(100%, 232px);
   max-width: 232px;
 }
 
@@ -90,7 +92,7 @@ a:not(.active):hover {
   display: flex;
   align-items: center;
   height: 40px;
-  width: 186px;
+  width: min(100%, 186px);
   padding: var(--ui-space-xs) 30px;
   border-radius: 8px;
   gap: var(--ui-space-xs);
@@ -116,13 +118,14 @@ a:not(.active):hover {
 
 @media (max-width: 801px) {
   .legal_notice-wrapper {
-    margin: 36px var(--ui-page-inline-mobile);
+    margin: 36px auto;
+    padding-inline: var(--ui-page-inline-mobile);
   }
 }
 
 @media (max-width: 500px) {
   .h1LegalNoticeBackButton img {
-    width: 32px;
+    width: clamp(28px, 8vw, 32px);
     margin-bottom: 24px;
   }
 }

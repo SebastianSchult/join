@@ -1,5 +1,7 @@
 .privacy-wrapper {
-  margin: 76px var(--ui-page-inline);
+  width: min(100%, 1080px);
+  margin: 76px auto;
+  padding-inline: var(--ui-page-inline);
 }
 
 h1 {
@@ -52,13 +54,14 @@ p {
 
 .h1PrivacyBackButton img {
   display: block;
-  width: 40px;
+  width: clamp(32px, 6vw, 40px);
   margin-bottom: 42px;
 }
 
 @media (max-width: 900px) {
   .privacy-wrapper {
-    margin: 36px var(--ui-page-inline-mobile);
+    margin: 36px auto;
+    padding-inline: var(--ui-page-inline-mobile);
   }
 
   h1 {
@@ -90,15 +93,9 @@ p {
   }
 }
 
-@media (max-width: 801px) {
-  .privacy-wrapper {
-    margin: 36px var(--ui-page-inline-mobile);
-  }
-}
-
 @media (max-width: 500px) {
   .h1PrivacyBackButton img {
-    width: 32px;
+    width: clamp(28px, 8vw, 32px);
     margin-bottom: 24px;
   }
 }

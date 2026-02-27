@@ -1,5 +1,7 @@
 .help-page {
-  margin: 0 var(--ui-page-inline);
+  width: min(100%, 1080px);
+  margin: 0 auto;
+  padding-inline: var(--ui-page-inline);
 }
 
 .help-page-header {
@@ -18,7 +20,7 @@
 
 .help-page-back-button img {
   display: block;
-  width: 40px;
+  width: clamp(32px, 6vw, 40px);
 }
 
 h1 {
@@ -83,11 +85,12 @@ h2 {
 
 @media screen and (max-width: 500px) {
   .help-page {
-    margin: 0 var(--ui-page-inline-mobile);
+    width: 100%;
+    padding-inline: var(--ui-page-inline-mobile);
   }
 
   .help-page-back-button img {
-    width: 32px;
+    width: clamp(28px, 8vw, 32px);
   }
 
   h2 {
