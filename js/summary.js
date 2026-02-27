@@ -4,6 +4,7 @@ let loggedUser;
 let globalCapitalizedName;
 let dayTime;
 let mobileGreetingTimeoutId = null;
+let summaryTasks = [];
 
 
 /**
@@ -11,13 +12,10 @@ let mobileGreetingTimeoutId = null;
  */
 async function summaryInit() {
     includeHTML();
-    const usersLoadResult = await firebaseGetArraySafe(FIREBASE_USERS_ID, {
-        context: 'contacts',
-        errorMessage: 'Could not load contacts for summary.',
-    });
-    users = usersLoadResult.data;
-    getContactsOutOfUsers();
-    await loadTasksFromRemoteStorage();
+    const tasksLoadResult = await loadSummaryTasksFromRemoteStorage();
+    if (tasksLoadResult.error) {
+        return;
+    }
     getLoggedUser();
     getUserNameForGreeting();
     getDate();
@@ -69,7 +67,7 @@ function greetAccordingToDayTime() {
 */
 function getUserNameForGreeting() {
     if (loggedUser) {
-        let capitalizedName = getNameWithCapitalizedFirstLetter(loggedUser);
+        let capitalizedName = getCapitalizedDisplayName(loggedUser);
         greet(capitalizedName);
     }
 }
@@ -120,13 +118,12 @@ function getDate() {
  * @param {array} categoriesAmounts - An array of category amounts.                                 
  */
 function loadAmounts() {
-    // let categories = ['todo', 'inProgress', 'awaitFeedback', 'done'];
     let categories = ['category-0', 'category-1', 'category-2', 'category-3'];
     let categoriesAmounts = [0, 0, 0, 0];
 
     for (let i = 0; i < categories.length; i++) {
         let category = categories[i];
-        let filteredTasks = filterTasks(tasks, category);
+        let filteredTasks = filterSummaryTasks(summaryTasks, category);
         categoriesAmounts[i] = filteredTasks.length;
     }
     showAmounts(categoriesAmounts);
@@ -158,8 +155,8 @@ function showAmounts(categoriesAmounts) {
 */
 function getUrgentTasks() {
     let urgentTasks = [];
-    for (let i = 0; i < tasks.length; i++) {
-        let task = tasks[i];
+    for (let i = 0; i < summaryTasks.length; i++) {
+        let task = summaryTasks[i];
         if (task.priority === 'urgent' && (task.category === 'category-0' || task.category === 'category-1' || task.category === 'category-2')) {
             urgentTasks.push(task);
         }
@@ -282,4 +279,51 @@ function mobileGreeting() {
         mobileGreeting.style.fontWeight = 'bold';
         mobileGreetingUsername.innerHTML = '';
     }
+}
+
+/**
+ * Loads summary task data from Firebase and normalizes optional task fields.
+ *
+ * @returns {Promise<{data:Array,error:Error|null}>} Safe load result.
+ */
+async function loadSummaryTasksFromRemoteStorage() {
+    const loadResult = await firebaseGetArraySafe(FIREBASE_TASKS_ID, {
+        context: 'tasks',
+        errorMessage: 'Could not load tasks for summary.',
+    });
+    summaryTasks = Array.isArray(loadResult.data) ? loadResult.data : [];
+    summaryTasks.forEach((task) => {
+        if (!task.hasOwnProperty('subtasks')) task.subtasks = [];
+        if (!task.hasOwnProperty('assignedTo')) task.assignedTo = [];
+    });
+    return loadResult;
+}
+
+/**
+ * Filters task entries by summary category key.
+ *
+ * @param {Array<Object>} tasksToFilter - Source tasks.
+ * @param {string} category - Category key.
+ * @returns {Array<Object>} Filtered tasks.
+ */
+function filterSummaryTasks(tasksToFilter, category) {
+    return tasksToFilter.filter((task) => task && task.category === category);
+}
+
+/**
+ * Returns a display-friendly name with capitalized first letters per word.
+ *
+ * @param {string} name - Raw user name.
+ * @returns {string}
+ */
+function getCapitalizedDisplayName(name) {
+    if (typeof name !== 'string' || name.trim() === '') {
+        return '';
+    }
+
+    return name
+        .trim()
+        .split(/\s+/)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
 }
