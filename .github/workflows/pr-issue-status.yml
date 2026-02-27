@@ -87,14 +87,19 @@ jobs:
               issueNumbers.add(Number(branchMatch[1]));
             }
 
-            // Fallback: issue references in PR body, for example "#123"
+            // Fallback: explicit closing references in PR body (e.g. "Closes #123")
             const bodyText = prData.repository.pullRequest.body || "";
-            const refs = bodyText.match(/#\d+/g) || [];
-            for (const ref of refs) {
-              issueNumbers.add(Number(ref.replace("#", "")));
+            const closingRefs =
+              bodyText.match(/\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b/gi) || [];
+            for (const ref of closingRefs) {
+              const match = ref.match(/#(\d+)/);
+              if (!match) continue;
+              issueNumbers.add(Number(match[1]));
             }
 
-            const issueList = [...issueNumbers].filter((n) => Number.isInteger(n) && n > 0);
+            const issueList = [...issueNumbers].filter(
+              (n) => Number.isInteger(n) && n > 0 && n !== prNumber
+            );
             if (issueList.length === 0) {
               core.warning("No linked issues detected for PR.");
               return;
@@ -192,29 +197,40 @@ jobs:
             }
 
             async function getIssueAndItem(issueNumber) {
-              const data = await github.graphql(
-                `
-                query($owner: String!, $repo: String!, $issueNumber: Int!) {
-                  repository(owner: $owner, name: $repo) {
-                    issue(number: $issueNumber) {
-                      id
-                      number
-                      url
-                      projectItems(first: 50) {
-                        nodes {
-                          id
-                          project {
+              try {
+                const data = await github.graphql(
+                  `
+                  query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      issue(number: $issueNumber) {
+                        id
+                        number
+                        url
+                        projectItems(first: 50) {
+                          nodes {
                             id
+                            project {
+                              id
+                            }
                           }
                         }
                       }
                     }
                   }
+                  `,
+                  { owner, repo, issueNumber }
+                );
+                return data.repository.issue;
+              } catch (error) {
+                const isNotFound =
+                  Array.isArray(error?.errors) &&
+                  error.errors.some((entry) => entry?.type === "NOT_FOUND");
+                if (isNotFound) {
+                  core.warning(`Issue #${issueNumber} not found or not accessible.`);
+                  return null;
                 }
-                `,
-                { owner, repo, issueNumber }
-              );
-              return data.repository.issue;
+                throw error;
+              }
             }
 
             async function ensureProjectItem(projectId, issue) {
