@@ -15,7 +15,27 @@ function bootstrapRuntime() {
 	initializeLegacyRuntimeFallbacks();
 	initializeCookiebot();
 	initializeUiEventDelegation();
+	initializeCspViolationLogging();
 	initializePageOnDomReady();
+}
+
+/**
+ * Registers a CSP violation listener so blocked resources are visible during rollout.
+ * Listener is registered once per page runtime.
+ *
+ * @returns {void}
+ */
+function initializeCspViolationLogging() {
+	if (window.__joinCspViolationLoggingRegistered === true) {
+		return;
+	}
+
+	window.__joinCspViolationLoggingRegistered = true;
+	document.addEventListener("securitypolicyviolation", (event) => {
+		console.warn(
+			`CSP violation: directive=${event.effectiveDirective} blocked=${event.blockedURI || "inline"} source=${event.sourceFile || "n/a"}`
+		);
+	});
 }
 
 /**
