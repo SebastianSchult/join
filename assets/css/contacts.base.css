@@ -269,6 +269,7 @@
 }
 
 .input-frame {
+  position: relative;
   display: flex;
   justify-content: end;
   align-items: center;
@@ -276,12 +277,12 @@
   gap: 32px;
 }
 
-body[data-init="contactsInit"] input {
+body[data-init="contactsInit"] .add-contact-input-group input {
   justify-content: space-between;
   width: 100%;
   font-size: 19px;
   display: flex;
-  padding: 12px 21px;
+  padding: 12px 56px 12px 21px;
   align-items: center;
   outline: none;
   border: none;
@@ -290,7 +291,11 @@ body[data-init="contactsInit"] input {
 
 .input-frame img {
   position: absolute;
-  padding: 16px;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  padding: 0;
+  pointer-events: none;
 }
 
 .input-frame input[aria-invalid="true"] {
@@ -307,7 +312,7 @@ body[data-init="contactsInit"] input {
   color: #ff8190;
 }
 
-body[data-init="contactsInit"] input::placeholder {
+body[data-init="contactsInit"] .add-contact-input-group input::placeholder {
   color: #d1d1d1;
 }
 
