@@ -33,6 +33,7 @@ npm run lint
 npm run lint:css
 npm run lint:jsdoc
 npm run lint:file-size
+npm run lint:blank-target-rel
 npm run a11y:audit
 npm run a11y:ci
 npm run a11y:report
