@@ -48,6 +48,7 @@ npm run a11y:report
 - Page script dependency manifest: [PAGE_SCRIPT_DEPENDENCIES.md](./PAGE_SCRIPT_DEPENDENCIES.md)
 - CSS guardrails (Stylelint): [CSS_GUARDRAILS.md](./CSS_GUARDRAILS.md)
 - JSDoc guardrails: [JSDOC_GUARDRAILS.md](./JSDOC_GUARDRAILS.md)
+- Content Security Policy baseline: [CSP_BASELINE.md](./CSP_BASELINE.md)
 - UI tokens and breakpoints: [UI_TOKENS.md](./UI_TOKENS.md)
 - Secure rendering / XSS rules: [SECURITY_RENDERING.md](./SECURITY_RENDERING.md)
 - Refactor baseline and roadmap: [REFACTOR_RESEARCH.md](./REFACTOR_RESEARCH.md)
