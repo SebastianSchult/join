@@ -66,6 +66,12 @@ CSS selector scoping:
 - scope element rules under domain/page roots (for example `.board-Container`, `.addTaskBody`, `body[data-init="contactsInit"]`)
 - keep truly global element styles only in explicit shared utility/base files
 
+Breakpoint strategy:
+
+- use only values represented by `--ui-bp-*` tokens in `assets/css/ui-tokens.css`
+- if a new breakpoint is needed, add token first and then use the exact pixel value in CSS media queries
+- keep breakpoints consolidated and avoid one-off values when an existing token satisfies the layout need
+
 ## 3) Module Boundaries and Ownership
 
 Ownership is domain-based. Each module has a primary responsibility:

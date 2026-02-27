@@ -1,11 +1,36 @@
 :root {
   /* Responsive breakpoints (single source of truth for CSS/JS) */
+  /* Core runtime breakpoints */
   --ui-bp-mobile-max: 801px;
   --ui-bp-mobile-min: 802px;
   --ui-bp-navigation-tablet-max: 950px;
   --ui-bp-phone-max: 560px;
   --ui-bp-content-narrow-max: 500px;
   --ui-bp-board-columns-max: 1400px;
+
+  /* Shared page/layout breakpoints (approved set for CSS media queries) */
+  --ui-bp-desktop-max: 1200px;
+  --ui-bp-summary-min: 1200px;
+  --ui-bp-contacts-large-max: 1124px;
+  --ui-bp-addtask-layout-max: 1070px;
+  --ui-bp-contacts-medium-max: 1010px;
+  --ui-bp-auth-tablet-max: 970px;
+  --ui-bp-privacy-max: 900px;
+  --ui-bp-contacts-compact-max: 890px;
+  --ui-bp-auth-mobile-max: 769px;
+  --ui-bp-help-max: 700px;
+  --ui-bp-auth-small-max: 680px;
+  --ui-bp-summary-mid-min: 600px;
+  --ui-bp-contacts-overlay-max: 580px;
+  --ui-bp-auth-phone-max: 550px;
+  --ui-bp-auth-compact-max: 480px;
+  --ui-bp-summary-compact-max: 465px;
+  --ui-bp-board-compact-max: 450px;
+  --ui-bp-contacts-button-max: 420px;
+  --ui-bp-board-small-max: 400px;
+  --ui-bp-contacts-tiny-max: 380px;
+  --ui-bp-help-tiny-max: 360px;
+  --ui-bp-board-tiny-max: 350px;
 
   /* Spacing scale */
   --ui-space-0: 0;

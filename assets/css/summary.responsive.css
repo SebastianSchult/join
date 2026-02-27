@@ -250,7 +250,7 @@
 }
 
 /*////////////////////////////////////////////////////////////////////min 700px*/
-@media (max-width: 949px) {
+@media (max-width: 950px) {
   .inner-square-button.toDo {
     display: flex;
     flex-direction: row;
@@ -260,7 +260,7 @@
   }
 }
 
-@media (min-width: 600px) and (max-width: 949px) {
+@media (min-width: 600px) and (max-width: 950px) {
   .sub-main-summary {
     padding: 16px 52px;
   }
@@ -391,7 +391,7 @@
 
 /*/ ///////////////////////////////////////////////////////////////////min    950px*/
 
-@media only screen and (min-width: 950px) and (max-width: 1204px) {
+@media only screen and (min-width: 950px) and (max-width: 1200px) {
   .summary-box {
     margin-top: 0;
     gap: 20px;
@@ -467,7 +467,7 @@
 
 /*////////////////////////////////////////////////////////////////////min 1204px*/
 /* Medium Devices, Desktops */
-@media only screen and (min-width: 1204px) {
+@media only screen and (min-width: 1200px) {
   .button-container {
     display: grid;
     grid-template-columns: 204px 204px 204px 204px;
