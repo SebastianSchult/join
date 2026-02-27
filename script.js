@@ -33,12 +33,12 @@ function initializePageOnDomReady() {
 		runNamedPageInitializer(initFunctionName);
 	};
 
-	if (document.readyState === "loading") {
-		document.addEventListener("DOMContentLoaded", runPageInit, { once: true });
+	if (document.readyState === "complete") {
+		runPageInit();
 		return;
 	}
 
-	runPageInit();
+	document.addEventListener("DOMContentLoaded", runPageInit, { once: true });
 }
 
 /**
