@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Ensure triage labels exist
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const labels = [
@@ -67,10 +67,10 @@ jobs:
             }
 
       - name: Checkout repository for triage classifier
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Apply labels from issue content
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const { classifyIssue } = require("./scripts/issue_triage_classifier.cjs");
@@ -93,7 +93,7 @@ jobs:
 
       - name: Add issue to GitHub project (optional)
         if: ${{ vars.GH_PROJECT_URL != '' && env.PROJECT_TOKEN != '' }}
-        uses: actions/add-to-project@v1.0.2
+        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
         with:
           project-url: ${{ vars.GH_PROJECT_URL }}
           github-token: ${{ env.PROJECT_TOKEN }}

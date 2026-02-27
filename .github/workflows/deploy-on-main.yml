@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Select deploy mode
         id: mode
@@ -123,7 +123,7 @@ jobs:
 
       - name: Setup SSH key
         if: ${{ steps.mode.outputs.mode == 'ssh' }}
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0
         with:
           ssh-private-key: ${{ env.DEPLOY_SSH_KEY }}
 
@@ -165,7 +165,7 @@ jobs:
         id: deploy_ftps
         if: ${{ steps.mode.outputs.mode == 'ftp' }}
         continue-on-error: true
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@8e83cea8672e3fbcbb9fdafff34debf6ae4c5f65 # v4.3.5
         with:
           server: ${{ env.DEPLOY_FTP_SERVER }}
           username: ${{ env.DEPLOY_FTP_USER }}
@@ -184,7 +184,7 @@ jobs:
       - name: Deploy with FTP (fallback)
         id: deploy_ftp
         if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps.outcome != 'success' }}
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@8e83cea8672e3fbcbb9fdafff34debf6ae4c5f65 # v4.3.5
         with:
           server: ${{ env.DEPLOY_FTP_SERVER }}
           username: ${{ env.DEPLOY_FTP_USER }}
