@@ -14,6 +14,8 @@ const CORE_BREAKPOINT_TOKENS = Object.freeze({
   boardColumnsMax: "--ui-bp-board-columns-max",
 });
 
+const MAX_ALLOWED_BREAKPOINT_VARIANTS = 30;
+
 const violations = [];
 
 if (!fs.existsSync(TOKEN_FILE)) {
@@ -22,28 +24,25 @@ if (!fs.existsSync(TOKEN_FILE)) {
 }
 
 const tokenSource = fs.readFileSync(TOKEN_FILE, "utf8");
-const tokenValues = readBreakpointTokenValues(tokenSource);
+const breakpointTokens = readBreakpointTokens(tokenSource);
+const tokenValues = readCoreBreakpointValues(breakpointTokens);
+const approvedBreakpointValues = new Set(Object.values(breakpointTokens));
 
-const cssChecks = [
-  { file: "assets/css/header.css", kind: "max", token: "mobileMax" },
-  { file: "assets/css/navigation.css", kind: "max", token: "navigationTabletMax" },
-  { file: "assets/css/navigation.css", kind: "max", token: "mobileMax" },
-  { file: "assets/css/navigation.css", kind: "max", token: "phoneMax" },
-  { file: "assets/css/board.responsive.css", kind: "max", token: "boardColumnsMax" },
-  { file: "assets/css/board.responsive.css", kind: "max", token: "mobileMax" },
-  { file: "assets/css/board.responsive.css", kind: "max", token: "phoneMax" },
-  { file: "assets/css/addTask.responsive.css", kind: "max", token: "mobileMax" },
-  { file: "assets/css/addTask.responsive.css", kind: "max", token: "phoneMax" },
-  { file: "style.css", kind: "max", token: "mobileMax" },
-  { file: "assets/css/legalNotice.css", kind: "max", token: "contentNarrowMax" },
-  { file: "assets/css/privacy.css", kind: "max", token: "contentNarrowMax" },
-  { file: "assets/css/contacts.responsive.css", kind: "max", token: "mobileMax" },
-  { file: "assets/css/contacts.responsive.css", kind: "min", token: "mobileMin" },
-];
+if (approvedBreakpointValues.size === 0) {
+  violations.push("No '--ui-bp-*' breakpoint tokens found in assets/css/ui-tokens.css.");
+}
 
-for (const check of cssChecks) {
-  const absolutePath = path.resolve(process.cwd(), check.file);
-  ensureFileContainsBreakpoint(absolutePath, check.kind, tokenValues[check.token], check.token);
+const referencedStylesheets = collectReferencedStylesheets();
+const discoveredBreakpointValues = collectStylesheetBreakpointValues(
+  referencedStylesheets,
+  approvedBreakpointValues
+);
+
+if (discoveredBreakpointValues.size > MAX_ALLOWED_BREAKPOINT_VARIANTS) {
+  violations.push(
+    `Too many breakpoint variants in referenced stylesheets (${discoveredBreakpointValues.size}). ` +
+      `Limit is ${MAX_ALLOWED_BREAKPOINT_VARIANTS}.`
+  );
 }
 
 assertBreakpointFallbacks(tokenValues);
@@ -60,43 +59,140 @@ if (violations.length > 0) {
 
 console.log("UI token alignment guardrail passed.");
 
-function readBreakpointTokenValues(source) {
+function readBreakpointTokens(source) {
+  const tokens = {};
+  const regex = /(--ui-bp-[a-z0-9-]+)\s*:\s*(\d+)px\s*;/gi;
+  let match;
+
+  while ((match = regex.exec(source)) !== null) {
+    tokens[match[1]] = Number(match[2]);
+  }
+
+  return tokens;
+}
+
+function readCoreBreakpointValues(tokens) {
   const values = {};
+
   for (const [key, tokenName] of Object.entries(CORE_BREAKPOINT_TOKENS)) {
-    const match = source.match(
-      new RegExp(`${escapeForRegex(tokenName)}\\s*:\\s*(\\d+)px\\s*;`)
-    );
-    if (!match) {
+    const value = tokens[tokenName];
+    if (!Number.isFinite(value)) {
       violations.push(`Missing breakpoint token '${tokenName}' in ui-tokens.css.`);
       continue;
     }
-    values[key] = Number(match[1]);
+    values[key] = value;
   }
+
   return values;
 }
 
-function ensureFileContainsBreakpoint(filePath, kind, value, tokenKey) {
-  if (!Number.isFinite(value)) {
-    violations.push(
-      `Token '${tokenKey}' could not be resolved to a numeric pixel value.`
-    );
-    return;
+function collectReferencedStylesheets() {
+  const htmlFiles = fs
+    .readdirSync(process.cwd())
+    .filter((file) => file.endsWith(".html"))
+    .sort();
+
+  const stylesheets = new Set();
+
+  for (const htmlFile of htmlFiles) {
+    const absoluteHtmlPath = path.resolve(process.cwd(), htmlFile);
+    const source = fs.readFileSync(absoluteHtmlPath, "utf8");
+    const linkRegex = /<link\b[^>]*>/gi;
+    let match;
+
+    while ((match = linkRegex.exec(source)) !== null) {
+      const linkTag = match[0];
+      const hrefMatch = linkTag.match(/\bhref\s*=\s*(["'])([^"']+)\1/i);
+      if (!hrefMatch) {
+        continue;
+      }
+
+      const relMatch = linkTag.match(/\brel\s*=\s*(["'])([^"']+)\1/i);
+      const relValue = relMatch ? relMatch[2].toLowerCase() : "";
+      const hrefValue = hrefMatch[2];
+
+      if (isRemoteSource(hrefValue)) {
+        continue;
+      }
+
+      if (!relValue.includes("stylesheet") && !hrefValue.endsWith(".css")) {
+        continue;
+      }
+
+      const normalizedHref = normalizeAssetSource(hrefValue);
+      if (!normalizedHref.endsWith(".css")) {
+        continue;
+      }
+
+      const absoluteCssPath = path.resolve(path.dirname(absoluteHtmlPath), normalizedHref);
+      if (!fs.existsSync(absoluteCssPath)) {
+        violations.push(`${htmlFile}: missing stylesheet '${normalizedHref}'.`);
+        continue;
+      }
+
+      addCssWithImports(stylesheets, absoluteCssPath);
+    }
   }
-  if (!fs.existsSync(filePath)) {
-    violations.push(`Missing file for token check: ${relative(filePath)}.`);
+
+  return stylesheets;
+}
+
+function addCssWithImports(targetSet, absoluteCssPath) {
+  if (targetSet.has(absoluteCssPath)) {
     return;
   }
 
-  const source = fs.readFileSync(filePath, "utf8");
-  const regex = new RegExp(
-    `@media[^\\n\\r]*\\(${kind}-width:\\s*${value}px\\)`,
-    "i"
-  );
-  if (!regex.test(source)) {
-    violations.push(
-      `${relative(filePath)} is expected to use ${kind}-width: ${value}px (token ${tokenKey}).`
-    );
+  targetSet.add(absoluteCssPath);
+  const source = fs.readFileSync(absoluteCssPath, "utf8");
+  const importRegex = /@import\s+(?:url\(\s*(["']?)([^"')]+)\1\s*\)|(["'])([^"']+)\3)\s*;/gi;
+  let match;
+
+  while ((match = importRegex.exec(source)) !== null) {
+    const importPath = match[2] || match[4];
+    if (!importPath || isRemoteSource(importPath)) {
+      continue;
+    }
+
+    const normalizedImportPath = normalizeAssetSource(importPath);
+    if (!normalizedImportPath.endsWith(".css")) {
+      continue;
+    }
+
+    const absoluteImportPath = path.resolve(path.dirname(absoluteCssPath), normalizedImportPath);
+    if (!fs.existsSync(absoluteImportPath)) {
+      violations.push(
+        `${relative(absoluteCssPath)}: missing imported stylesheet '${normalizedImportPath}'.`
+      );
+      continue;
+    }
+
+    addCssWithImports(targetSet, absoluteImportPath);
   }
+}
+
+function collectStylesheetBreakpointValues(stylesheets, approvedValues) {
+  const discoveredValues = new Set();
+
+  for (const stylesheetPath of stylesheets) {
+    const source = fs.readFileSync(stylesheetPath, "utf8");
+    const mediaRegex = /@media[^\n\r{}]*\((max|min)-width\s*:\s*(\d+)px\)/gi;
+    let match;
+
+    while ((match = mediaRegex.exec(source)) !== null) {
+      const kind = match[1];
+      const value = Number(match[2]);
+      discoveredValues.add(value);
+
+      if (!approvedValues.has(value)) {
+        violations.push(
+          `${relative(stylesheetPath)} uses non-token breakpoint '${kind}-width: ${value}px'. ` +
+            `Add a matching '--ui-bp-*' token before using this value.`
+        );
+      }
+    }
+  }
+
+  return discoveredValues;
 }
 
 function assertBreakpointFallbacks(tokenValues) {
@@ -195,8 +291,12 @@ function ensureAnyFileMatches(filePaths, regex, message) {
   }
 }
 
-function escapeForRegex(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function isRemoteSource(value) {
+  return /^(https?:)?\/\//i.test(value);
+}
+
+function normalizeAssetSource(value) {
+  return value.split("?")[0].split("#")[0].replace(/^\.\//, "").replace(/^\//, "");
 }
 
 function relative(filePath) {

@@ -4,7 +4,7 @@ This project now uses shared UI tokens from `assets/css/ui-tokens.css`.
 
 ## Breakpoints
 
-Canonical responsive breakpoints:
+Core runtime breakpoints:
 
 - `--ui-bp-mobile-max: 801px`
 - `--ui-bp-mobile-min: 802px`
@@ -12,6 +12,31 @@ Canonical responsive breakpoints:
 - `--ui-bp-phone-max: 560px`
 - `--ui-bp-content-narrow-max: 500px`
 - `--ui-bp-board-columns-max: 1400px`
+
+Approved CSS breakpoint set (v1):
+
+- `--ui-bp-desktop-max: 1200px`
+- `--ui-bp-summary-min: 1200px`
+- `--ui-bp-summary-mid-min: 600px`
+- `--ui-bp-summary-compact-max: 465px`
+- `--ui-bp-contacts-large-max: 1124px`
+- `--ui-bp-contacts-medium-max: 1010px`
+- `--ui-bp-contacts-compact-max: 890px`
+- `--ui-bp-contacts-overlay-max: 580px`
+- `--ui-bp-contacts-button-max: 420px`
+- `--ui-bp-contacts-tiny-max: 380px`
+- `--ui-bp-addtask-layout-max: 1070px`
+- `--ui-bp-auth-tablet-max: 970px`
+- `--ui-bp-auth-mobile-max: 769px`
+- `--ui-bp-auth-small-max: 680px`
+- `--ui-bp-auth-phone-max: 550px`
+- `--ui-bp-auth-compact-max: 480px`
+- `--ui-bp-privacy-max: 900px`
+- `--ui-bp-help-max: 700px`
+- `--ui-bp-help-tiny-max: 360px`
+- `--ui-bp-board-compact-max: 450px`
+- `--ui-bp-board-small-max: 400px`
+- `--ui-bp-board-tiny-max: 350px`
 
 ### JS usage
 
@@ -69,6 +94,6 @@ Layout helpers:
 
 Run `npm run lint:ui-tokens` to validate:
 
-- core breakpoint usage in CSS,
+- all HTML-referenced stylesheets (including `@import`) use only `--ui-bp-*` token values,
 - JS breakpoint fallback alignment,
 - tokenized spacing usage in key UI styles.
