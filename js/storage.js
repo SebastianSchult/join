@@ -1,15 +1,93 @@
 "use strict";
 
-const storageRuntime = window.StorageRuntime;
-if (!storageRuntime) {
-  throw new Error(
-    "Missing StorageRuntime. Ensure js/storage_runtime.js is loaded before js/storage.js."
-  );
-}
+const createStorageRuntimeFallbackObject = () => {
+  const joinAppConfig = window.JOIN_APP_CONFIG || {};
+  const storageCompatFallbacks = window.StorageCompatFallbacks || null;
+
+  const getCompatFactory = (factoryName) => {
+    if (!storageCompatFallbacks || typeof factoryName !== "string") {
+      return undefined;
+    }
+    const fallbackFactory = storageCompatFallbacks[factoryName];
+    return typeof fallbackFactory === "function" ? fallbackFactory : undefined;
+  };
+
+  const resolveStorageDependency = (moduleName, fallbackFactoryName) => {
+    const moduleRef = window[moduleName];
+    if (moduleRef) {
+      return moduleRef;
+    }
+    const fallbackFactory = getCompatFactory(fallbackFactoryName);
+    if (
+      storageCompatFallbacks &&
+      typeof storageCompatFallbacks.resolveModule === "function"
+    ) {
+      return storageCompatFallbacks.resolveModule(moduleName, fallbackFactory);
+    }
+    return typeof fallbackFactory === "function" ? fallbackFactory() : null;
+  };
+
+  const readConfigValue = (key, fallback = "") => {
+    const value = joinAppConfig[key];
+    return typeof value === "string" ? value.trim() : fallback;
+  };
+
+  const ensureConfigValues = (requiredKeys) => {
+    const missing = requiredKeys.filter((key) => {
+      const value = joinAppConfig[key];
+      return typeof value !== "string" || value.trim() === "";
+    });
+    if (missing.length > 0) {
+      throw new Error(
+        `Missing JOIN_APP_CONFIG values: ${missing.join(", ")}. Create js/config.js from js/config.example.js.`
+      );
+    }
+  };
+
+  const baseUrl = readConfigValue("BASE_URL");
+  const runtime = {
+    StorageErrorPolicy: resolveStorageDependency(
+      "StorageErrorPolicy",
+      "createStorageErrorPolicyFallback"
+    ),
+    StorageTransport: resolveStorageDependency(
+      "StorageTransport",
+      "createStorageTransportFallback"
+    ),
+    StorageFirebaseAdapter: resolveStorageDependency(
+      "StorageFirebaseAdapter",
+      "createStorageFirebaseAdapterFallback"
+    ),
+    STORAGE_TOKEN: readConfigValue("STORAGE_TOKEN"),
+    STORAGE_URL: readConfigValue(
+      "STORAGE_URL",
+      "https://remote-storage.developerakademie.org/item"
+    ),
+    BASE_URL: baseUrl
+      ? baseUrl.endsWith("/")
+        ? baseUrl
+        : `${baseUrl}/`
+      : "",
+    FIREBASE_TASKS_ID: readConfigValue("FIREBASE_TASKS_ID"),
+    FIREBASE_USERS_ID: readConfigValue("FIREBASE_USERS_ID"),
+    assertConfig: ensureConfigValues,
+  };
+
+  window.StorageRuntime = runtime;
+  return runtime;
+};
+
+const storageRuntime = window.StorageRuntime || createStorageRuntimeFallbackObject();
 
 const StorageErrorPolicy = storageRuntime.StorageErrorPolicy;
 const StorageTransport = storageRuntime.StorageTransport;
 const StorageFirebaseAdapter = storageRuntime.StorageFirebaseAdapter;
+
+if (!StorageErrorPolicy || !StorageTransport || !StorageFirebaseAdapter) {
+  throw new Error(
+    "Missing storage dependencies. Ensure storage_* scripts are loaded before js/storage.js."
+  );
+}
 
 const STORAGE_TOKEN = storageRuntime.STORAGE_TOKEN;
 const STORAGE_URL = storageRuntime.STORAGE_URL;
