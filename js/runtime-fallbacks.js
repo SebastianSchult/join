@@ -39,6 +39,11 @@ const RUNTIME_FALLBACK_GROUPS = Object.freeze({
 		rationale:
 			"Provide minimal numeric helper compatibility for delegated action payloads.",
 	}),
+	navigation: Object.freeze({
+		version: "navigation-v1",
+		rationale:
+			"Keep responsive navigation rendering stable when template bundle is stale or missing.",
+	}),
 });
 
 /**
@@ -175,6 +180,32 @@ function applyHelperFallbacks() {
 	ensureWindowFunction("toSafeInteger", function (value, fallback = 0) {
 		const parsed = Number.parseInt(String(value), 10);
 		return Number.isFinite(parsed) ? parsed : fallback;
+	});
+
+	ensureWindowFunction("renderNavigationHTML", function () {
+		return /* html */ `
+	<div class="navigation-content">
+		<div id="nav-wrapper" class="nav-wrapper">
+			<div class="nav-buttons-box">
+				<a href="./summary.html" id="summary" class="nav-btn">
+					<img class="navImg" src="./assets/img/icon-summary.png" alt="summary" />Summary
+				</a>
+				<a href="./addTask.html" id="addTask" class="nav-btn">
+					<img src="./assets/img/icon-addTask.png" alt="add task" />Add Task
+				</a>
+				<a href="./board.html" id="board" class="nav-btn">
+					<img src="./assets/img/icon-board.png" alt="board" />Board
+				</a>
+				<a href="./contacts.html" id="contacts" class="nav-btn">
+					<img src="./assets/img/icon-contacts.png" alt="contacts" />Contacts
+				</a>
+			</div>
+			<div class="privatePolicyAndLegalNoticeLinksNav">
+				<div id="privacyNav"><a href="./privacy.html">Privacy Policy</a></div>
+				<div id="legalNav"><a href="./legal_notice.html">Legal Notice</a></div>
+			</div>
+		</div>
+	</div>`;
 	});
 }
 
