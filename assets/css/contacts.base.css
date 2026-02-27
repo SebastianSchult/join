@@ -72,9 +72,12 @@
 }
 
 .add-contact {
+  --contact-overlay-gap: clamp(8px, 2vw, 24px);
   top: 0;
-  width: 584px;
-  right: 0px;
+  right: 0;
+  inline-size: min(584px, calc(100vw - var(--contact-overlay-gap)));
+  max-inline-size: 100vw;
+  block-size: 100dvh;
   position: fixed;
   border-radius: 30px 0px 30px 30px;
   animation: moveInRight 125ms ease-in-out;
@@ -159,10 +162,12 @@
 }
 
 .edit-contact {
+  --contact-overlay-gap: clamp(8px, 2vw, 24px);
   top: 0;
-  width: 584px;
-  left: 0px;
-  margin-right: 159px;
+  left: 0;
+  inline-size: min(584px, calc(100vw - var(--contact-overlay-gap)));
+  max-inline-size: 100vw;
+  block-size: 100dvh;
   position: fixed;
   border-radius: 0px 30px 30px 30px;
   animation: moveInLeft 125ms ease-in-out;
