@@ -329,15 +329,41 @@
   .edit-contact p {
     font-size: 24px;
   }
+
+  .addContactButton {
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 24px;
+    width: 100%;
+  }
+
+  .cancelButton,
+  .createButton {
+    font-size: 18px;
+    min-width: 140px;
+    flex: 1 1 140px;
+    padding: 12px 14px;
+  }
+
+  .createButton img,
+  .cancelButton img {
+    padding-left: 10px;
+  }
 }
 
 @media screen and (max-width: 420px) {
-  .cancelButton {
-    display: none;
-  }
-
   .add-contact-header-logo p {
     font-size: 21px;
+  }
+
+  .addContactButton {
+    gap: 10px;
+  }
+
+  .cancelButton,
+  .createButton {
+    min-width: 0;
+    width: 100%;
   }
 }
 
