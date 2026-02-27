@@ -126,17 +126,17 @@
 }
 
 /*progress-bar*/
-progress {
+.board-Container progress {
   appearance: none;
   height: 8px;
   max-width: 125px;
 }
 
-::-webkit-progress-bar {
+.board-Container progress::-webkit-progress-bar {
   background: #f4f4f4;
   border-radius: 10px;
 }
-::-webkit-progress-value {
+.board-Container progress::-webkit-progress-value {
   background: #4589ff;
   border-radius: 10px;
 }
@@ -465,4 +465,3 @@ progress {
     display: none;
   }
 }
-

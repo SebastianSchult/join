@@ -60,6 +60,12 @@ Avoid:
 - implicit globals
 - duplicate helper names across files
 
+CSS selector scoping:
+
+- in domain stylesheets (`board.*`, `addTask.*`, `contacts.*`, `summary.*`), avoid unscoped bare element selectors (`input`, `button`, `h1`, etc.)
+- scope element rules under domain/page roots (for example `.board-Container`, `.addTaskBody`, `body[data-init="contactsInit"]`)
+- keep truly global element styles only in explicit shared utility/base files
+
 ## 3) Module Boundaries and Ownership
 
 Ownership is domain-based. Each module has a primary responsibility:
