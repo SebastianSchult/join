@@ -75,6 +75,24 @@ jobs:
           set -euo pipefail
           npm run a11y:audit
 
+  css-guardrails:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Guardrail check for CSS syntax and maintainability (Stylelint)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run lint:css
+
   accessibility-baseline:
     runs-on: ubuntu-latest
 
