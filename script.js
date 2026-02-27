@@ -1,9 +1,22 @@
 "use strict";
 
-initializeLegacyRuntimeFallbacks();
-initializeCookiebot();
-initializeUiEventDelegation();
-initializePageOnDomReady();
+const PAGE_INIT_RETRY_DELAY_MS = 16;
+const PAGE_INIT_MAX_RETRIES = 20;
+
+bootstrapRuntime();
+
+/**
+ * Bootstraps runtime fallbacks, consent integration, delegated actions,
+ * and page-level initialization in a defer-safe order.
+ *
+ * @returns {void}
+ */
+function bootstrapRuntime() {
+	initializeLegacyRuntimeFallbacks();
+	initializeCookiebot();
+	initializeUiEventDelegation();
+	initializePageOnDomReady();
+}
 
 /**
  * Executes the page-specific initializer declared via `data-init` on the body.
@@ -17,7 +30,7 @@ function initializePageOnDomReady() {
 		if (!initFunctionName) {
 			return;
 		}
-		executeNamedFunction(initFunctionName);
+		runNamedPageInitializer(initFunctionName);
 	};
 
 	if (document.readyState === "loading") {
@@ -26,6 +39,34 @@ function initializePageOnDomReady() {
 	}
 
 	runPageInit();
+}
+
+/**
+ * Executes the page initializer by name and retries briefly when a handler is
+ * still pending, which can happen in mixed cached asset states.
+ *
+ * @param {string} initFunctionName - Global page-init handler name.
+ * @param {number} [retryCount=0] - Current retry counter.
+ * @returns {void}
+ */
+function runNamedPageInitializer(initFunctionName, retryCount = 0) {
+	if (typeof window[initFunctionName] === "function") {
+		if (typeof executeNamedFunction === "function") {
+			executeNamedFunction(initFunctionName);
+		} else {
+			window[initFunctionName]();
+		}
+		return;
+	}
+
+	if (retryCount >= PAGE_INIT_MAX_RETRIES) {
+		console.warn(`Page init handler not found: ${initFunctionName}`);
+		return;
+	}
+
+	window.setTimeout(() => {
+		runNamedPageInitializer(initFunctionName, retryCount + 1);
+	}, PAGE_INIT_RETRY_DELAY_MS);
 }
 
 
