@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Move linked issue in project and labels
         if: ${{ env.GH_PROJECT_URL != '' && env.PROJECT_TOKEN != '' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28fcf53e6d2dfac4282a2e3891f5f1f1b05b39c # v7.1.0
         with:
           github-token: ${{ env.PROJECT_TOKEN }}
           script: |

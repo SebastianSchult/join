@@ -2,6 +2,12 @@
 
 This project uses GitHub Actions for issue triage, PR status sync, quality checks, and deployment.
 
+## Action pinning policy
+
+- All third-party and official marketplace actions are pinned to immutable commit SHAs in workflow files.
+- Inline comments next to each pinned SHA reference the original release/tag for readability.
+- Do not switch back to floating references like `@v4` or `@main`.
+
 ## Workflows
 
 ### 1) Issue triage
@@ -47,7 +53,7 @@ Required:
     - page-bundle lint guardrail
     - semantic accessibility baseline guardrail (`npm run a11y:audit`)
   - `accessibility-baseline`
-    - Lighthouse accessibility baseline via `treosh/lighthouse-ci-action`
+    - Lighthouse accessibility baseline via `npm run a11y:ci`
     - uploads `.lighthouseci` artifacts
 
 ### 4) Deploy on main
@@ -111,6 +117,29 @@ FTP mode:
 - Open PR from feature branch to `main`.
 
 This keeps issue linking deterministic for `pr-issue-status.yml`.
+
+## Updating pinned action SHAs
+
+When you intentionally upgrade an action:
+
+1. Pick a target release tag from the action repository (example: `v4.2.2`).
+2. Resolve the tag to a commit SHA.
+3. Replace `uses:` in workflow files with the full 40-char SHA.
+4. Keep the version comment next to it (example: `# v4.2.2`).
+5. Run PR checks before merge.
+
+Reference commands (requires internet and `jq`):
+
+```bash
+# Lightweight tag (common)
+curl -sL https://api.github.com/repos/actions/checkout/git/ref/tags/v4 \
+  | jq -r '.object.sha'
+
+# Annotated tag (if .object.type == "tag", resolve one level deeper)
+TAG_SHA="$(curl -sL https://api.github.com/repos/actions/checkout/git/ref/tags/v4 | jq -r '.object.sha')"
+curl -sL "https://api.github.com/repos/actions/checkout/git/tags/${TAG_SHA}" \
+  | jq -r '.object.sha'
+```
 
 ## Troubleshooting
 
