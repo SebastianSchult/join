@@ -30,6 +30,7 @@ Then open `http://127.0.0.1:4173/index.html`.
 
 ```bash
 npm run lint
+npm run lint:css
 npm run lint:jsdoc
 npm run lint:file-size
 npm run a11y:audit
@@ -44,6 +45,7 @@ npm run a11y:report
 - GitHub issue/PR/project/deploy automation: [GITHUB_AUTOMATION.md](./GITHUB_AUTOMATION.md)
 - Accessibility checks: [ACCESSIBILITY_CHECKS.md](./ACCESSIBILITY_CHECKS.md)
 - File-size guardrails: [FILE_SIZE_GUARDRAILS.md](./FILE_SIZE_GUARDRAILS.md)
+- CSS guardrails (Stylelint): [CSS_GUARDRAILS.md](./CSS_GUARDRAILS.md)
 - JSDoc guardrails: [JSDOC_GUARDRAILS.md](./JSDOC_GUARDRAILS.md)
 - UI tokens and breakpoints: [UI_TOKENS.md](./UI_TOKENS.md)
 - Secure rendering / XSS rules: [SECURITY_RENDERING.md](./SECURITY_RENDERING.md)
