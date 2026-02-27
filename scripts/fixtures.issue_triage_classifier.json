@@ -1,0 +1,106 @@
+[
+  {
+    "name": "explicit_title_chore_over_security_keywords_in_body",
+    "issue": {
+      "title": "[P2][Chore]: Add docs for password migration",
+      "body": "### Priority\nP2 - Medium\n\n### Area\nUI\n\n### Summary\nDocument password/token handling examples for new contributors.",
+      "existingLabels": []
+    },
+    "expectInclude": [
+      "needs-triage",
+      "status: backlog",
+      "priority: p2",
+      "type: chore",
+      "area: ui"
+    ],
+    "expectExclude": ["type: security", "area: auth"]
+  },
+  {
+    "name": "template_area_preferred_over_body_auth_terms",
+    "issue": {
+      "title": "[P1][Bug]: Edit overlay button clipping",
+      "body": "### Priority\nP1 - High\n\n### Area\nUI\n\n### Summary\nLayout issue in contact edit overlay when login/auth text is present in helper text.",
+      "existingLabels": []
+    },
+    "expectInclude": [
+      "needs-triage",
+      "status: backlog",
+      "priority: p1",
+      "type: bug",
+      "area: ui"
+    ],
+    "expectExclude": ["area: auth"]
+  },
+  {
+    "name": "explicit_security_tag_sets_security_type",
+    "issue": {
+      "title": "[P0][Security]: Prevent stored XSS in comments",
+      "body": "### Priority\nP0 - Critical\n\n### Area\nStorage\n\n### Risk / Impact\nStored XSS.\n\n### Proposed Mitigation\nEscape user content.",
+      "existingLabels": []
+    },
+    "expectInclude": [
+      "priority: p0",
+      "type: security",
+      "area: storage"
+    ],
+    "expectExclude": []
+  },
+  {
+    "name": "refactor_template_without_title_tag",
+    "issue": {
+      "title": "Split board runtime into modules",
+      "body": "### Priority\nP2 - Medium\n\n### Area\nBoard\n\n### Context / Problem\nLarge module.\n\n### Proposed Refactor\nSplit rendering and state.\n",
+      "existingLabels": []
+    },
+    "expectInclude": ["priority: p2", "type: refactor", "area: board"],
+    "expectExclude": []
+  },
+  {
+    "name": "bug_template_without_title_tag",
+    "issue": {
+      "title": "Contact save fails after refresh",
+      "body": "### Priority\nP1 - High\n\n### Area\nContacts\n\n### Summary\nSave fails.\n\n### Steps To Reproduce\n1. Open contacts\n2. Save contact\n",
+      "existingLabels": []
+    },
+    "expectInclude": ["priority: p1", "type: bug", "area: contacts"],
+    "expectExclude": []
+  },
+  {
+    "name": "existing_type_not_overwritten",
+    "issue": {
+      "title": "[P2][Security]: classify me",
+      "body": "### Priority\nP2 - Medium\n\n### Area\nTooling\n\n### Summary\nClassifier maintenance.\n",
+      "existingLabels": ["type: chore"]
+    },
+    "expectInclude": ["priority: p2", "area: tooling"],
+    "expectExclude": ["type: security"]
+  },
+  {
+    "name": "no_default_area_when_unknown",
+    "issue": {
+      "title": "[P3][Chore]: repository housekeeping",
+      "body": "### Priority\nP3 - Low\n\n### Summary\nHousekeeping task.\n",
+      "existingLabels": []
+    },
+    "expectInclude": ["priority: p3", "type: chore"],
+    "expectExclude": [
+      "area: ui",
+      "area: auth",
+      "area: board",
+      "area: contacts",
+      "area: summary",
+      "area: storage",
+      "area: tooling"
+    ]
+  },
+  {
+    "name": "area_from_title_tag",
+    "issue": {
+      "title": "[P2][Bug][Storage]: fetch wrapper options wrong",
+      "body": "### Priority\nP2 - Medium\n\n### Summary\nFetch wrapper uses invalid options.",
+      "existingLabels": []
+    },
+    "expectInclude": ["priority: p2", "type: bug", "area: storage"],
+    "expectExclude": []
+  }
+]

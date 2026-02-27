@@ -49,6 +49,12 @@ jobs:
           set -euo pipefail
           npm run lint:blank-target-rel
 
+      - name: Guardrail check for issue-triage classifier fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run lint:issue-triage
+
       - name: Guardrail check for UI breakpoint and spacing token alignment
         shell: bash
         run: |

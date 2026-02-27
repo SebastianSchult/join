@@ -7,11 +7,12 @@
     "lint:jsdoc:update-baseline": "node scripts/check_jsdoc_coverage.cjs --update-baseline",
     "lint:file-size": "node scripts/check_file_size_guardrail.cjs",
     "lint:css": "npx --yes stylelint@16.24.0 \"assets/css/**/*.css\" \"style.css\"",
+    "lint:issue-triage": "node scripts/test_issue_triage_classifier.cjs",
     "lint:templates": "node scripts/check_duplicate_template_attributes.cjs",
     "lint:inline-events": "node scripts/check_inline_event_handlers.cjs",
     "lint:blank-target-rel": "node scripts/check_blank_target_rel.cjs",
     "lint:ui-tokens": "node scripts/check_ui_tokens_alignment.cjs",
-    "lint": "npm run lint:templates && npm run lint:inline-events && npm run lint:blank-target-rel && npm run lint:ui-tokens && npm run lint:css && npm run lint:file-size && npm run lint:jsdoc && npm run lint:js",
+    "lint": "npm run lint:templates && npm run lint:inline-events && npm run lint:blank-target-rel && npm run lint:issue-triage && npm run lint:ui-tokens && npm run lint:css && npm run lint:file-size && npm run lint:jsdoc && npm run lint:js",
     "a11y:ci": "npx --yes @lhci/cli autorun --config=./lighthouserc.cjs",
     "a11y:report": "node scripts/summarize_lighthouse_accessibility.cjs",
     "a11y:audit": "node scripts/check_accessibility_baseline.cjs"
