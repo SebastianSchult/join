@@ -174,7 +174,7 @@ jobs:
         id: deploy_ftps
         if: ${{ steps.mode.outputs.mode == 'ftp' }}
         continue-on-error: true
-        uses: SamKirkland/FTP-Deploy-Action@8e83cea8672e3fbcbb9fdafff34debf6ae4c5f65 # v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@a51268f67f6605236975928ae28b0f7e9971d50a # v4.3.6
         with:
           server: ${{ env.DEPLOY_FTP_SERVER }}
           username: ${{ env.DEPLOY_FTP_USER }}
@@ -193,7 +193,7 @@ jobs:
       - name: Deploy with FTP (fallback)
         id: deploy_ftp
         if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps.outcome != 'success' }}
-        uses: SamKirkland/FTP-Deploy-Action@8e83cea8672e3fbcbb9fdafff34debf6ae4c5f65 # v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@a51268f67f6605236975928ae28b0f7e9971d50a # v4.3.6
         with:
           server: ${{ env.DEPLOY_FTP_SERVER }}
           username: ${{ env.DEPLOY_FTP_USER }}
