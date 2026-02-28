@@ -38,6 +38,7 @@ npm run lint:issue-triage
 npm run a11y:audit
 npm run a11y:ci
 npm run a11y:report
+npm run e2e:smoke
 ```
 
 ## Lockfile policy
@@ -57,6 +58,7 @@ npm run a11y:report
 - Deployment pipeline: [DEPLOYMENT.md](./DEPLOYMENT.md)
 - GitHub issue/PR/project/deploy automation: [GITHUB_AUTOMATION.md](./GITHUB_AUTOMATION.md)
 - Accessibility checks: [ACCESSIBILITY_CHECKS.md](./ACCESSIBILITY_CHECKS.md)
+- E2E smoke tests: [E2E_SMOKE_TESTS.md](./E2E_SMOKE_TESTS.md)
 - File-size guardrails: [FILE_SIZE_GUARDRAILS.md](./FILE_SIZE_GUARDRAILS.md)
 - Page script dependency manifest: [PAGE_SCRIPT_DEPENDENCIES.md](./PAGE_SCRIPT_DEPENDENCIES.md)
 - CSS guardrails (Stylelint): [CSS_GUARDRAILS.md](./CSS_GUARDRAILS.md)

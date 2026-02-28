@@ -60,6 +60,12 @@ Required:
     - deterministic dependency install (`npm ci`)
     - Lighthouse accessibility baseline via `npm run a11y:ci`
     - uploads `.lighthouseci` artifacts
+  - `e2e-smoke`
+    - deterministic dependency install (`npm ci`)
+    - Playwright browser install (`chromium`)
+    - critical user journey smoke tests (`npm run e2e:smoke`)
+    - uploads `playwright-report` and `test-results` artifacts on every run
+- Maintenance guide for smoke tests: `E2E_SMOKE_TESTS.md`
 
 ## Lockfile and install policy
 
