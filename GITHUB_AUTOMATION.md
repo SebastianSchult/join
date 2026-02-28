@@ -69,6 +69,23 @@ Required:
 - Add/update dependencies with explicit versions (`npm install <pkg>@<version> ...`) so version intent is reviewable in PRs.
 - Dependency updates must include both `package.json` and `package-lock.json` changes in the same PR.
 
+## Dependency automation (Dependabot)
+
+- File: `.github/dependabot.yml`
+- Ecosystems:
+  - `npm` (root package)
+  - `github-actions` (workflow actions)
+- Schedule: weekly
+- Dependabot PRs are labeled as `type: chore` and `area: tooling`.
+
+### Review and merge checklist for Dependabot PRs
+
+1. Confirm PR scope is dependency-only (no unrelated application code changes).
+2. For npm updates, verify `package.json` and `package-lock.json` are both present in the diff.
+3. Run PR checks and merge only when CI is green.
+4. For GitHub Actions updates, keep actions pinned to full commit SHAs (no fallback to floating tags like `@v4`).
+5. If a major update changes behavior or CI stability, split/hold that PR and handle it in a dedicated follow-up ticket.
+
 ### 4) Deploy on main
 
 - File: `.github/workflows/deploy-on-main.yml`
