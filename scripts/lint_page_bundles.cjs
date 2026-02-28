@@ -82,8 +82,8 @@ function collectPageBundles() {
 
 async function runEslintGuardrail(eslintModule, bundles) {
   const { ESLint } = eslintModule;
-  const eslint = new ESLint({
-    useEslintrc: true,
+  const eslintrcPath = path.resolve(process.cwd(), ".eslintrc.cjs");
+  const eslintOptions = {
     ignore: false,
     overrideConfig: {
       rules: {
@@ -91,6 +91,14 @@ async function runEslintGuardrail(eslintModule, bundles) {
         "no-redeclare": "error",
       },
     },
+  };
+
+  if (fs.existsSync(eslintrcPath)) {
+    eslintOptions.overrideConfigFile = eslintrcPath;
+  }
+
+  const eslint = new ESLint({
+    ...eslintOptions,
   });
 
   const lintResults = [];
@@ -195,6 +203,9 @@ function getLineNumber(source, index) {
 }
 
 function tryLoadEslint() {
+  // Keep legacy .eslintrc support in environments that default to flat config.
+  process.env.ESLINT_USE_FLAT_CONFIG = process.env.ESLINT_USE_FLAT_CONFIG || "false";
+
   try {
     return require("eslint");
   } catch (_error) {
