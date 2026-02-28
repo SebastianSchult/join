@@ -26,7 +26,7 @@ cp js/config.example.js js/config.js
 Run these commands before pushing a branch:
 
 ```bash
-npm install
+npm ci
 npm run lint
 ```
 

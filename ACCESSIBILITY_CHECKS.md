@@ -47,7 +47,7 @@ If any `critical` or `serious` finding exists, CI fails.
 ## Run locally
 
 ```bash
-npm install
+npm ci
 npm run a11y:ci
 npm run a11y:report
 npm run a11y:audit
