@@ -121,6 +121,15 @@ jobs:
           console.log("Generated js/config.js for deployment.");
           NODE
 
+      - name: Inject centralized asset version for local JS/CSS references
+        if: ${{ steps.mode.outputs.mode != 'none' }}
+        shell: bash
+        env:
+          ASSET_VERSION: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          node scripts/inject_asset_version.cjs --version "${ASSET_VERSION}"
+
       - name: Setup SSH key
         if: ${{ steps.mode.outputs.mode == 'ssh' }}
         uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0

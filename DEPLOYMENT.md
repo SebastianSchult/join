@@ -63,6 +63,27 @@ Optional:
 - `JOIN_APP_STORAGE_URL` (default: `https://remote-storage.developerakademie.org/item`)
 - `JOIN_APP_COOKIEBOT_BLOCKING_MODE` (default: `auto`)
 
+## Centralized asset cache-busting
+
+To keep cache invalidation predictable, deploy now uses one central asset version source:
+
+- Source of truth: `github.sha` from the current deploy run
+- Injection step: `node scripts/inject_asset_version.cjs --version "${ASSET_VERSION}"`
+- Scope: local `.js` and `.css` references in root `*.html` files
+
+This means:
+
+- No manual `?v=...` updates in individual HTML files for releases
+- A single deploy applies one consistent asset version across pages
+- Existing query params are preserved, and `v` is refreshed centrally
+
+### Release workflow
+
+1. Merge changes to `main`.
+2. Deploy workflow runs automatically.
+3. Workflow generates runtime config and injects centralized asset version.
+4. Uploaded HTML files reference the new versioned local assets consistently.
+
 ## What gets deployed
 
 The workflow excludes:

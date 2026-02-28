@@ -94,6 +94,14 @@ Required:
   - SSH + rsync
   - FTPS primary with FTP fallback
 - Also generates `js/config.js` at deploy-time from repository secrets.
+- Also injects centralized cache-busting version for local JS/CSS assets from one source (`github.sha`).
+
+### Asset cache-busting strategy
+
+- Source of truth: deploy-time `ASSET_VERSION` (derived from `github.sha`).
+- Injector script: `scripts/inject_asset_version.cjs`.
+- Target scope: local `.js`/`.css` references in root `*.html` files.
+- Expected workflow: do not manually bump `?v=...` in page files; deploy applies versioning consistently.
 
 ## Setup checklist
 
