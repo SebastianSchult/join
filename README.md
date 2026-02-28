@@ -44,8 +44,10 @@ npm run a11y:report
 
 - `package-lock.json` is required and must be committed.
 - CI uses deterministic installs with `npm ci`.
+- CI/quality tooling must be installed from `devDependencies` via `npm ci` (no ad-hoc `npx --yes <pkg>` installs).
+- New dependencies should be added with an explicit version (`npm install <pkg>@<version> --save-dev` or `--save`).
 - For dependency updates:
-  1. Run `npm install <pkg> --save-dev` (or `--save`).
+  1. Run `npm install <pkg>@<version> --save-dev` (or `--save`).
   2. Commit both `package.json` and `package-lock.json`.
   3. In PR description, mention why the dependency update is needed.
 

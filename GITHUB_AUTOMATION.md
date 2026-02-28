@@ -65,6 +65,8 @@ Required:
 
 - `package-lock.json` is part of the repository and must be committed.
 - Node-based CI jobs use `npm ci` (not `npm install`) for reproducible dependency resolution.
+- CI scripts should execute tooling from committed `devDependencies` instead of fetching tools ad-hoc via `npx --yes`.
+- Add/update dependencies with explicit versions (`npm install <pkg>@<version> ...`) so version intent is reviewable in PRs.
 - Dependency updates must include both `package.json` and `package-lock.json` changes in the same PR.
 
 ### 4) Deploy on main

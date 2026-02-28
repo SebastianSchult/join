@@ -143,3 +143,8 @@ a {
   height: 44px !important;
   width: 44px !important;
 }
+
+.main.signup-active {
+  max-width: none !important;
+  width: 100% !important;
+}
