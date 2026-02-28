@@ -46,15 +46,26 @@ Required:
 - Trigger: `push`, `pull_request`
 - Jobs:
   - `js-guardrails`
+    - deterministic dependency install (`npm ci`)
     - JS syntax checks
     - template duplicate-attribute guardrail
     - inline event guardrail
     - UI token alignment guardrail
     - page-bundle lint guardrail
     - semantic accessibility baseline guardrail (`npm run a11y:audit`)
+  - `css-guardrails`
+    - deterministic dependency install (`npm ci`)
+    - CSS syntax and maintainability checks
   - `accessibility-baseline`
+    - deterministic dependency install (`npm ci`)
     - Lighthouse accessibility baseline via `npm run a11y:ci`
     - uploads `.lighthouseci` artifacts
+
+## Lockfile and install policy
+
+- `package-lock.json` is part of the repository and must be committed.
+- Node-based CI jobs use `npm ci` (not `npm install`) for reproducible dependency resolution.
+- Dependency updates must include both `package.json` and `package-lock.json` changes in the same PR.
 
 ### 4) Deploy on main
 

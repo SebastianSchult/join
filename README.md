@@ -7,7 +7,7 @@ Join is a kanban-style task management web app (login, board, contacts, summary,
 1. Install dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
 2. Create runtime config:
@@ -39,6 +39,15 @@ npm run a11y:audit
 npm run a11y:ci
 npm run a11y:report
 ```
+
+## Lockfile policy
+
+- `package-lock.json` is required and must be committed.
+- CI uses deterministic installs with `npm ci`.
+- For dependency updates:
+  1. Run `npm install <pkg> --save-dev` (or `--save`).
+  2. Commit both `package.json` and `package-lock.json`.
+  3. In PR description, mention why the dependency update is needed.
 
 ## Documentation index
 
