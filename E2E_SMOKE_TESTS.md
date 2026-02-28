@@ -44,6 +44,7 @@ npm run e2e:smoke
 
 - Tests use a local Firebase mock (`/e2e/support/firebase-mock.js`) and do not depend on live backend state.
 - Third-party CDN/Cookiebot assets are stubbed for stable, offline-capable execution.
+- Smoke tests no longer require a committed/local `js/config.js`; the test runtime injects a deterministic fallback `JOIN_APP_CONFIG` when that file is missing (CI-safe).
 - Prefer stable selectors (`data-action`, form ids, explicit element ids) over style/CSS-path selectors.
 - If a user journey changes intentionally, update:
   1. the affected test case in `/e2e/smoke.spec.js`,

@@ -7,6 +7,16 @@ const FIREBASE_REQUEST_PATTERN =
   /https:\/\/[^/]+\.(?:firebasedatabase\.app|firebaseio\.com)\/.+\.json(?:\?.*)?$/i;
 const THIRD_PARTY_ASSET_PATTERN =
   /https:\/\/(?:cdnjs\.cloudflare\.com|consent\.cookiebot\.com|consentcdn\.cookiebot\.com)\//i;
+const CONFIG_FILE_CANDIDATES = Object.freeze(["js/config.js", "js/config.example.js"]);
+const SMOKE_FALLBACK_RUNTIME_CONFIG = Object.freeze({
+  STORAGE_TOKEN: "E2E_SMOKE_TOKEN",
+  STORAGE_URL: "https://remote-storage.developerakademie.org/item",
+  BASE_URL: "https://join-smoke-e2e-default-rtdb.europe-west1.firebasedatabase.app/",
+  FIREBASE_TASKS_ID: "e2e-smoke-tasks",
+  FIREBASE_USERS_ID: "e2e-smoke-users",
+  COOKIEBOT_ID: "",
+  COOKIEBOT_BLOCKING_MODE: "auto",
+});
 
 const SMOKE_TEST_CREDENTIALS = Object.freeze({
   name: "Smoke User",
@@ -70,24 +80,79 @@ const SMOKE_SEED_TASKS = Object.freeze([
   },
 ]);
 
-function readFirebaseCollectionIds(options = {}) {
+function readRuntimeConfig(options = {}) {
   const repoRoot = options.repoRoot || process.cwd();
-  const configPath = path.join(repoRoot, "js", "config.js");
-  const configSource = fs.readFileSync(configPath, "utf8");
+  const configSource = readConfigSourceFromCandidates(repoRoot);
 
-  return {
-    usersId: readConfigValue(configSource, "FIREBASE_USERS_ID"),
-    tasksId: readConfigValue(configSource, "FIREBASE_TASKS_ID"),
+  const runtimeConfig = {
+    STORAGE_TOKEN: readConfigValue(
+      configSource,
+      "STORAGE_TOKEN",
+      SMOKE_FALLBACK_RUNTIME_CONFIG.STORAGE_TOKEN
+    ),
+    STORAGE_URL: readConfigValue(
+      configSource,
+      "STORAGE_URL",
+      SMOKE_FALLBACK_RUNTIME_CONFIG.STORAGE_URL
+    ),
+    BASE_URL: normalizeBaseUrl(
+      readConfigValue(configSource, "BASE_URL", SMOKE_FALLBACK_RUNTIME_CONFIG.BASE_URL)
+    ),
+    FIREBASE_TASKS_ID: readConfigValue(
+      configSource,
+      "FIREBASE_TASKS_ID",
+      SMOKE_FALLBACK_RUNTIME_CONFIG.FIREBASE_TASKS_ID
+    ),
+    FIREBASE_USERS_ID: readConfigValue(
+      configSource,
+      "FIREBASE_USERS_ID",
+      SMOKE_FALLBACK_RUNTIME_CONFIG.FIREBASE_USERS_ID
+    ),
+    COOKIEBOT_ID: readConfigValue(
+      configSource,
+      "COOKIEBOT_ID",
+      SMOKE_FALLBACK_RUNTIME_CONFIG.COOKIEBOT_ID
+    ),
+    COOKIEBOT_BLOCKING_MODE: readConfigValue(
+      configSource,
+      "COOKIEBOT_BLOCKING_MODE",
+      SMOKE_FALLBACK_RUNTIME_CONFIG.COOKIEBOT_BLOCKING_MODE
+    ),
   };
+
+  return Object.freeze(runtimeConfig);
 }
 
-function readConfigValue(source, key) {
+function readConfigSourceFromCandidates(repoRoot) {
+  for (const relativePath of CONFIG_FILE_CANDIDATES) {
+    const candidatePath = path.join(repoRoot, relativePath);
+    if (!fs.existsSync(candidatePath)) {
+      continue;
+    }
+    return fs.readFileSync(candidatePath, "utf8");
+  }
+  return "";
+}
+
+function readConfigValue(source, key, fallbackValue = "") {
   const pattern = new RegExp(`${key}\\s*:\\s*["']([^"']+)["']`);
   const match = source.match(pattern);
   if (!match) {
-    throw new Error(`Could not resolve ${key} from js/config.js`);
+    return fallbackValue;
   }
-  return match[1].trim();
+  const value = match[1].trim();
+  return value === "" ? fallbackValue : value;
+}
+
+function normalizeBaseUrl(baseUrl) {
+  if (typeof baseUrl !== "string") {
+    return SMOKE_FALLBACK_RUNTIME_CONFIG.BASE_URL;
+  }
+  const trimmed = baseUrl.trim();
+  if (trimmed === "") {
+    return SMOKE_FALLBACK_RUNTIME_CONFIG.BASE_URL;
+  }
+  return trimmed.endsWith("/") ? trimmed : `${trimmed}/`;
 }
 
 function createInitialCollectionStore(firebaseIds) {
@@ -193,9 +258,14 @@ async function stubThirdPartyAssets(page) {
 }
 
 async function installFirebaseMock(page, options = {}) {
-  const firebaseIds = options.firebaseIds || readFirebaseCollectionIds(options);
+  const runtimeConfig = options.runtimeConfig || readRuntimeConfig(options);
+  const firebaseIds = options.firebaseIds || {
+    usersId: runtimeConfig.FIREBASE_USERS_ID,
+    tasksId: runtimeConfig.FIREBASE_TASKS_ID,
+  };
   const collectionStore = createInitialCollectionStore(firebaseIds);
 
+  await injectRuntimeConfig(page, runtimeConfig);
   await stubThirdPartyAssets(page);
 
   await page.route(FIREBASE_REQUEST_PATTERN, async (route) => {
@@ -278,6 +348,20 @@ async function installFirebaseMock(page, options = {}) {
       }),
     });
   });
+}
+
+async function injectRuntimeConfig(page, runtimeConfig) {
+  await page.addInitScript((config) => {
+    window.JOIN_APP_CONFIG = {
+      STORAGE_TOKEN: config.STORAGE_TOKEN,
+      STORAGE_URL: config.STORAGE_URL,
+      BASE_URL: config.BASE_URL,
+      FIREBASE_TASKS_ID: config.FIREBASE_TASKS_ID,
+      FIREBASE_USERS_ID: config.FIREBASE_USERS_ID,
+      COOKIEBOT_ID: config.COOKIEBOT_ID,
+      COOKIEBOT_BLOCKING_MODE: config.COOKIEBOT_BLOCKING_MODE,
+    };
+  }, runtimeConfig);
 }
 
 module.exports = {
