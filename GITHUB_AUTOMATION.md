@@ -101,6 +101,11 @@ Required:
   - FTPS primary with FTP fallback
 - Also generates `js/config.js` at deploy-time from repository secrets.
 - Also injects centralized cache-busting version for local JS/CSS assets from one source (`github.sha`).
+- FTP mode hardening:
+  - Connectivity precheck with explicit DNS and TCP-port probing (with retry/backoff).
+  - FTPS deploy retries (up to 3 attempts) before FTP fallback.
+  - FTP fallback retries (up to 3 attempts).
+  - Diagnostic probe classifies likely failure class (`network`, `auth`, `path`, `unknown`) and publishes a deploy summary.
 
 ### Asset cache-busting strategy
 
@@ -192,6 +197,13 @@ curl -sL "https://api.github.com/repos/actions/checkout/git/tags/${TAG_SHA}" \
   - Ensure project has a `Status` single-select field.
 - Deployment fails:
   - Check which mode was selected in workflow logs (`ssh`, `ftp`, `none`).
-  - Re-validate server/credentials/path secrets.
+  - In FTP mode, inspect:
+    - precheck result (`DNS` and `TCP` reachability),
+    - FTPS/FTP diagnostic probe class (`network`, `auth`, `path`, `unknown`),
+    - per-attempt outcomes for FTPS and FTP retries.
+  - Re-validate server/credentials/path secrets:
+    - `network`: host, port, provider availability, firewall.
+    - `auth`: `DEPLOY_FTP_USER` / `DEPLOY_FTP_PASSWORD`.
+    - `path`: `DEPLOY_FTP_DIR` path and write permissions.
 - Runtime config generation fails:
   - Missing required `JOIN_APP_*` secrets are shown in logs.
