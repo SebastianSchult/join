@@ -130,3 +130,29 @@ A standards-compliant change has:
 - no module boundary violations
 - lint checks passing
 - PR description containing checklist evidence
+
+## 6) Function Size and SRP Policy
+
+Function-size guidance is a maintainability baseline, not a goal by itself.
+Primary objective: each function should have one clear responsibility.
+
+Baseline thresholds:
+
+- ideal size: `5-20` lines
+- soft limit: `30` lines
+- hard refactor trigger: `40+` lines
+
+Interpretation rules:
+
+- if a function cannot be explained in one sentence, split responsibilities
+- prefer composition (small helpers) over monolithic control flow
+- keep side effects explicit and isolated where possible
+
+Review and exception policy:
+
+- new or modified functions should stay within `<=30` lines when practical
+- functions at `40+` lines must be refactored before merge
+- temporary exceptions are allowed only with:
+  - linked issue
+  - reason and owner
+  - planned follow-up removal

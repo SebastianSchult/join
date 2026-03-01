@@ -52,6 +52,11 @@ npm run e2e:smoke
   2. Commit both `package.json` and `package-lock.json`.
   3. In PR description, mention why the dependency update is needed.
 
+## Function size guideline
+
+- Function size and SRP expectations are documented in [ENGINEERING_STANDARDS.md](./ENGINEERING_STANDARDS.md).
+- Target size is `5-20` lines, soft limit is `30`, and functions `40+` lines must be refactored or explicitly tracked as a follow-up.
+
 ## Documentation index
 
 - Runtime config: [CONFIGURATION.md](./CONFIGURATION.md)
