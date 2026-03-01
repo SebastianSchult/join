@@ -276,10 +276,12 @@ function displayEmptyTask(taskId, categoryId) {
     const cardHeight = "min-height: " + taskElement.clientHeight + "px";
     const cardWidth = "min-width: " + taskElement.clientWidth + "px";
     const cardStyle = cardHeight + "; " + cardWidth;
-    const boardColumnsMaxWidth =
-        typeof getUiBreakpointValue === "function"
-            ? getUiBreakpointValue("boardColumnsMax")
-            : 1400;
+    if (typeof getUiBreakpointValue !== "function") {
+        console.warn("Missing getUiBreakpointValue runtime helper.");
+        return;
+    }
+
+    const boardColumnsMaxWidth = getUiBreakpointValue("boardColumnsMax");
 
     const newDiv = document.createElement("div");
     newDiv.classList.add("emptyCard");
