@@ -108,9 +108,11 @@ async function runEslintGuardrail(eslintModule, bundles) {
       rules: FLAT_FALLBACK_RULES,
     });
     eslintForFormatting = flatEslint;
-    lintResults = await lintBundlesWithEslint(flatEslint, bundles);
+    lintResults = await lintBundlesWithEslint(flatEslint, bundles, {
+      sourceTransform: stripLegacyEslintPragmas,
+    });
     console.warn(
-      "Flat-config fallback enforces no-redeclare only to avoid false-positive no-undef reports in legacy global-script bundles."
+      "Flat-config fallback enforces no-redeclare only and neutralizes legacy ESLint pragma comments to avoid false-positive guardrail failures in global-script bundles."
     );
   }
 
@@ -131,11 +133,16 @@ async function runEslintGuardrail(eslintModule, bundles) {
   console.log("ESLint page-bundle guardrail passed.");
 }
 
-async function lintBundlesWithEslint(eslint, bundles) {
+async function lintBundlesWithEslint(eslint, bundles, options = {}) {
+  const sourceTransform =
+    typeof options.sourceTransform === "function"
+      ? options.sourceTransform
+      : (source) => source;
   const lintResults = [];
 
   for (const bundle of bundles) {
-    const pageResults = await eslint.lintText(bundle.bundleSource, {
+    const lintSource = sourceTransform(bundle.bundleSource);
+    const pageResults = await eslint.lintText(lintSource, {
       filePath: bundle.virtualFilePath,
     });
     lintResults.push(...pageResults);
@@ -260,6 +267,13 @@ function normalizeFlatGlobals(globalsMap) {
     normalized[name] = access === true || access === "writable" ? "writable" : "readonly";
   });
   return normalized;
+}
+
+function stripLegacyEslintPragmas(source) {
+  return source.replace(
+    /\/\*\s*(?:global|globals|exported)\b[\s\S]*?\*\//gi,
+    (match) => " ".repeat(match.length)
+  );
 }
 
 function isLegacyConfigCompatibilityError(error) {
