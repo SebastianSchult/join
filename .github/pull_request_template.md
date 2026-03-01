@@ -12,6 +12,10 @@
 - [ ] `npm run lint`
 - [ ] Additional checks run (list manually)
 
+## Function Size / SRP Checklist
+- [ ] Functions touched in this PR follow the Function Size and SRP policy in `ENGINEERING_STANDARDS.md`.
+- [ ] No newly introduced or modified function exceeds 40 lines without a linked follow-up issue and explicit reviewer sign-off.
+
 ## Refactor Regression Checklist (required for refactor PRs)
 Reference: [REFACTOR_REGRESSION_MATRIX.md](./REFACTOR_REGRESSION_MATRIX.md)
 
