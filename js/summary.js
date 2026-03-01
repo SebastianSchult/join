@@ -195,10 +195,12 @@ function buttonEventListener() {
  * Displays a mobile greeting overlay on tablet/mobile breakpoints.
  */
 function greetUserMobile() {
-    const mobileGreetingMaxWidth =
-        typeof getUiBreakpointValue === 'function'
-            ? getUiBreakpointValue('navigationTabletMax')
-            : 950;
+    if (typeof getUiBreakpointValue !== 'function') {
+        console.warn("Missing getUiBreakpointValue runtime helper.");
+        return;
+    }
+
+    const mobileGreetingMaxWidth = getUiBreakpointValue('navigationTabletMax');
 
     if (window.innerWidth <= mobileGreetingMaxWidth && document.referrer.includes('index')) {
         const { greetingContainer, subMainSummary, bitGreeting, main } = getSummaryGreetingElements();
