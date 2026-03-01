@@ -7,6 +7,9 @@ const GUARDRAIL_RULES = Object.freeze({
   "no-undef": "error",
   "no-redeclare": "error",
 });
+const FLAT_FALLBACK_RULES = Object.freeze({
+  "no-redeclare": "error",
+});
 
 async function main() {
   const pageBundles = collectPageBundles();
@@ -101,9 +104,14 @@ async function runEslintGuardrail(eslintModule, bundles) {
     console.warn(
       "Legacy ESLint config mode is not supported in this runtime. Retrying with flat-config guardrail mode."
     );
-    const flatEslint = createFlatConfigEslint(eslintModule);
+    const flatEslint = createFlatConfigEslint(eslintModule, {
+      rules: FLAT_FALLBACK_RULES,
+    });
     eslintForFormatting = flatEslint;
     lintResults = await lintBundlesWithEslint(flatEslint, bundles);
+    console.warn(
+      "Flat-config fallback enforces no-redeclare only to avoid false-positive no-undef reports in legacy global-script bundles."
+    );
   }
 
   const formatter = await eslintForFormatting.loadFormatter("stylish");
@@ -156,6 +164,11 @@ async function createLegacyEslint(eslintModule) {
 }
 
 async function resolveLegacyEslintClass(eslintModule) {
+  const riskyLegacyClass = resolveLegacyEslintClassFromRiskyExports();
+  if (riskyLegacyClass) {
+    return riskyLegacyClass;
+  }
+
   if (typeof eslintModule.loadESLint === "function") {
     return eslintModule.loadESLint({ useFlatConfig: false });
   }
@@ -167,11 +180,25 @@ async function resolveLegacyEslintClass(eslintModule) {
   throw new Error("Could not resolve an ESLint class from the installed eslint module.");
 }
 
-function createFlatConfigEslint(eslintModule) {
+function resolveLegacyEslintClassFromRiskyExports() {
+  try {
+    const eslintAtYourOwnRisk = require("eslint/use-at-your-own-risk");
+    if (typeof eslintAtYourOwnRisk.LegacyESLint === "function") {
+      return eslintAtYourOwnRisk.LegacyESLint;
+    }
+  } catch (_error) {
+    return null;
+  }
+  return null;
+}
+
+function createFlatConfigEslint(eslintModule, options = {}) {
   const { ESLint } = eslintModule;
   if (typeof ESLint !== "function") {
     throw new Error("Could not resolve ESLint flat-config class.");
   }
+
+  const selectedRules = options.rules || GUARDRAIL_RULES;
 
   return new ESLint({
     ignore: false,
@@ -182,7 +209,7 @@ function createFlatConfigEslint(eslintModule) {
         sourceType: "script",
         globals: loadBrowserGlobalsForFlatConfig(),
       },
-      rules: GUARDRAIL_RULES,
+      rules: selectedRules,
     },
   });
 }
