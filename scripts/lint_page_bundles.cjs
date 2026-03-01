@@ -3,6 +3,11 @@
 const fs = require("fs");
 const path = require("path");
 
+const GUARDRAIL_RULES = Object.freeze({
+  "no-undef": "error",
+  "no-redeclare": "error",
+});
+
 async function main() {
   const pageBundles = collectPageBundles();
   if (pageBundles.missingScripts.length > 0) {
@@ -81,26 +86,44 @@ function collectPageBundles() {
 }
 
 async function runEslintGuardrail(eslintModule, bundles) {
-  const { ESLint } = eslintModule;
-  const eslintrcPath = path.resolve(process.cwd(), ".eslintrc.cjs");
-  const eslintOptions = {
-    ignore: false,
-    overrideConfig: {
-      rules: {
-        "no-undef": "error",
-        "no-redeclare": "error",
-      },
-    },
-  };
+  let eslintForFormatting;
+  let lintResults;
 
-  if (fs.existsSync(eslintrcPath)) {
-    eslintOptions.overrideConfigFile = eslintrcPath;
+  try {
+    const legacyEslint = await createLegacyEslint(eslintModule);
+    eslintForFormatting = legacyEslint;
+    lintResults = await lintBundlesWithEslint(legacyEslint, bundles);
+  } catch (error) {
+    if (!isLegacyConfigCompatibilityError(error)) {
+      throw error;
+    }
+
+    console.warn(
+      "Legacy ESLint config mode is not supported in this runtime. Retrying with flat-config guardrail mode."
+    );
+    const flatEslint = createFlatConfigEslint(eslintModule);
+    eslintForFormatting = flatEslint;
+    lintResults = await lintBundlesWithEslint(flatEslint, bundles);
   }
 
-  const eslint = new ESLint({
-    ...eslintOptions,
-  });
+  const formatter = await eslintForFormatting.loadFormatter("stylish");
+  const output = formatter.format(lintResults);
+  if (output.trim()) {
+    console.log(output);
+  }
 
+  const errorCount = lintResults.reduce(
+    (sum, result) => sum + (result.errorCount || 0),
+    0
+  );
+  if (errorCount > 0) {
+    process.exit(1);
+  }
+
+  console.log("ESLint page-bundle guardrail passed.");
+}
+
+async function lintBundlesWithEslint(eslint, bundles) {
   const lintResults = [];
 
   for (const bundle of bundles) {
@@ -110,18 +133,133 @@ async function runEslintGuardrail(eslintModule, bundles) {
     lintResults.push(...pageResults);
   }
 
-  const formatter = await eslint.loadFormatter("stylish");
-  const output = formatter.format(lintResults);
-  if (output.trim()) {
-    console.log(output);
+  return lintResults;
+}
+
+async function createLegacyEslint(eslintModule) {
+  const eslintrcPath = path.resolve(process.cwd(), ".eslintrc.cjs");
+  const LegacyESLintClass = await resolveLegacyEslintClass(eslintModule);
+
+  const legacyOptions = {
+    useEslintrc: true,
+    ignore: false,
+    overrideConfig: {
+      rules: GUARDRAIL_RULES,
+    },
+  };
+
+  if (fs.existsSync(eslintrcPath)) {
+    legacyOptions.overrideConfigFile = eslintrcPath;
   }
 
-  const errorCount = lintResults.reduce((sum, result) => sum + result.errorCount, 0);
-  if (errorCount > 0) {
-    process.exit(1);
+  return new LegacyESLintClass(legacyOptions);
+}
+
+async function resolveLegacyEslintClass(eslintModule) {
+  if (typeof eslintModule.loadESLint === "function") {
+    return eslintModule.loadESLint({ useFlatConfig: false });
   }
 
-  console.log("ESLint page-bundle guardrail passed.");
+  if (typeof eslintModule.ESLint === "function") {
+    return eslintModule.ESLint;
+  }
+
+  throw new Error("Could not resolve an ESLint class from the installed eslint module.");
+}
+
+function createFlatConfigEslint(eslintModule) {
+  const { ESLint } = eslintModule;
+  if (typeof ESLint !== "function") {
+    throw new Error("Could not resolve ESLint flat-config class.");
+  }
+
+  return new ESLint({
+    ignore: false,
+    overrideConfigFile: true,
+    overrideConfig: {
+      languageOptions: {
+        ecmaVersion: "latest",
+        sourceType: "script",
+        globals: loadBrowserGlobalsForFlatConfig(),
+      },
+      rules: GUARDRAIL_RULES,
+    },
+  });
+}
+
+function loadBrowserGlobalsForFlatConfig() {
+  const projectGlobals = {
+    Viewer: "readonly",
+    Cookiebot: "readonly",
+  };
+
+  try {
+    const globalsPackage = require("globals");
+    return {
+      ...normalizeFlatGlobals(globalsPackage.browser || {}),
+      ...projectGlobals,
+    };
+  } catch (_error) {
+    return {
+      window: "readonly",
+      document: "readonly",
+      navigator: "readonly",
+      localStorage: "readonly",
+      sessionStorage: "readonly",
+      fetch: "readonly",
+      URL: "readonly",
+      URLSearchParams: "readonly",
+      FormData: "readonly",
+      Headers: "readonly",
+      Request: "readonly",
+      Response: "readonly",
+      console: "readonly",
+      setTimeout: "readonly",
+      clearTimeout: "readonly",
+      setInterval: "readonly",
+      clearInterval: "readonly",
+      atob: "readonly",
+      btoa: "readonly",
+      Event: "readonly",
+      CustomEvent: "readonly",
+      ...projectGlobals,
+    };
+  }
+}
+
+function normalizeFlatGlobals(globalsMap) {
+  const normalized = {};
+  Object.entries(globalsMap).forEach(([name, access]) => {
+    normalized[name] = access === true || access === "writable" ? "writable" : "readonly";
+  });
+  return normalized;
+}
+
+function isLegacyConfigCompatibilityError(error) {
+  if (!error) {
+    return false;
+  }
+
+  if (error.code === "ESLINT_INVALID_OPTIONS") {
+    return true;
+  }
+
+  const message = typeof error.message === "string" ? error.message : "";
+  if (
+    message.includes("Unknown options: useEslintrc") ||
+    message.includes("eslintrc format rather than flat config format")
+  ) {
+    return true;
+  }
+
+  const cause = error.cause;
+  const causeMessage =
+    cause && typeof cause.message === "string" ? cause.message : "";
+  if (causeMessage.includes("eslintrc format rather than flat config format")) {
+    return true;
+  }
+
+  return false;
 }
 
 function runFallbackRedeclareGuardrail(bundles) {
@@ -203,9 +341,6 @@ function getLineNumber(source, index) {
 }
 
 function tryLoadEslint() {
-  // Keep legacy .eslintrc support in environments that default to flat config.
-  process.env.ESLINT_USE_FLAT_CONFIG = process.env.ESLINT_USE_FLAT_CONFIG || "false";
-
   try {
     return require("eslint");
   } catch (_error) {
