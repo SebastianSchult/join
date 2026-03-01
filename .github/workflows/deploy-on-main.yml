@@ -61,6 +61,159 @@ jobs:
           echo "Configure SSH secrets (DEPLOY_SSH_*) or FTP secrets (DEPLOY_FTP_*)."
           exit 1
 
+      - name: FTP connectivity precheck (DNS + TCP with retry)
+        id: ftp_precheck
+        if: ${{ steps.mode.outputs.mode == 'ftp' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          host="${DEPLOY_FTP_SERVER}"
+          port="${{ steps.mode.outputs.ftp_port }}"
+
+          dns_ok=false
+          tcp_ok=false
+          dns_output=""
+
+          echo "Running FTP precheck for ${host}:${port}"
+
+          if dns_output="$(getent ahosts "${host}" 2>&1)"; then
+            dns_ok=true
+            echo "DNS resolution succeeded:"
+            echo "${dns_output}"
+          else
+            echo "DNS resolution failed:"
+            echo "${dns_output}"
+          fi
+
+          check_tcp_once() {
+            timeout 7 bash -c "cat < /dev/null > /dev/tcp/${host}/${port}" >/dev/null 2>&1
+          }
+
+          for attempt in 1 2 3; do
+            echo "TCP connectivity probe ${attempt}/3 to ${host}:${port} ..."
+            if check_tcp_once; then
+              tcp_ok=true
+              echo "TCP connectivity check succeeded on attempt ${attempt}."
+              break
+            fi
+            if [[ "${attempt}" -lt 3 ]]; then
+              sleep_seconds=$((attempt * 5))
+              echo "TCP probe failed on attempt ${attempt}. Retrying in ${sleep_seconds}s ..."
+              sleep "${sleep_seconds}"
+            fi
+          done
+
+          if [[ "${tcp_ok}" != "true" ]]; then
+            echo "TCP connectivity check failed after 3 attempts."
+          fi
+
+          echo "dns_ok=${dns_ok}" >> "$GITHUB_OUTPUT"
+          echo "tcp_ok=${tcp_ok}" >> "$GITHUB_OUTPUT"
+
+      - name: FTP/FTPS diagnostic probe (classify network/auth/path)
+        id: ftp_diagnostics
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          host="${DEPLOY_FTP_SERVER}"
+          port="${{ steps.mode.outputs.ftp_port }}"
+          username="${DEPLOY_FTP_USER}"
+          password="${DEPLOY_FTP_PASSWORD}"
+          server_dir="${DEPLOY_FTP_DIR}"
+
+          if [[ "${server_dir}" != /* ]]; then
+            server_dir="/${server_dir}"
+          fi
+          if [[ "${server_dir}" != */ ]]; then
+            server_dir="${server_dir}/"
+          fi
+
+          classify_failure() {
+            local raw_message="$1"
+            local message
+            message="$(echo "${raw_message}" | tr '[:upper:]' '[:lower:]')"
+
+            if echo "${message}" | grep -Eiq \
+              "timed out|timeout|could not resolve host|failed to connect|connection refused|connection reset|network is unreachable|temporary failure|ssl connect error|tls|handshake|econnrefused|econnreset"; then
+              echo "network"
+              return 0
+            fi
+
+            if echo "${message}" | grep -Eiq \
+              "530|not logged in|login|authentication|auth failed|invalid credentials|bad password|password rejected|user cannot log in"; then
+              echo "auth"
+              return 0
+            fi
+
+            if echo "${message}" | grep -Eiq \
+              "550|failed to change directory|can't cwd|cannot cwd|no such file|directory not found|path not found|permission denied"; then
+              echo "path"
+              return 0
+            fi
+
+            echo "unknown"
+          }
+
+          run_probe() {
+            local protocol="$1"
+            local curl_log
+            local url
+            local result
+            local class
+            local status
+
+            curl_log="$(mktemp)"
+            url="${protocol}://${host}:${port}${server_dir}"
+
+            echo "Running ${protocol} diagnostic probe against ${host}:${port}${server_dir}"
+            set +e
+            if [[ "${protocol}" == "ftps" ]]; then
+              curl \
+                --silent \
+                --show-error \
+                --disable-epsv \
+                --ssl-reqd \
+                --insecure \
+                --connect-timeout 10 \
+                --max-time 30 \
+                --user "${username}:${password}" \
+                --list-only \
+                "${url}" >"${curl_log}" 2>&1
+            else
+              curl \
+                --silent \
+                --show-error \
+                --disable-epsv \
+                --insecure \
+                --connect-timeout 10 \
+                --max-time 30 \
+                --user "${username}:${password}" \
+                --list-only \
+                "${url}" >"${curl_log}" 2>&1
+            fi
+            status=$?
+            set -e
+
+            if [[ "${status}" -eq 0 ]]; then
+              result="success"
+              class="success"
+              echo "${protocol} probe succeeded."
+            else
+              result="failure"
+              class="$(classify_failure "$(cat "${curl_log}")")"
+              echo "${protocol} probe failed with exit code ${status} (classified as ${class})."
+              cat "${curl_log}"
+            fi
+
+            echo "${protocol}_probe_result=${result}" >> "$GITHUB_OUTPUT"
+            echo "${protocol}_probe_class=${class}" >> "$GITHUB_OUTPUT"
+            echo "${protocol}_probe_status=${status}" >> "$GITHUB_OUTPUT"
+          }
+
+          run_probe "ftps"
+          run_probe "ftp"
+
       - name: Generate runtime config.js from repository secrets
         if: ${{ steps.mode.outputs.mode != 'none' }}
         shell: bash
@@ -170,8 +323,8 @@ jobs:
           port="${DEPLOY_SSH_PORT:-22}"
           ssh -p "$port" "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST" "$DEPLOY_POST_COMMAND"
 
-      - name: Deploy with FTPS (primary)
-        id: deploy_ftps
+      - name: Deploy with FTPS (attempt 1/3)
+        id: deploy_ftps_1
         if: ${{ steps.mode.outputs.mode == 'ftp' }}
         continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@a51268f67f6605236975928ae28b0f7e9971d50a # v4.3.6
@@ -190,9 +343,110 @@ jobs:
             **/.DS_Store
             **/node_modules/**
 
-      - name: Deploy with FTP (fallback)
-        id: deploy_ftp
-        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps.outcome != 'success' }}
+      - name: Backoff before FTPS retry 2
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps_1.outcome != 'success' }}
+        shell: bash
+        run: sleep 10
+
+      - name: Deploy with FTPS (attempt 2/3)
+        id: deploy_ftps_2
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps_1.outcome != 'success' }}
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@a51268f67f6605236975928ae28b0f7e9971d50a # v4.3.6
+        with:
+          server: ${{ env.DEPLOY_FTP_SERVER }}
+          username: ${{ env.DEPLOY_FTP_USER }}
+          password: ${{ env.DEPLOY_FTP_PASSWORD }}
+          protocol: ftps
+          port: ${{ steps.mode.outputs.ftp_port }}
+          local-dir: ./
+          server-dir: ${{ env.DEPLOY_FTP_DIR }}
+          exclude: |
+            **/.git/**
+            **/.github/**
+            **/.vscode/**
+            **/.DS_Store
+            **/node_modules/**
+
+      - name: Backoff before FTPS retry 3
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps_1.outcome != 'success' && steps.deploy_ftps_2.outcome != 'success' }}
+        shell: bash
+        run: sleep 20
+
+      - name: Deploy with FTPS (attempt 3/3)
+        id: deploy_ftps_3
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps_1.outcome != 'success' && steps.deploy_ftps_2.outcome != 'success' }}
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@a51268f67f6605236975928ae28b0f7e9971d50a # v4.3.6
+        with:
+          server: ${{ env.DEPLOY_FTP_SERVER }}
+          username: ${{ env.DEPLOY_FTP_USER }}
+          password: ${{ env.DEPLOY_FTP_PASSWORD }}
+          protocol: ftps
+          port: ${{ steps.mode.outputs.ftp_port }}
+          local-dir: ./
+          server-dir: ${{ env.DEPLOY_FTP_DIR }}
+          exclude: |
+            **/.git/**
+            **/.github/**
+            **/.vscode/**
+            **/.DS_Store
+            **/node_modules/**
+
+      - name: Deploy with FTP fallback (attempt 1/3)
+        id: deploy_ftp_1
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftps_1.outcome != 'success' && steps.deploy_ftps_2.outcome != 'success' && steps.deploy_ftps_3.outcome != 'success' }}
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@a51268f67f6605236975928ae28b0f7e9971d50a # v4.3.6
+        with:
+          server: ${{ env.DEPLOY_FTP_SERVER }}
+          username: ${{ env.DEPLOY_FTP_USER }}
+          password: ${{ env.DEPLOY_FTP_PASSWORD }}
+          protocol: ftp
+          port: ${{ steps.mode.outputs.ftp_port }}
+          local-dir: ./
+          server-dir: ${{ env.DEPLOY_FTP_DIR }}
+          exclude: |
+            **/.git/**
+            **/.github/**
+            **/.vscode/**
+            **/.DS_Store
+            **/node_modules/**
+
+      - name: Backoff before FTP fallback retry 2
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftp_1.outcome != 'success' }}
+        shell: bash
+        run: sleep 10
+
+      - name: Deploy with FTP fallback (attempt 2/3)
+        id: deploy_ftp_2
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftp_1.outcome != 'success' }}
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@a51268f67f6605236975928ae28b0f7e9971d50a # v4.3.6
+        with:
+          server: ${{ env.DEPLOY_FTP_SERVER }}
+          username: ${{ env.DEPLOY_FTP_USER }}
+          password: ${{ env.DEPLOY_FTP_PASSWORD }}
+          protocol: ftp
+          port: ${{ steps.mode.outputs.ftp_port }}
+          local-dir: ./
+          server-dir: ${{ env.DEPLOY_FTP_DIR }}
+          exclude: |
+            **/.git/**
+            **/.github/**
+            **/.vscode/**
+            **/.DS_Store
+            **/node_modules/**
+
+      - name: Backoff before FTP fallback retry 3
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftp_1.outcome != 'success' && steps.deploy_ftp_2.outcome != 'success' }}
+        shell: bash
+        run: sleep 20
+
+      - name: Deploy with FTP fallback (attempt 3/3)
+        id: deploy_ftp_3
+        if: ${{ always() && steps.mode.outputs.mode == 'ftp' && steps.deploy_ftp_1.outcome != 'success' && steps.deploy_ftp_2.outcome != 'success' }}
+        continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@a51268f67f6605236975928ae28b0f7e9971d50a # v4.3.6
         with:
           server: ${{ env.DEPLOY_FTP_SERVER }}
@@ -214,16 +468,63 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ftps="${{ steps.deploy_ftps.outcome }}"
-          ftp="${{ steps.deploy_ftp.outcome }}"
+          precheck_dns="${{ steps.ftp_precheck.outputs.dns_ok }}"
+          precheck_tcp="${{ steps.ftp_precheck.outputs.tcp_ok }}"
+          ftps_probe="${{ steps.ftp_diagnostics.outputs.ftps_probe_class }}"
+          ftp_probe="${{ steps.ftp_diagnostics.outputs.ftp_probe_class }}"
 
-          echo "FTPS outcome: ${ftps}"
-          echo "FTP fallback outcome: ${ftp}"
+          ftps_1="${{ steps.deploy_ftps_1.outcome }}"
+          ftps_2="${{ steps.deploy_ftps_2.outcome }}"
+          ftps_3="${{ steps.deploy_ftps_3.outcome }}"
+          ftp_1="${{ steps.deploy_ftp_1.outcome }}"
+          ftp_2="${{ steps.deploy_ftp_2.outcome }}"
+          ftp_3="${{ steps.deploy_ftp_3.outcome }}"
 
-          if [[ "${ftps}" == "success" || "${ftp}" == "success" ]]; then
+          echo "Precheck DNS: ${precheck_dns}"
+          echo "Precheck TCP: ${precheck_tcp}"
+          echo "FTPS probe class: ${ftps_probe}"
+          echo "FTP probe class: ${ftp_probe}"
+          echo "FTPS attempt outcomes: ${ftps_1}, ${ftps_2}, ${ftps_3}"
+          echo "FTP fallback attempt outcomes: ${ftp_1}, ${ftp_2}, ${ftp_3}"
+
+          if [[ "${ftps_1}" == "success" || "${ftps_2}" == "success" || "${ftps_3}" == "success" || "${ftp_1}" == "success" || "${ftp_2}" == "success" || "${ftp_3}" == "success" ]]; then
             echo "Deployment succeeded via FTP mode."
             exit 0
           fi
 
+          failure_class="unknown"
+          if [[ "${precheck_dns}" != "true" || "${precheck_tcp}" != "true" ]]; then
+            failure_class="network"
+          elif [[ "${ftps_probe}" == "auth" || "${ftp_probe}" == "auth" ]]; then
+            failure_class="auth"
+          elif [[ "${ftps_probe}" == "path" || "${ftp_probe}" == "path" ]]; then
+            failure_class="path"
+          elif [[ "${ftps_probe}" == "network" || "${ftp_probe}" == "network" ]]; then
+            failure_class="network"
+          fi
+
           echo "Both FTPS primary and FTP fallback failed."
+          echo "Failure class: ${failure_class}"
+
+          {
+            echo "### FTP Deploy Diagnostics"
+            echo "- Precheck DNS reachable: \`${precheck_dns}\`"
+            echo "- Precheck TCP reachable: \`${precheck_tcp}\`"
+            echo "- FTPS probe class: \`${ftps_probe}\`"
+            echo "- FTP probe class: \`${ftp_probe}\`"
+            echo "- FTPS outcomes: \`${ftps_1}, ${ftps_2}, ${ftps_3}\`"
+            echo "- FTP outcomes: \`${ftp_1}, ${ftp_2}, ${ftp_3}\`"
+            echo "- Classified failure: \`${failure_class}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "${failure_class}" == "network" ]]; then
+            echo "::error::Deploy failed due to transport/connectivity issues (DNS/TCP/timeout)."
+          elif [[ "${failure_class}" == "auth" ]]; then
+            echo "::error::Deploy failed due to FTP authentication errors (check DEPLOY_FTP_USER/DEPLOY_FTP_PASSWORD)."
+          elif [[ "${failure_class}" == "path" ]]; then
+            echo "::error::Deploy failed due to target path/directory errors (check DEPLOY_FTP_DIR permissions/path)."
+          else
+            echo "::error::Deploy failed with unclassified FTP/FTPS error."
+          fi
+
           exit 1
