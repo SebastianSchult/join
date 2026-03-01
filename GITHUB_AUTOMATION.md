@@ -59,6 +59,8 @@ Required:
   - `accessibility-baseline`
     - deterministic dependency install (`npm ci`)
     - Lighthouse accessibility baseline via `npm run a11y:ci`
+    - stage-1 gate from `A11Y_MIN_SCORE` (currently `0.7`)
+    - staged target from `A11Y_TARGET_SCORE` (currently `0.85`) shown in report severity mapping
     - uploads `.lighthouseci` artifacts
   - `e2e-smoke`
     - deterministic dependency install (`npm ci`)
@@ -74,6 +76,36 @@ Required:
 - CI scripts should execute tooling from committed `devDependencies` instead of fetching tools ad-hoc via `npx --yes`.
 - Add/update dependencies with explicit versions (`npm install <pkg>@<version> ...`) so version intent is reviewable in PRs.
 - Dependency updates must include both `package.json` and `package-lock.json` changes in the same PR.
+
+## Lighthouse accessibility gate policy
+
+- Enforced CI gate: `A11Y_MIN_SCORE` (stage 1 baseline, currently `0.7`).
+- Quality target: `A11Y_TARGET_SCORE` (stage 2 target, currently `0.85`).
+- Report command (`npm run a11y:report`) prints severity levels so regressions are actionable:
+  - page severity:
+    - `critical`: below `A11Y_MIN_SCORE` (CI-failing quality)
+    - `serious`: passes gate but below `A11Y_TARGET_SCORE`
+    - `moderate`: passes target with remaining findings
+    - `info`: no accessibility deductions
+  - audit severity (top failing audits per page):
+    - `critical`: audit score `<= 0.1`
+    - `serious`: audit score `< 0.5` (or failed binary audit)
+    - `moderate`: audit score `< 0.9`
+    - `info`: audit score `>= 0.9`
+
+### Temporary page-level exception strategy
+
+- Exception source of truth: `A11Y_PAGE_EXCEPTIONS` in `lighthouserc.cjs`.
+- Each exception entry must include:
+  - `matchingUrlPattern` (specific page scope),
+  - `minScore` (temporary lower bound),
+  - linked `issue` id,
+  - `owner`,
+  - `expiresOn` date.
+- Rules:
+  1. Keep exceptions temporary and minimal (single page pattern where possible).
+  2. Record remediation steps in the linked issue and plan removal before `expiresOn`.
+  3. Do not merge broad wildcard exceptions that weaken the global baseline.
 
 ## Dependency automation (Dependabot)
 

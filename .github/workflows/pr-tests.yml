@@ -165,6 +165,9 @@ jobs:
 
   accessibility-baseline:
     runs-on: ubuntu-latest
+    env:
+      A11Y_MIN_SCORE: "0.7"
+      A11Y_TARGET_SCORE: "0.85"
 
     steps:
       - name: Checkout
@@ -192,8 +195,6 @@ jobs:
       - name: Print Lighthouse accessibility summary
         if: always()
         shell: bash
-        env:
-          A11Y_MIN_SCORE: "0.5"
         run: |
           set -euo pipefail
           npm run a11y:report
