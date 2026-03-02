@@ -24,7 +24,11 @@ function createFirstLetter(main, firstLetter) {
  * @return {void} This function does not return anything.
  */
 function removeContainer(id) {
-  document.getElementById(id).remove();
+  const container = document.getElementById(id);
+  if (!container) {
+    return;
+  }
+  container.remove();
 }
 
 /**
