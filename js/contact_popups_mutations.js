@@ -1,6 +1,59 @@
 "use strict";
 
 (function registerContactPopupMutationsModule() {
+  /**
+   * Normalizes contact/user ids to safe integers for stable comparisons.
+   *
+   * @param {number|string} idValue - Raw id value.
+   * @returns {number|null}
+   */
+  function cpmNormalizeContactId(idValue) {
+    const normalizedId = Number(idValue);
+    return Number.isSafeInteger(normalizedId) ? normalizedId : null;
+  }
+
+  /**
+   * Builds a canonical Firebase users map keyed by contact id.
+   *
+   * @param {Array<Object>} sourceUsers - Source users array.
+   * @returns {Object<string, Object>}
+   */
+  function cpmBuildCanonicalUsersMap(sourceUsers) {
+    const canonicalUsersMap = {};
+    const sourceList = Array.isArray(sourceUsers) ? sourceUsers : [];
+
+    sourceList.forEach((user) => {
+      if (!user || typeof user !== "object") {
+        return;
+      }
+
+      const normalizedId = cpmNormalizeContactId(user.id);
+      if (normalizedId == null) {
+        return;
+      }
+
+      canonicalUsersMap[String(normalizedId)] = {
+        ...user,
+        id: normalizedId,
+        mail: ContactPopupValidation.normalizeEmailForContactFlow(user.mail),
+      };
+    });
+
+    return canonicalUsersMap;
+  }
+
+  /**
+   * Persists users as one canonical id-keyed collection to avoid stale duplicate records.
+   *
+   * @param {Array<Object>} sourceUsers - Users to persist.
+   * @returns {Promise<Array<Object>>} Persisted users as array.
+   */
+  async function cpmPersistCanonicalUsers(sourceUsers) {
+    const canonicalUsersMap = cpmBuildCanonicalUsersMap(sourceUsers);
+    await firebaseUpdateItem(canonicalUsersMap, FIREBASE_USERS_ID);
+    return Object.values(canonicalUsersMap);
+  }
+
   /** Validates form data and creates a new contact entity in Firebase and local runtime state. */
   async function cpmSaveContact() {
     const formElements = ContactPopupValidation.getContactFormElements();
@@ -33,7 +86,7 @@
 
     try {
       createButton.disabled = true;
-      const sourceUsers = Array.isArray(users) ? users : [];
+      const sourceUsers = Array.isArray(users) ? users.slice() : [];
       const newId = generateCollisionSafeId(sourceUsers);
       const newContact = {
         id: newId,
@@ -43,12 +96,12 @@
         contactColor: generateRandomColor(),
       };
 
-      await firebaseSetEntity(newContact, FIREBASE_USERS_ID);
       sourceUsers.push(newContact);
+      const persistedUsers = await cpmPersistCanonicalUsers(sourceUsers);
       ContactPopupValidation.resetContactForm(formElements);
       ContactPopupOverlay.closeOverlay("addContact");
       cpmDisplaySuccessMessage("Contact successfully created");
-      cpmApplyContactsMutationResult(sourceUsers, newContact.id);
+      cpmApplyContactsMutationResult(persistedUsers, newContact.id);
     } catch (error) {
       console.error("Error saving contact:", error);
       showGlobalUserMessage("Could not save contact. Please try again.");
@@ -72,7 +125,15 @@
     }
 
     const sourceUsers = loadResult.data;
-    const userIndex = sourceUsers.findIndex((contact) => contact.id === id);
+    const normalizedTargetId = cpmNormalizeContactId(id);
+    if (normalizedTargetId == null) {
+      showGlobalUserMessage("Invalid contact id. Please reload and try again.");
+      return;
+    }
+
+    const userIndex = sourceUsers.findIndex(
+      (contact) => cpmNormalizeContactId(contact && contact.id) === normalizedTargetId
+    );
 
     if (userIndex === -1) {
       return;
@@ -93,16 +154,21 @@
       formElements.mailInput.value
     );
 
-    const mailExistsOnAnotherContact =
-      typeof doesEmailExist === "function"
-        ? doesEmailExist(sourceUsers, normalizedMail, { excludeId: id })
-        : sourceUsers.some(
-            (contact) =>
-              contact &&
-              contact.id !== id &&
-              ContactPopupValidation.normalizeEmailForContactFlow(contact.mail) ===
-                normalizedMail
-          );
+    const mailExistsOnAnotherContact = sourceUsers.some((contact) => {
+      if (!contact || typeof contact !== "object") {
+        return false;
+      }
+
+      const contactId = cpmNormalizeContactId(contact.id);
+      if (contactId === normalizedTargetId) {
+        return false;
+      }
+
+      return (
+        ContactPopupValidation.normalizeEmailForContactFlow(contact.mail) ===
+        normalizedMail
+      );
+    });
 
     if (mailExistsOnAnotherContact) {
       ContactPopupValidation.setContactFieldError(
@@ -113,14 +179,20 @@
       return;
     }
 
-    user.name = formElements.nameInput.value.trim();
-    user.mail = normalizedMail;
-    user.phone = formElements.phoneInput.value.trim();
+    try {
+      user.id = normalizedTargetId;
+      user.name = formElements.nameInput.value.trim();
+      user.mail = normalizedMail;
+      user.phone = formElements.phoneInput.value.trim();
 
-    await firebaseSetEntity(user, FIREBASE_USERS_ID);
-    ContactPopupOverlay.closeOverlay("editContact");
-    cpmDisplaySuccessMessage("Contact successfully edited");
-    cpmApplyContactsMutationResult(sourceUsers, id);
+      const persistedUsers = await cpmPersistCanonicalUsers(sourceUsers);
+      ContactPopupOverlay.closeOverlay("editContact");
+      cpmDisplaySuccessMessage("Contact successfully edited");
+      cpmApplyContactsMutationResult(persistedUsers, normalizedTargetId);
+    } catch (error) {
+      console.error("Error editing contact:", error);
+      showGlobalUserMessage("Could not edit contact. Please try again.");
+    }
   }
 
   /**
@@ -131,7 +203,14 @@
    */
   function cpmEditContact(id) {
     ContactPopupOverlay.closeEditDelete({ restoreFocus: false });
-    const contactIndex = contacts.findIndex((contact) => contact.id === id);
+    const normalizedTargetId = cpmNormalizeContactId(id);
+    if (normalizedTargetId == null) {
+      return;
+    }
+
+    const contactIndex = contacts.findIndex(
+      (contact) => cpmNormalizeContactId(contact && contact.id) === normalizedTargetId
+    );
     if (contactIndex === -1) {
       return;
     }
@@ -146,7 +225,7 @@
       phone: contact.phone,
     });
 
-    currentContactId = id;
+    currentContactId = normalizedTargetId;
   }
 
   /**
@@ -157,10 +236,11 @@
    */
   function cpmDeleteContactFromLocalStorage(contactId) {
     var contactsInStorage = JSON.parse(localStorage.getItem("contacts"));
+    const normalizedTargetId = cpmNormalizeContactId(contactId);
 
     if (contactsInStorage) {
       contactsInStorage = contactsInStorage.filter(function (contact) {
-        return contact.id !== contactId;
+        return cpmNormalizeContactId(contact && contact.id) !== normalizedTargetId;
       });
       localStorage.setItem("contacts", JSON.stringify(contactsInStorage));
     }
@@ -182,16 +262,29 @@
     }
 
     const sourceUsers = loadResult.data;
-    const userIndex = sourceUsers.findIndex((user) => user.id === id);
+    const normalizedTargetId = cpmNormalizeContactId(id);
+    if (normalizedTargetId == null) {
+      showGlobalUserMessage("Invalid contact id. Please reload and try again.");
+      return;
+    }
+
+    const userIndex = sourceUsers.findIndex(
+      (user) => cpmNormalizeContactId(user && user.id) === normalizedTargetId
+    );
     if (userIndex === -1) {
       return;
     }
 
-    sourceUsers.splice(userIndex, 1);
-    await firebaseDeleteEntity(id, FIREBASE_USERS_ID);
-    cpmDeleteContactFromLocalStorage(id);
-    cpmDisplaySuccessMessage("Contact successfully deleted");
-    cpmApplyContactsMutationResult(sourceUsers);
+    try {
+      sourceUsers.splice(userIndex, 1);
+      const persistedUsers = await cpmPersistCanonicalUsers(sourceUsers);
+      cpmDeleteContactFromLocalStorage(normalizedTargetId);
+      cpmDisplaySuccessMessage("Contact successfully deleted");
+      cpmApplyContactsMutationResult(persistedUsers);
+    } catch (error) {
+      console.error("Error deleting contact:", error);
+      showGlobalUserMessage("Could not delete contact. Please try again.");
+    }
   }
 
   /**
@@ -221,11 +314,16 @@
       return;
     }
 
+    const normalizedSelectedId = cpmNormalizeContactId(selectedContactId);
+    if (normalizedSelectedId == null) {
+      return;
+    }
+
     const hasSelectedContact = contacts.some(
-      (contact) => contact.id === selectedContactId
+      (contact) => cpmNormalizeContactId(contact && contact.id) === normalizedSelectedId
     );
     if (hasSelectedContact) {
-      openContactDetails(selectedContactId);
+      openContactDetails(normalizedSelectedId);
     }
   }
 
