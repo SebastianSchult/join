@@ -81,7 +81,14 @@ function getNameWithCapitalizedFirstLetter(name) {
  * @param {number} id - The unique identifier of the contact.
  */
 function openContactDetails(id) {
-  const contact = contacts.find(({ id: contactId }) => contactId === id);
+  const normalizedId = Number(id);
+  if (!Number.isSafeInteger(normalizedId)) {
+    return;
+  }
+
+  const contact = contacts.find(
+    ({ id: contactId }) => Number(contactId) === normalizedId
+  );
   if (!contact) {
     return;
   }
