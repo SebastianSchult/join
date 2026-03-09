@@ -1,4 +1,83 @@
 /**
+ * Returns whether task origin is the email/AI intake flow.
+ *
+ * @param {Object} task - Task entity.
+ * @returns {boolean} True when task came from email/AI automation.
+ */
+function isEmailAiTask(task) {
+  return Boolean(task && task.source === "email-ai");
+}
+
+/**
+ * Returns a readable external creator label for AI/email tickets.
+ *
+ * @param {Object} task - Task entity.
+ * @returns {string} Creator label text.
+ */
+function getExternalCreatorLabel(task) {
+  const externalName =
+    task && typeof task.externalCreatorName === "string"
+      ? task.externalCreatorName.trim()
+      : "";
+  const externalEmail =
+    task && typeof task.externalCreatorEmail === "string"
+      ? task.externalCreatorEmail.trim()
+      : "";
+
+  if (externalName && externalEmail) {
+    return `Externer: ${externalName} (${externalEmail})`;
+  }
+  if (externalName) {
+    return `Externer: ${externalName}`;
+  }
+  if (externalEmail) {
+    return `Externer: ${externalEmail}`;
+  }
+  return "Externer";
+}
+
+/**
+ * Renders compact ticket-intake badges shown on board cards.
+ *
+ * @param {Object} task - Task entity.
+ * @returns {string} Badge markup.
+ */
+function renderTaskMetaBadgesHTML(task) {
+  if (!isEmailAiTask(task)) {
+    return "";
+  }
+
+  const creatorLabel = escapeHtml(getExternalCreatorLabel(task));
+  return /*html*/ `
+    <div class="cardTaskMeta">
+      <span class="cardMetaBadge cardMetaBadgeAi">AI Generated Ticket</span>
+      <span class="cardMetaBadge cardMetaBadgeExternal">${creatorLabel}</span>
+    </div>`;
+}
+
+/**
+ * Renders open-card metadata for AI/email intake tasks.
+ *
+ * @param {Object} task - Task entity.
+ * @returns {string} Metadata markup.
+ */
+function renderOpenCardTaskMetaHTML(task) {
+  if (!isEmailAiTask(task)) {
+    return "";
+  }
+
+  const creatorLabel = escapeHtml(getExternalCreatorLabel(task));
+  return /*html*/ `
+    <div class="openCardTaskMeta">
+      <div class="openCardTaskMetaTitle">Intake:</div>
+      <div class="openCardTaskMetaBadges">
+        <span class="cardMetaBadge cardMetaBadgeAi">AI Generated Ticket</span>
+        <span class="cardMetaBadge cardMetaBadgeExternal">${creatorLabel}</span>
+      </div>
+    </div>`;
+}
+
+/**
  * Renders the HTML code for a task card.
  *
  * @param {Object} task - The task object to be rendered.
@@ -6,14 +85,20 @@
  */
 function renderTasksHTML(task) {
   const safeTaskId = toSafeInteger(task && task.id);
-  const safeTaskType = escapeHtml(task && task.type);
+  const safeTaskType = escapeHtml(
+    task && typeof task.type === "string" && task.type.trim() !== ""
+      ? task.type
+      : "Task"
+  );
   const safeTaskTitle = escapeHtml(task && task.title);
   const safeTaskDescription = escapeHtml(task && task.description);
+  const taskMetaBadgesHTML = renderTaskMetaBadgesHTML(task);
 
   return /*html*/ `
       <a draggable="true" id="${safeTaskId}" class="card" href="#" data-action="open-card" data-task-id="${safeTaskId}" data-prevent-default="true" data-dragstart-action="start-dragging" data-dragend-action="stop-dragging">
           <div class="cardTopContainer">
               <div id="cardType${safeTaskId}" class="cardType">${safeTaskType}</div>
+              ${taskMetaBadgesHTML}
               <div class="cardTitle">${safeTaskTitle}</div>
               <div id="cardText${safeTaskId}" class="cardText">${safeTaskDescription}</div>
           </div>
@@ -49,11 +134,16 @@ function renderEmptyCategoryHTML(name) {
  */
 function renderOpenCardHTML(task) {
   const safeTaskId = toSafeInteger(task && task.id);
-  const safeTaskType = escapeHtml(task && task.type);
+  const safeTaskType = escapeHtml(
+    task && typeof task.type === "string" && task.type.trim() !== ""
+      ? task.type
+      : "Task"
+  );
   const safeTaskTitle = escapeHtml(task && task.title);
   const safeTaskDescription = escapeHtml(task && task.description);
   const safeTaskDueDate = escapeHtml(task && task.dueDate);
   const safeTaskPriority = escapeHtml(task && task.priority);
+  const openCardTaskMetaHTML = renderOpenCardTaskMetaHTML(task);
 
   return /*html*/ `
       <div class="boardAddTaskCloseHoverOuterContainer">
@@ -63,6 +153,7 @@ function renderOpenCardHTML(task) {
           <div id="openCardType${safeTaskId}" class="cardType">${safeTaskType}</div>
           <div class="cardTitle">${safeTaskTitle}</div>
           <div class="openCardDescription">${safeTaskDescription}</div>
+          ${openCardTaskMetaHTML}
           <div class="openCardTextBox">
               <span class="openCardText">Due Date:</span>
               <span class="openCardValue">${safeTaskDueDate}</span>

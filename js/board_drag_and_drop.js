@@ -4,12 +4,21 @@
  * @param {string} taskId - The ID of the task element.
  */
 function setDroppableContainers(taskId){
-    let category = getTaskOutOfId(taskId)['category'].slice(-1)
-    for (let i=0; i<4; i++){
-        if (i != category){
-           displayEmptyTask(taskId, i);
-        }
+    const task = getTaskOutOfId(taskId);
+    if (!task || typeof task.category !== "string") {
+        return;
     }
+
+    const sourceCategoryId = Number(task.category.replace("category-", ""));
+    categories.forEach((category) => {
+        const categoryKey = Object.keys(category)[0];
+        const targetCategoryId = Number(categoryKey.replace("category-", ""));
+        if (!Number.isSafeInteger(targetCategoryId) || targetCategoryId === sourceCategoryId) {
+            return;
+        }
+
+        displayEmptyTask(taskId, targetCategoryId);
+    });
 }
 
 

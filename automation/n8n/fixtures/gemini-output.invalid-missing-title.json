@@ -1,0 +1,7 @@
+{
+  "label": "Technical Task",
+  "creatorName": "Claudia Baer",
+  "creatorEmail": "claudia.baer@example.com",
+  "priority": "urgent",
+  "description": "Missing title should fail strict schema validation."
+}

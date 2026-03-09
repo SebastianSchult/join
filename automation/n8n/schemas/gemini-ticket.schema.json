@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://join.local/schemas/gemini-ticket.schema.json",
+  "title": "Gemini Email Ticket Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "title",
+    "label",
+    "creatorName",
+    "creatorEmail",
+    "priority",
+    "description"
+  ],
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 120
+    },
+    "label": {
+      "type": "string",
+      "enum": [
+        "User Story",
+        "Technical Task"
+      ]
+    },
+    "creatorName": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 120
+    },
+    "creatorEmail": {
+      "type": "string",
+      "format": "email",
+      "minLength": 5,
+      "maxLength": 254
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "urgent"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 2000
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "title": "Clarify ticket priority handling",
+  "label": "User Story",
+  "creatorName": "External Requester",
+  "creatorEmail": "external.requester@example.com",
+  "priority": "critical",
+  "description": "Priority value is intentionally invalid for strict enum validation."
+}

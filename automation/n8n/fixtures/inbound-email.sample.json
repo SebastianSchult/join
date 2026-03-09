@@ -1,0 +1,10 @@
+{
+  "messageId": "<demo-20260309-001@example.com>",
+  "receivedAt": "2026-03-09T10:15:00.000Z",
+  "from": {
+    "name": "Claudia Baer",
+    "email": "claudia.baer@example.com"
+  },
+  "subject": "Join request: Contact import does not update existing entry",
+  "text": "Hi team, while editing a contact in Join we still see duplicates. Please create a task for this issue and set priority to urgent because we need it for our workshop this week."
+}

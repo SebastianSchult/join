@@ -226,7 +226,7 @@
   width: 100%;
   flex-direction: column;
   padding: var(--ui-space-sm);
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: var(--ui-space-lg);
   overflow: scroll;
   height: 100%;

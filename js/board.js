@@ -6,7 +6,8 @@ let categories = [
     {'category-0': "To do"},
     {'category-1': "In progress"}, 
     {'category-2': "Await Feedback"}, 
-    {'category-3': "Done"}
+    {'category-3': "Done"},
+    {'category-4': "E-Mails"}
 ];
 
 
