@@ -1,0 +1,83 @@
+{
+  "name": "Join - Email to Ticket (Gemini) - Dead Letter",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst execution = item.execution || {};\nconst workflow = item.workflow || {};\nconst triggerData = execution.error || {};\nconst message = typeof triggerData.message === 'string' ? triggerData.message : '';\nlet failureClass = 'unknown';\nif (/timeout|econn|network|socket/i.test(message)) failureClass = 'transport';\nelse if (/401|403|auth|unauthorized|forbidden/i.test(message)) failureClass = 'auth';\nelse if (/schema|validation|json/i.test(message)) failureClass = 'validation';\nreturn [{\n  json: {\n    failureClass,\n    failureReason: message || 'Unhandled workflow error',\n    workflowName: workflow.name || 'unknown',\n    workflowId: workflow.id || '',\n    executionId: execution.id || '',\n    loggedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "classify-error",
+      "name": "Classify Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -280,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{$env.JOIN_BASE_URL + 'dead_letters/' + Date.now() + '.json'}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}"
+      },
+      "id": "write-dead-letter",
+      "name": "Write Dead Letter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -40,
+        140
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Classify Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Failure": {
+      "main": [
+        [
+          {
+            "node": "Write Dead Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "join-email-to-ticket-dead-letter-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "join-email-to-ticket-dead-letter-v1",
+  "tags": []
+}

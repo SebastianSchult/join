@@ -64,6 +64,8 @@ npm run e2e:smoke
 - GitHub issue/PR/project/deploy automation: [GITHUB_AUTOMATION.md](./GITHUB_AUTOMATION.md)
 - Accessibility checks: [ACCESSIBILITY_CHECKS.md](./ACCESSIBILITY_CHECKS.md)
 - E2E smoke tests: [E2E_SMOKE_TESTS.md](./E2E_SMOKE_TESTS.md)
+- AI email-to-ticket workflow: [EMAIL_TO_TICKET_AUTOMATION.md](./EMAIL_TO_TICKET_AUTOMATION.md)
+- n8n workflow versioning bundle: [automation/n8n/README.md](./automation/n8n/README.md)
 - File-size guardrails: [FILE_SIZE_GUARDRAILS.md](./FILE_SIZE_GUARDRAILS.md)
 - Page script dependency manifest: [PAGE_SCRIPT_DEPENDENCIES.md](./PAGE_SCRIPT_DEPENDENCIES.md)
 - CSS guardrails (Stylelint): [CSS_GUARDRAILS.md](./CSS_GUARDRAILS.md)

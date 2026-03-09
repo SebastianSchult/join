@@ -19,18 +19,31 @@ let requiredInputFields = [
   },
 ];
 
-let newTask = {
-  id: 999,
-  type: "",
-  title: "",
-  description: "",
-  subtasks: [],
-  assignedTo: [],
-  category: "category-0",
-  priority: "",
-  dueDate: "",
-  images: [],
-};
+let newTask = createTaskDraft();
+
+/**
+ * Returns a normalized empty task draft used by create/edit flows.
+ *
+ * @returns {Object} Empty task payload with deterministic default values.
+ */
+function createTaskDraft() {
+  return {
+    id: 999,
+    type: "",
+    title: "",
+    description: "",
+    subtasks: [],
+    assignedTo: [],
+    category: "category-0",
+    priority: "",
+    dueDate: "",
+    images: [],
+    source: "manual",
+    aiGenerated: false,
+    externalCreatorName: "",
+    externalCreatorEmail: "",
+  };
+}
 
 /** Adds a new subtask to the list of tasks. */
 function addSubtask() {
@@ -149,18 +162,7 @@ async function createTask() {
  * Resets the `newTask` object to its initial state and clears the `tempAssignedContacts` array.
  */
 function resetNewTask() {
-  newTask = {
-    id: 999,
-    type: "",
-    title: "",
-    description: "",
-    subtasks: [],
-    assignedTo: [],
-    category: "category-0",
-    priority: "",
-    dueDate: "",
-    images: [],
-  };
+  newTask = createTaskDraft();
   tempAssignedContacts = [];
 }
 

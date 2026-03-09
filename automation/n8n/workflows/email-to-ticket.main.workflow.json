@@ -1,0 +1,448 @@
+{
+  "name": "Join - Email to Ticket (Gemini) - Main",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "number": [
+            {
+              "name": "dailyCount",
+              "value": 0
+            }
+          ],
+          "string": [
+            {
+              "name": "messageId",
+              "value": "<demo-message-id@example.com>"
+            },
+            {
+              "name": "subject",
+              "value": "Join request: contact update creates duplicate"
+            },
+            {
+              "name": "plainTextBody",
+              "value": "Please create a technical task. Editing a contact can create a duplicate record. Priority urgent."
+            },
+            {
+              "name": "fromName",
+              "value": "External Stakeholder"
+            },
+            {
+              "name": "fromEmail",
+              "value": "external.stakeholder@example.com"
+            }
+          ]
+        }
+      },
+      "id": "set-sample-email",
+      "name": "Set Sample Email Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        -980,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst timeZone = $env.N8N_TZ || 'Europe/Berlin';\nconst berlinDate = new Date().toLocaleDateString('sv-SE', { timeZone });\nconst dailyCount = Number(input.dailyCount || 0);\nreturn [{\n  json: {\n    ...input,\n    dailyKey: `email-ai:${berlinDate}`,\n    dailyLimit: 10,\n    dailyCount,\n    limitReached: dailyCount >= 10\n  }\n}];"
+      },
+      "id": "code-daily-limit",
+      "name": "Compute Daily Limit",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.limitReached}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-limit-reached",
+      "name": "If Daily Limit Reached",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -540,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "failureClass",
+              "value": "quota"
+            },
+            {
+              "name": "failureReason",
+              "value": "Daily limit reached (>= 10)."
+            }
+          ]
+        }
+      },
+      "id": "set-dead-letter-quota",
+      "name": "Build Dead Letter (Quota)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "geminiPrompt",
+              "value": "You are a strict extraction service. Return only valid JSON with keys: title, label, creatorName, creatorEmail, priority, description. label must be one of [User Story, Technical Task]. priority must be one of [low, medium, urgent].\n\nEmail subject: {{$json.subject}}\nEmail body: {{$json.plainTextBody}}\nSender name: {{$json.fromName}}\nSender email: {{$json.fromEmail}}"
+            }
+          ]
+        }
+      },
+      "id": "set-gemini-prompt",
+      "name": "Build Gemini Prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{$env.GEMINI_MODEL}}:generateContent?key={{$env.GEMINI_API_KEY}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"contents\":[{\"parts\":[{\"text\": $json.geminiPrompt }]}]}"
+      },
+      "id": "http-gemini",
+      "name": "Gemini Generate Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -90,
+        260
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst rawText = response?.candidates?.[0]?.content?.parts?.[0]?.text || response?.text || '';\nlet parsed;\ntry {\n  parsed = JSON.parse(rawText);\n} catch (error) {\n  return [{\n    json: {\n      parseError: true,\n      failureClass: 'validation',\n      failureReason: `Gemini response is not valid JSON: ${error.message}`,\n      rawGeminiText: rawText\n    }\n  }];\n}\nreturn [{ json: { parseError: false, geminiPayload: parsed, rawGeminiText: rawText } }];"
+      },
+      "id": "code-parse-gemini",
+      "name": "Parse Gemini JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        130,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nif (item.parseError === true) {\n  return [{ json: { ...item, schemaValid: false } }];\n}\nconst payload = item.geminiPayload && typeof item.geminiPayload === 'object' ? item.geminiPayload : {};\nconst normalized = {\n  title: typeof payload.title === 'string' ? payload.title.trim() : '',\n  label: typeof payload.label === 'string' ? payload.label.trim() : '',\n  creatorName: typeof payload.creatorName === 'string' ? payload.creatorName.trim() : '',\n  creatorEmail: typeof payload.creatorEmail === 'string' ? payload.creatorEmail.trim().toLowerCase() : '',\n  priority: typeof payload.priority === 'string' ? payload.priority.trim().toLowerCase() : '',\n  description: typeof payload.description === 'string' ? payload.description.trim() : ''\n};\nconst errors = [];\nconst allowedLabels = ['User Story', 'Technical Task'];\nconst allowedPriorities = ['low', 'medium', 'urgent'];\nif (normalized.title.length < 3 || normalized.title.length > 120) errors.push('title must be 3..120 chars');\nif (!allowedLabels.includes(normalized.label)) errors.push('label invalid');\nif (normalized.creatorName.length < 2 || normalized.creatorName.length > 120) errors.push('creatorName must be 2..120 chars');\nif (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(normalized.creatorEmail)) errors.push('creatorEmail invalid');\nif (!allowedPriorities.includes(normalized.priority)) errors.push('priority invalid');\nif (normalized.description.length < 3 || normalized.description.length > 2000) errors.push('description must be 3..2000 chars');\nreturn [{\n  json: {\n    ...item,\n    geminiPayload: normalized,\n    schemaValid: errors.length === 0,\n    schemaErrors: errors,\n    failureClass: errors.length === 0 ? '' : 'validation',\n    failureReason: errors.length === 0 ? '' : errors.join(' | ')\n  }\n}];"
+      },
+      "id": "code-validate-schema",
+      "name": "Validate Gemini Payload Schema",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.schemaValid}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-schema-valid",
+      "name": "If Schema Valid",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        590,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst payload = item.geminiPayload;\nconst category = $env.JOIN_EMAIL_TASK_CATEGORY || 'category-4';\nconst taskId = Date.now();\nconst task = {\n  id: taskId,\n  type: payload.label,\n  title: payload.title,\n  description: payload.description,\n  subtasks: [],\n  assignedTo: [],\n  category,\n  priority: payload.priority,\n  dueDate: '',\n  images: [],\n  source: 'email-ai',\n  aiGenerated: true,\n  externalCreatorName: payload.creatorName,\n  externalCreatorEmail: payload.creatorEmail,\n  createdAt: new Date().toISOString()\n};\nreturn [{ json: { ...item, task } }];"
+      },
+      "id": "code-map-task",
+      "name": "Map Join Task Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        810,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{$env.JOIN_BASE_URL + $env.JOIN_FIREBASE_TASKS_ID + '/' + $json.task.id + '.json'}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json.task}}"
+      },
+      "id": "http-upsert-task",
+      "name": "Persist Task to Firebase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "failureClass",
+              "value": "={{$json.failureClass || 'unknown'}}"
+            },
+            {
+              "name": "failureReason",
+              "value": "={{$json.failureReason || 'Unknown failure'}}"
+            },
+            {
+              "name": "messageId",
+              "value": "={{$json.messageId || ''}}"
+            },
+            {
+              "name": "loggedAt",
+              "value": "={{$now}}"
+            }
+          ]
+        }
+      },
+      "id": "set-dead-letter-generic",
+      "name": "Build Dead Letter Entry",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        810,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{$env.JOIN_BASE_URL + 'dead_letters/' + Date.now() + '.json'}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}"
+      },
+      "id": "http-dead-letter",
+      "name": "Write Dead Letter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        420
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Sample Email Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Sample Email Input": {
+      "main": [
+        [
+          {
+            "node": "Compute Daily Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Daily Limit": {
+      "main": [
+        [
+          {
+            "node": "If Daily Limit Reached",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Daily Limit Reached": {
+      "main": [
+        [
+          {
+            "node": "Build Dead Letter (Quota)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Gemini Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dead Letter (Quota)": {
+      "main": [
+        [
+          {
+            "node": "Write Dead Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Gemini Prompt": {
+      "main": [
+        [
+          {
+            "node": "Gemini Generate Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Generate Content": {
+      "main": [
+        [
+          {
+            "node": "Parse Gemini JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Gemini JSON": {
+      "main": [
+        [
+          {
+            "node": "Validate Gemini Payload Schema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Gemini Payload Schema": {
+      "main": [
+        [
+          {
+            "node": "If Schema Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Schema Valid": {
+      "main": [
+        [
+          {
+            "node": "Map Join Task Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Dead Letter Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Join Task Payload": {
+      "main": [
+        [
+          {
+            "node": "Persist Task to Firebase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dead Letter Entry": {
+      "main": [
+        [
+          {
+            "node": "Write Dead Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "join-email-to-ticket-main-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "join-email-to-ticket-main-v1",
+  "tags": []
+}

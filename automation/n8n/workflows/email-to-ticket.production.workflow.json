@@ -1,0 +1,450 @@
+{
+  "name": "Join - Email to Ticket (Gemini) - Production",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "email-trigger-imap",
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        -1180,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json || {};\nconst normalizeString = (value) => (typeof value === 'string' ? value.trim() : '');\nconst normalizeEmail = (value) => normalizeString(value).toLowerCase();\n\nlet fromName = '';\nlet fromEmail = '';\n\nif (Array.isArray(input.from) && input.from[0] && typeof input.from[0] === 'object') {\n  fromName = normalizeString(input.from[0].name || '');\n  fromEmail = normalizeEmail(input.from[0].address || '');\n} else if (input.from && typeof input.from === 'object') {\n  fromName = normalizeString(input.from.name || '');\n  fromEmail = normalizeEmail(input.from.address || input.from.email || '');\n} else if (typeof input.from === 'string') {\n  const rawFrom = input.from;\n  const match = rawFrom.match(/^(.*)<([^>]+)>$/);\n  if (match) {\n    fromName = normalizeString(match[1].replace(/\\\"/g, ''));\n    fromEmail = normalizeEmail(match[2]);\n  } else {\n    fromEmail = normalizeEmail(rawFrom);\n  }\n}\n\nconst subject = normalizeString(input.subject || input?.headers?.subject || '');\nconst plainTextBody = normalizeString(\n  input.text ||\n  input.textPlain ||\n  input.plainTextBody ||\n  input.body ||\n  input.html ||\n  ''\n);\nconst messageId = normalizeString(\n  input.messageId || input?.headers?.['message-id'] || ''\n);\n\nreturn [{\n  json: {\n    ...input,\n    messageId,\n    subject,\n    plainTextBody,\n    fromName,\n    fromEmail\n  }\n}];"
+      },
+      "id": "code-normalize-email",
+      "name": "Normalize Incoming Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -940,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json || {};\nconst timeZone = $env.N8N_TZ || 'Europe/Berlin';\nconst berlinDate = new Date().toLocaleDateString('sv-SE', { timeZone });\nconst dailyKey = `email-ai:${berlinDate}`;\nconst dailyLimit = 10;\n\nconst staticData = getWorkflowStaticData('global');\nif (!staticData.emailAiCounters || typeof staticData.emailAiCounters !== 'object') {\n  staticData.emailAiCounters = {};\n}\n\nconst rawCount = Number(staticData.emailAiCounters[dailyKey] || 0);\nconst dailyCount = Number.isFinite(rawCount) ? rawCount : 0;\n\nreturn [{\n  json: {\n    ...input,\n    dailyKey,\n    dailyLimit,\n    dailyCount,\n    limitReached: dailyCount >= dailyLimit\n  }\n}];"
+      },
+      "id": "code-daily-limit",
+      "name": "Load Persistent Daily Counter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -700,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.limitReached}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-limit-reached",
+      "name": "If Daily Limit Reached",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "failureClass",
+              "value": "quota"
+            },
+            {
+              "name": "failureReason",
+              "value": "Daily limit reached (>= 10)."
+            },
+            {
+              "name": "messageId",
+              "value": "={{$json.messageId || ''}}"
+            },
+            {
+              "name": "loggedAt",
+              "value": "={{$now}}"
+            }
+          ]
+        }
+      },
+      "id": "set-dead-letter-quota",
+      "name": "Build Dead Letter (Quota)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        -220,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json || {};\nconst staticData = getWorkflowStaticData('global');\nif (!staticData.emailAiCounters || typeof staticData.emailAiCounters !== 'object') {\n  staticData.emailAiCounters = {};\n}\n\nconst dailyKey = String(input.dailyKey || '');\nif (dailyKey === '') {\n  throw new Error('Missing dailyKey for persistent counter increment.');\n}\n\nconst nextCount = Number(staticData.emailAiCounters[dailyKey] || 0) + 1;\nstaticData.emailAiCounters[dailyKey] = nextCount;\n\nreturn [{\n  json: {\n    ...input,\n    dailyCountAfterIncrement: nextCount\n  }\n}];"
+      },
+      "id": "code-increment-counter",
+      "name": "Increment Persistent Counter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "geminiPrompt",
+              "value": "You are a strict extraction service. Return only valid JSON with keys: title, label, creatorName, creatorEmail, priority, description. label must be one of [User Story, Technical Task]. priority must be one of [low, medium, urgent].\\n\\nEmail subject: {{$json.subject}}\\nEmail body: {{$json.plainTextBody}}\\nSender name: {{$json.fromName}}\\nSender email: {{$json.fromEmail}}"
+            }
+          ]
+        }
+      },
+      "id": "set-gemini-prompt",
+      "name": "Build Gemini Prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        20,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{$env.GEMINI_MODEL}}:generateContent?key={{$env.GEMINI_API_KEY}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"contents\":[{\"parts\":[{\"text\": $json.geminiPrompt }]}]}"
+      },
+      "id": "http-gemini",
+      "name": "Gemini Generate Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        280
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst rawText = response?.candidates?.[0]?.content?.parts?.[0]?.text || response?.text || '';\nlet parsed;\ntry {\n  parsed = JSON.parse(rawText);\n} catch (error) {\n  return [{\n    json: {\n      parseError: true,\n      failureClass: 'validation',\n      failureReason: `Gemini response is not valid JSON: ${error.message}`,\n      rawGeminiText: rawText\n    }\n  }];\n}\nreturn [{ json: { parseError: false, geminiPayload: parsed, rawGeminiText: rawText } }];"
+      },
+      "id": "code-parse-gemini",
+      "name": "Parse Gemini JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nif (item.parseError === true) {\n  return [{ json: { ...item, schemaValid: false } }];\n}\n\nconst payload = item.geminiPayload && typeof item.geminiPayload === 'object' ? item.geminiPayload : {};\nconst normalized = {\n  title: typeof payload.title === 'string' ? payload.title.trim() : '',\n  label: typeof payload.label === 'string' ? payload.label.trim() : '',\n  creatorName: typeof payload.creatorName === 'string' ? payload.creatorName.trim() : '',\n  creatorEmail: typeof payload.creatorEmail === 'string' ? payload.creatorEmail.trim().toLowerCase() : '',\n  priority: typeof payload.priority === 'string' ? payload.priority.trim().toLowerCase() : '',\n  description: typeof payload.description === 'string' ? payload.description.trim() : ''\n};\n\nconst errors = [];\nconst allowedLabels = ['User Story', 'Technical Task'];\nconst allowedPriorities = ['low', 'medium', 'urgent'];\n\nif (normalized.title.length < 3 || normalized.title.length > 120) errors.push('title must be 3..120 chars');\nif (!allowedLabels.includes(normalized.label)) errors.push('label invalid');\nif (normalized.creatorName.length < 2 || normalized.creatorName.length > 120) errors.push('creatorName must be 2..120 chars');\nif (!/^[^\\\\s@]+@[^\\\\s@]+\\\\.[^\\\\s@]+$/.test(normalized.creatorEmail)) errors.push('creatorEmail invalid');\nif (!allowedPriorities.includes(normalized.priority)) errors.push('priority invalid');\nif (normalized.description.length < 3 || normalized.description.length > 2000) errors.push('description must be 3..2000 chars');\n\nreturn [{\n  json: {\n    ...item,\n    geminiPayload: normalized,\n    schemaValid: errors.length === 0,\n    schemaErrors: errors,\n    failureClass: errors.length === 0 ? '' : 'validation',\n    failureReason: errors.length === 0 ? '' : errors.join(' | ')\n  }\n}];"
+      },
+      "id": "code-validate-schema",
+      "name": "Validate Gemini Payload Schema",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.schemaValid}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-schema-valid",
+      "name": "If Schema Valid",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        980,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst payload = item.geminiPayload;\nconst category = $env.JOIN_EMAIL_TASK_CATEGORY || 'category-4';\nconst taskId = Date.now();\nconst task = {\n  id: taskId,\n  type: payload.label,\n  title: payload.title,\n  description: payload.description,\n  subtasks: [],\n  assignedTo: [],\n  category,\n  priority: payload.priority,\n  dueDate: '',\n  images: [],\n  source: 'email-ai',\n  aiGenerated: true,\n  externalCreatorName: payload.creatorName,\n  externalCreatorEmail: payload.creatorEmail,\n  createdAt: new Date().toISOString()\n};\nreturn [{ json: { ...item, task } }];"
+      },
+      "id": "code-map-task",
+      "name": "Map Join Task Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{$env.JOIN_BASE_URL + $env.JOIN_FIREBASE_TASKS_ID + '/' + $json.task.id + '.json'}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json.task}}"
+      },
+      "id": "http-upsert-task",
+      "name": "Persist Task to Firebase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "failureClass",
+              "value": "={{$json.failureClass || 'validation'}}"
+            },
+            {
+              "name": "failureReason",
+              "value": "={{$json.failureReason || 'Unknown failure'}}"
+            },
+            {
+              "name": "messageId",
+              "value": "={{$json.messageId || ''}}"
+            },
+            {
+              "name": "loggedAt",
+              "value": "={{$now}}"
+            }
+          ]
+        }
+      },
+      "id": "set-dead-letter-generic",
+      "name": "Build Dead Letter Entry",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        1220,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{$env.JOIN_BASE_URL + 'dead_letters/' + Date.now() + '.json'}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}"
+      },
+      "id": "http-dead-letter",
+      "name": "Write Dead Letter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        420
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    }
+  ],
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Incoming Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Incoming Email": {
+      "main": [
+        [
+          {
+            "node": "Load Persistent Daily Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Persistent Daily Counter": {
+      "main": [
+        [
+          {
+            "node": "If Daily Limit Reached",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Daily Limit Reached": {
+      "main": [
+        [
+          {
+            "node": "Build Dead Letter (Quota)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Increment Persistent Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dead Letter (Quota)": {
+      "main": [
+        [
+          {
+            "node": "Write Dead Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Persistent Counter": {
+      "main": [
+        [
+          {
+            "node": "Build Gemini Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Gemini Prompt": {
+      "main": [
+        [
+          {
+            "node": "Gemini Generate Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Generate Content": {
+      "main": [
+        [
+          {
+            "node": "Parse Gemini JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Gemini JSON": {
+      "main": [
+        [
+          {
+            "node": "Validate Gemini Payload Schema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Gemini Payload Schema": {
+      "main": [
+        [
+          {
+            "node": "If Schema Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Schema Valid": {
+      "main": [
+        [
+          {
+            "node": "Map Join Task Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Dead Letter Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Join Task Payload": {
+      "main": [
+        [
+          {
+            "node": "Persist Task to Firebase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dead Letter Entry": {
+      "main": [
+        [
+          {
+            "node": "Write Dead Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "join-email-to-ticket-production-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "join-email-to-ticket-production-v1",
+  "tags": []
+}

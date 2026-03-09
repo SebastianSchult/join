@@ -5,6 +5,13 @@ let globalCapitalizedName;
 let dayTime;
 let mobileGreetingTimeoutId = null;
 let summaryTasks = [];
+const SUMMARY_CATEGORY_TO_AMOUNT_ID = Object.freeze({
+    'category-0': 'amountTodo',
+    'category-1': 'amountInProgress',
+    'category-2': 'amountAwaitFeedback',
+    'category-3': 'amountDone',
+    'category-4': 'amountEmailTasks',
+});
 
 
 /**
@@ -113,40 +120,65 @@ function getDate() {
 
 
 /**
- * Loads the amounts of tasks in each category and calls function to display them.
- * @param {array} categories - An array of category names.
- * @param {array} categoriesAmounts - An array of category amounts.                                 
+ * Loads and renders summary counts from category-grouped task totals.
  */
 function loadAmounts() {
-    let categories = ['category-0', 'category-1', 'category-2', 'category-3'];
-    let categoriesAmounts = [0, 0, 0, 0];
-
-    for (let i = 0; i < categories.length; i++) {
-        let category = categories[i];
-        let filteredTasks = filterSummaryTasks(summaryTasks, category);
-        categoriesAmounts[i] = filteredTasks.length;
-    }
-    showAmounts(categoriesAmounts);
+    const categoryAmounts = countSummaryTasksByCategory(summaryTasks);
+    showAmounts(categoryAmounts);
 }
 
 
 /**
- * Updates the HTML elements with the amounts from the categoriesAmounts array.
- * @param {array} categoriesAmounts - An array of category amounts to be displayed.
+ * Counts tasks per category for all recognized board category keys.
+ *
+ * @param {Array<Object>} tasksToCount - Task list.
+ * @returns {Object<string, number>} Category totals keyed by category id.
  */
-function showAmounts(categoriesAmounts) {
-    let amountTodo = document.getElementById("amountTodo");
-    let amountInProgress = document.getElementById("amountInProgress");
-    let amountAwaitFeedback = document.getElementById("amountAwaitFeedback");
-    let amountDone = document.getElementById("amountDone");
-    let amountAllBoardTasks = document.getElementById("amountAllBoardTasks");
+function countSummaryTasksByCategory(tasksToCount) {
+    const counts = {};
+    const sourceTasks = Array.isArray(tasksToCount) ? tasksToCount : [];
+    sourceTasks.forEach((task) => {
+        if (!task || typeof task.category !== 'string') {
+            return;
+        }
+        const normalizedCategory = task.category.trim();
+        if (!/^category-\d+$/.test(normalizedCategory)) {
+            return;
+        }
 
-    amountTodo.innerHTML = categoriesAmounts[0];
+        if (!Object.prototype.hasOwnProperty.call(counts, normalizedCategory)) {
+            counts[normalizedCategory] = 0;
+        }
+        counts[normalizedCategory] += 1;
+    });
+    return counts;
+}
 
-    amountInProgress.innerHTML = categoriesAmounts[1];
-    amountAwaitFeedback.innerHTML = categoriesAmounts[2];
-    amountDone.innerHTML = categoriesAmounts[3];
-    amountAllBoardTasks.innerHTML = categoriesAmounts[0] + categoriesAmounts[1] + categoriesAmounts[2] + categoriesAmounts[3];
+/**
+ * Updates summary widgets based on category totals.
+ *
+ * @param {Object<string, number>} categoryAmounts - Category totals keyed by category id.
+ */
+function showAmounts(categoryAmounts) {
+    const normalizedAmounts = categoryAmounts && typeof categoryAmounts === 'object' ? categoryAmounts : {};
+    Object.keys(SUMMARY_CATEGORY_TO_AMOUNT_ID).forEach((categoryKey) => {
+        const elementId = SUMMARY_CATEGORY_TO_AMOUNT_ID[categoryKey];
+        const targetElement = document.getElementById(elementId);
+        if (!targetElement) {
+            return;
+        }
+        const amount = Number(normalizedAmounts[categoryKey] || 0);
+        targetElement.innerHTML = amount;
+    });
+
+    const amountAllBoardTasks = document.getElementById("amountAllBoardTasks");
+    if (!amountAllBoardTasks) {
+        return;
+    }
+    amountAllBoardTasks.innerHTML = Object.values(normalizedAmounts).reduce(
+        (sum, current) => sum + Number(current || 0),
+        0
+    );
 }
 
 
@@ -157,7 +189,13 @@ function getUrgentTasks() {
     let urgentTasks = [];
     for (let i = 0; i < summaryTasks.length; i++) {
         let task = summaryTasks[i];
-        if (task.priority === 'urgent' && (task.category === 'category-0' || task.category === 'category-1' || task.category === 'category-2')) {
+        if (
+            task &&
+            task.priority === 'urgent' &&
+            typeof task.category === 'string' &&
+            /^category-\d+$/.test(task.category) &&
+            task.category !== 'category-3'
+        ) {
             urgentTasks.push(task);
         }
     }

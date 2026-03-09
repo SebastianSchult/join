@@ -12,6 +12,7 @@
     "lint:inline-events": "node scripts/check_inline_event_handlers.cjs",
     "lint:blank-target-rel": "node scripts/check_blank_target_rel.cjs",
     "lint:ui-tokens": "node scripts/check_ui_tokens_alignment.cjs",
+    "test:n8n-email-ticket": "node scripts/test_n8n_email_ticket_schema.cjs",
     "lint": "npm run lint:templates && npm run lint:inline-events && npm run lint:blank-target-rel && npm run lint:issue-triage && npm run lint:ui-tokens && npm run lint:css && npm run lint:file-size && npm run lint:jsdoc && npm run lint:js",
     "a11y:ci": "lhci autorun --config=./lighthouserc.cjs",
     "a11y:report": "node scripts/summarize_lighthouse_accessibility.cjs",

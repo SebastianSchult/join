@@ -1,0 +1,8 @@
+{
+  "title": "Fix duplicate contacts after edit",
+  "label": "Technical Task",
+  "creatorName": "Claudia Baer",
+  "creatorEmail": "claudia.baer@example.com",
+  "priority": "urgent",
+  "description": "Editing an existing contact can create a duplicate record instead of updating the same contact. Investigate and fix the update path."
+}
